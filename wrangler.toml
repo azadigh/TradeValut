@@ -1,0 +1,22 @@
+name = "trading-dashboard"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "trading-dashboard-db"
+database_id = "YOUR_D1_DATABASE_ID"  # Replace after: wrangler d1 create trading-dashboard-db
+
+# KV Namespace binding (for sessions)
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_KV_NAMESPACE_ID"  # Replace after: wrangler kv namespace create SESSIONS
+
+# Environment variables
+[vars]
+JWT_SECRET = "change-this-to-a-random-secret"
+
+# Static assets (serves public/ directory)
+[site]
+bucket = "./public"
