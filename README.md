@@ -10,8 +10,7 @@ A modern, full-featured trading journal & analytics dashboard with real-time cha
 [![D1 Database](https://img.shields.io/badge/D1-Database-0052CC?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 <br>
-**[فارسی](README_fa.md) | [English](README.md)**
-
+**[فارسی](README_FA.md) | [English](README.md)**
 </div>
 
 ---
