@@ -323,10 +323,6 @@ MIT License — free for personal and commercial use.
 
 ---
 
-<br>
-
----
-
 <div align="center">
 
 # 💛 Donate / حمایت مالی
