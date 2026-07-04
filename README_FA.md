@@ -112,30 +112,25 @@
 
 <div align="center">
 
-# 💛 حمایت مالی
+# 💛 Donate / حمایت مالی
 
-اگر تریدولت به معاملات شما کمک می‌کند، از حمایت شما سپاسگزاریم.
+If TradeVault helps your trading, consider supporting development.
 
 </div>
 
-### کیف پول‌های ارز دیجیتال
+### 💎 Crypto Wallets / کیف پول‌های ارز دیجیتال
 
-| ارز | آدرس |
-|-----|-------|
-| **بیت‌کوین (BTC)** | `bc1q9h6x3f5k8v2n7y4m6p3q8r2t5w9x1z4d6f8g0` |
-| **اتریوم (ETH)** | `0x7A3b4F5c6D7e8F9a0B1c2D3e4F5a6B7c8D9e0F1a` |
-| **تیتر (TRC20)** | `TQm5k8v2n7y4m6p3q8r2t5w9x1z4d6f8g0` |
-| **تیتر (BEP20)** | `0x7A3b4F5c6D7e8F9a0B1c2D3e4F5a6B7c8D9e0F1a` |
-| **سولانا (SOL)** | `7A3b4F5c6D7e8F9a0B1c2D3e4F5a6B7c8D9e0F1a` |
+| Currency | Address |
+|----------|---------|
+| **BTC** | `bc1q580tzk2h9277mk6waepl4unuvpdwlzlj9cvx6c` |
+| **ETH** | `0x59947E23B37778722efC7afF7D5f19D71B4FE703` |
+| **USDT (TRC20)** | `TRBMdyWNfDja5NMcKQQTK5nFRjjV5tRDXE` |
+| **USDT (BEP20)** | `0x59947E23B37778722efC7afF7D5f19D71B4FE703` |
+| **SOL** | `7CUoigTM2nfzFXchzmwWZ53xgdKMS29HzUQqwpj8vNBg` |
 
-> ⚠️ لطفاً قبل از انتشار در گیت‌هاب، آدرس‌های بالا را با آدرس‌های واقعی خود جایگزین کنید.
 
-<br>
-
-<div align="center">
-
-**ساخته شده با 💙 برای معامله‌گران سراسر جهان**
 
 [⬆ بازگشت به بالا](#-tradevault)
 
 </div>
+
