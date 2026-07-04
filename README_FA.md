@@ -2,7 +2,7 @@
 
 # 📊 تریدولت — TradeVault
 
-### لبه معاملاتی شما، کمی‌سازی شده
+###دستیار معاملاتی شما، کمی‌سازی شده
 
 یک داشبورد مدرن و کامل برای ژورنال معاملات و تحلیل‌ها با نمودارهای زنده، ردیابی سود و زیان، مدیریت استراتژی و یکپادگی TradingView
 
@@ -84,96 +84,6 @@
 
 ---
 
-## 🚀 استقرار
-
-تریدولت را می‌توان به **3 روش** مستقر کرد:
-
-### روش الف: داشبورد Cloudflare (توصیه شده — بدون نیاز به ابزار)
-
-#### مرحله 1: ایجاد دیتابیس D1
-1. به [داشبورد Cloudflare](https://dash.cloudflare.com) بروید
-2. **Workers & Pages** → **D1** → **Create database**
-3. نام: `tradevault-db` → **Create**
-
-#### مرحله 2: ایجاد KV Namespace
-1. **Workers & Pages** → **KV** → **Create namespace**
-2. نام: `SESSIONS` → **Add**
-
-#### مرحله 3: ایجاد Worker
-1. **Workers & Pages** → **Create application** → **Create Worker**
-2. نام: `tradevault` → **Deploy**
-3. روی **Edit code** کلیک کنید
-
-#### مرحله 4: جای‌گذاری کد
-1. همه چیز را در ویرایشگر پاک کنید
-2. فایل `trading-dashboard-worker.js` را باز کنید
-3. همه محتوا را کپی کرده و در ویرایشگر جای‌گذاری کنید
-4. **Save and deploy** را کلیک کنید
-
-#### مرحله 5: افزودن متغیر محیطی
-1. به Worker → **Settings** → **Variables** بروید
-2. **Add variable**:
-   - Name: `PASSWORD`
-   - Value: `رمز-عبور-شما`
-   - Type: **Plaintext**
-3. **Save and deploy**
-
-#### مرحله 6: اتصال D1
-1. به Worker → **Settings** → **Bindings** بروید
-2. **Add binding** → **D1 database**:
-   - Variable name: `DB`
-   - Database: `tradevault-db`
-3. **Save and deploy**
-
-#### مرحله 7: اتصال KV
-1. در همان **Bindings**
-2. **Add binding** → **KV namespace**:
-   - Variable name: `SESSIONS`
-   - Namespace: `SESSIONS`
-3. **Save and deploy**
-
-#### مرحله 8: تمام! 🎉
-- به `https://tradevault.<your-subdomain>.workers.dev` بروید
-- رمز عبور را وارد کنید → ورود
-- شروع به ثبت معاملات کنید!
-
----
-
-### روش ب: Cloudflare Wrangler (خط فرمان)
-
-```bash
-npm install -g wrangler
-wrangler login
-
-git clone https://github.com/YOUR_USERNAME/tradevault.git
-cd tradevault
-
-wrangler d1 create tradevault-db
-# آیدی دیتابیس را در wrangler.toml کپی کنید
-
-wrangler kv namespace create SESSIONS
-# آیدی را در wrangler.toml کپی کنید
-
-wrangler d1 execute tradevault-db --file=./schema.sql
-
-echo "PASSWORD=your-password" > .dev.vars
-
-wrangler dev    # اجرای محلی
-wrangler deploy # استقرار در پروداکشن
-```
-
----
-
-### روش ج: فایل محلی (بدون سرور)
-
-1. `trading-dashboard-local.html` را دانلود کنید
-2. در هر مرورگری باز کنید (کروم، فایرفاکس، سافاری، اج)
-3. همه داده‌ها در localStorage مرورگر ذخیره می‌شوند
-4. آفلاین کار می‌کند — بدون نیاز به اینترنت (به جز نمودار TradingView)
-5. قبل از پاک کردن حافظه مرورگر، از **Backup All** برای خروجی داده‌ها استفاده کنید
-
----
-
 ## 📋 حداقل‌ها
 
 ### نسخه Cloudflare Worker
@@ -186,20 +96,6 @@ wrangler deploy # استقرار در پروداکشن
 - هر مرورگر مدرن
 - بدون نیاز به نصب
 
----
-
-## 🛠️ تکنولوژی‌ها
-
-| لایه | تکنولوژی |
-|------|----------|
-| فرانت‌اند | یک فایل HTML — فونت‌های Inter + JetBrains Mono، جاوااسکریپت خالص، CSS variables |
-| بک‌اند | Cloudflare Workers (اجرا در لبه) |
-| دیتابیس | Cloudflare D1 (SQLite) |
-| سشن‌ها | Cloudflare KV |
-| نمودارها | TradingView Advanced Chart Widget |
-| آیکون‌ها | SVG درون‌خطی (بدون وابستگی) |
-
----
 
 ## 🧪 تست شده
 - ✅ 10,000 معامله — ژورنال در 172ms رندر می‌شود، تحلیل‌ها در 414ms
