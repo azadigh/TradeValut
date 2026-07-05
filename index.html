@@ -625,7 +625,7 @@ input, select, textarea { font-family: inherit; }
 .review-notes:focus { outline: none; border-color: var(--border-accent); }
 
 /* =========================================================================
-   SETUPS PANEL
+   OPPORTUNITIES PANEL
    ========================================================================= */
 .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 90; }
 .backdrop.active { opacity: 1; pointer-events: auto; }
@@ -1012,6 +1012,291 @@ input, select, textarea { font-family: inherit; }
 .tc-custom { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .tc-custom-item { font-size: 11px; color: var(--text-2); }
 .tc-custom-lbl { font-size: 9px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; }
+
+/* =========================================================================
+   STRATEGY CARDS — beautiful redesign
+   ========================================================================= */
+.strategy-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  position: relative;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.strategy-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 14px 32px -14px rgba(0,0,0,.22);
+  transform: translateY(-2px);
+}
+.strat-card-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-h) 100%);
+}
+.strat-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px 12px;
+}
+.strat-card-num {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--accent-dim);
+  color: var(--accent-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-accent);
+  letter-spacing: -.02em;
+}
+.strat-card-title-block { flex: 1; min-width: 0; }
+.strat-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.strat-card-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.strat-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.strat-meta-chip svg { width: 10px; height: 10px; stroke-width: 2.5; }
+.strat-meta-chip.has-value {
+  color: var(--accent-h);
+  border-color: var(--border-accent);
+  background: var(--accent-dim);
+}
+.strat-card-delete {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.strat-card-delete:hover {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.strat-card-delete svg { width: 14px; height: 14px; stroke-width: 2.2; }
+.strat-card-body { padding: 0 18px 14px; display: flex; flex-direction: column; gap: 14px; }
+.strat-section { display: flex; flex-direction: column; gap: 8px; }
+.strat-section-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.strat-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.strat-progress {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-h);
+  font-family: var(--font-mono);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.strat-progress.complete {
+  color: var(--success);
+  background: rgba(34,197,94,.12);
+  border-color: rgba(34,197,94,.35);
+}
+.strat-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.strat-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.strat-check-item:hover {
+  border-color: var(--border-accent);
+  background: var(--surface);
+}
+.strat-check-box {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--text-3);
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  position: relative;
+}
+.strat-check-item:hover .strat-check-box { border-color: var(--accent-h); }
+.strat-check-item.checked .strat-check-box {
+  background: var(--success);
+  border-color: var(--success);
+}
+.strat-check-item.checked .strat-check-box::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(-45deg) translate(0, -1px);
+}
+.strat-check-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.strat-check-item.checked .strat-check-text {
+  text-decoration: line-through;
+  color: var(--text-3);
+}
+.strat-notes {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.6;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+}
+.strat-notes.md-content > *:first-child { margin-top: 0; }
+.strat-notes.md-content > *:last-child { margin-bottom: 0; }
+.strat-video-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-h);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.strat-video-link:hover { text-decoration: underline; }
+.strat-video-embed {
+  position: relative;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding-top: 56.25%;
+}
+.strat-video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.strat-card-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.strat-created {
+  font-size: 10px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  letter-spacing: .04em;
+}
+.strat-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-h);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* =========================================================================
+   OPPORTUNITY THUMBNAIL (inline image preview)
+   ========================================================================= */
+.opp-thumb {
+  margin-top: 6px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  background: var(--surface-2);
+  transition: all .15s;
+}
+.opp-thumb:hover { border-color: var(--border-accent); }
+.opp-thumb img {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+}
+.opp-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.45) 0%, transparent 50%);
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 9px;
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+.opp-thumb:hover .opp-thumb-overlay { opacity: 1; }
+.opp-thumb-overlay span {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.opp-thumb-overlay svg { width: 11px; height: 11px; }
 </style>
 </head>
 <body>
@@ -1041,7 +1326,7 @@ input, select, textarea { font-family: inherit; }
   </button>
   <button class="nav-btn" onclick="openPanel()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    <span class="nav-tip">Setups</span>
+    <span class="nav-tip">Opportunities</span>
   </button>
   <div class="nav-spacer"></div>
   <button class="nav-btn" onclick="backupAll()">
@@ -1308,16 +1593,16 @@ input, select, textarea { font-family: inherit; }
 <!-- BACKDROP -->
 <div class="backdrop" id="backdrop"></div>
 
-<!-- SETUPS PANEL -->
+<!-- OPPORTUNITIES PANEL -->
 <aside class="panel" id="panel">
-  <div class="panel-header"><h2>New Setup</h2><button class="icon-btn" id="closeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+  <div class="panel-header"><h2>New Opportunity</h2><button class="icon-btn" id="closeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
   <form class="form-section" id="oppForm" onsubmit="saveOpportunity(event)">
     <div class="form-row"><div class="form-grp"><input type="text" id="input_symbol" class="mono" placeholder="SYMBOL (e.g. XAUUSD)" required autocomplete="off"></div><button type="submit" class="tbtn primary">Save</button></div>
     <div class="tag-selector" id="tagSelector"><button type="button" class="tag-btn active" data-tag="long">Long</button><button type="button" class="tag-btn" data-tag="short">Short</button><button type="button" class="tag-btn" data-tag="watch">Watch</button></div>
     <div class="form-row"><div class="form-grp"><input type="text" id="input_note" placeholder="Price note..." autocomplete="off"></div></div>
     <div class="form-row"><div class="form-grp"><input type="url" id="input_pic" placeholder="Image URL..." autocomplete="off"></div></div>
   </form>
-  <div class="list-header"><span>Saved Setups</span><span id="setupCount">0</span></div>
+  <div class="list-header"><span>Saved Opportunities</span><span id="setupCount">0</span></div>
   <div class="list-area" id="oppListContainer"></div>
   <div class="panel-stats"><div class="ps-item"><div class="ps-val" id="sfTotal">0</div><div class="ps-lbl">Total</div></div><div class="ps-item"><div class="ps-val" id="sfToday">0</div><div class="ps-lbl">Today</div></div><div class="ps-item"><div class="ps-val" id="sfTop" style="font-size:13px;">—</div><div class="ps-lbl">Top Symbol</div></div></div>
 </aside>
@@ -1327,7 +1612,7 @@ input, select, textarea { font-family: inherit; }
   <div class="modal">
     <button class="modal-close" onclick="closeAccountModal()">&times;</button>
     <h3>Manage Accounts</h3>
-    <p style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Each account has its own trades and setups.</p>
+    <p style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Each account has its own trades and opportunities.</p>
     <div class="account-list" id="accountList"></div>
     <div class="modal-input-row"><input type="text" class="modal-input" id="newAccountName" placeholder="New account name..."><button class="modal-add-btn" onclick="addAccount()">Add</button></div>
   </div>
@@ -1356,7 +1641,7 @@ input, select, textarea { font-family: inherit; }
 <script>
 const defaultSymbol = 'OANDA:XAUUSD';
 let currentTag='long', activeFilter='all', searchQuery='', editingId=null;
-let currentChartSymbol=defaultSymbol, currentAccountId=null;
+let currentChartSymbol = (function(){ try { const s = localStorage.getItem('last_chart_symbol'); return s || defaultSymbol; } catch(e) { return defaultSymbol; } })(), currentAccountId=null;
 let currentRating=0, currentTags=[];
 let tradeSearchQuery='', tradeFilters={symbol:'',status:'',direction:'',session:'',dateFrom:'',dateTo:''};
 let calCurrentMonth=new Date(), editingTradeId=null;
@@ -1371,7 +1656,7 @@ function str(v, max) { max = max || 10000; return (typeof v === 'string') ? v.tr
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  initAccounts(); loadChart(defaultSymbol);
+  initAccounts(); loadChart(currentChartSymbol);
   renderOpportunities(); renderQuickChips(); renderTrades();
   updateStats(); updateJournalStats(); renderEquityCurve();
   [bindEvents, bindJournalEvents, bindFilterEvents, bindStarRating,
@@ -1435,19 +1720,25 @@ function togglePanel() { $('panel').classList.contains('open') ? closePanel() : 
 function openPanel() { $('panel').classList.add('open'); $('backdrop').classList.add('active'); }
 function closePanel() { $('panel').classList.remove('open'); $('backdrop').classList.remove('active'); }
 
-let showTVWatchlist = true;
+let showTVWatchlist = (function(){ try { return localStorage.getItem('tv_wl_visible') !== 'false'; } catch(e) { return true; } })();
 
 function loadChart(symbol) {
+  if (!symbol) symbol = defaultSymbol;
   currentChartSymbol = symbol;
+  try { localStorage.setItem('last_chart_symbol', symbol); } catch(e) {}
   const c = $('tv_chart_container'); c.innerHTML = '';
   const w = document.createElement('div'); w.className = 'tradingview-widget-container'; w.style.height = w.style.width = '100%';
   const d = document.createElement('div'); d.className = 'tradingview-widget-container__widget'; d.style.height = d.style.width = '100%';
   const s = document.createElement('script'); s.type = 'text/javascript'; s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js?v=' + Date.now(); s.async = true;
-  // Build watchlist from our watchlist + current symbol
-  const wlList = getWatchlist() || []; const wlSyms = wlList.map(sym => getFullSymbol(sym));
+  // Build watchlist from our watchlist + current symbol — ALWAYS pass the full list
+  const wlList = getWatchlist() || []; let wlSyms = wlList.map(sym => getFullSymbol(sym));
   if (!wlSyms.includes(symbol)) wlSyms.unshift(symbol);
-  s.text = JSON.stringify({ allow_symbol_change:true, calendar:false, details:false, hide_side_toolbar:!showTVWatchlist, hide_top_toolbar:false, hide_legend:false, hide_volume:false, hotlist:false, interval:'15', locale:'en', save_image:true, style:'1', symbol:symbol, theme:currentTheme, timezone:'Asia/Tehran', backgroundColor: currentTheme==='dark'?'rgba(10,14,26,1)':'rgba(255,255,255,1)', gridColor: currentTheme==='dark'?'rgba(255,255,255,0.04)':'rgba(15,23,42,0.06)', watchlist: wlSyms.length > 1 ? wlSyms : [symbol], withdateranges:false, compareSymbols:[], studies:['STD;RSI'], autosize:true });
+  // De-duplicate while preserving order
+  wlSyms = wlSyms.filter((v, i, a) => a.indexOf(v) === i);
+  s.text = JSON.stringify({ allow_symbol_change:true, calendar:false, details:false, hide_side_toolbar:!showTVWatchlist, hide_top_toolbar:false, hide_legend:false, hide_volume:false, hotlist:false, interval:'15', locale:'en', save_image:true, style:'1', symbol:symbol, theme:currentTheme, timezone:'Asia/Tehran', backgroundColor: currentTheme==='dark'?'rgba(10,14,26,1)':'rgba(255,255,255,1)', gridColor: currentTheme==='dark'?'rgba(255,255,255,0.04)':'rgba(15,23,42,0.06)', watchlist: wlSyms, withdateranges:false, compareSymbols:[], studies:['STD;RSI'], autosize:true });
   w.appendChild(d); w.appendChild(s); c.appendChild(w); renderQuickChips(); renderWatchlist();
+  // Update TV sidebar toggle button color to reflect current state
+  const tvToggle = $('tvWlToggle'); if (tvToggle) tvToggle.style.color = showTVWatchlist ? 'var(--accent-h)' : 'var(--text-3)';
 }
 
 function saveOpportunity(event) {
@@ -1468,13 +1759,17 @@ function renderOpportunities() {
   if(searchQuery) opps = opps.filter(o => o.symbol.toLowerCase().includes(searchQuery) || (o.note&&o.note.toLowerCase().includes(searchQuery)));
   const total = getOpportunities().length;
   $('setupCount').textContent = opps.length+'/'+total;
-  if(opps.length===0) { c.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--text-3);font-size:12px;">'+(searchQuery||activeFilter!=='all'?'No matches.':'No setups yet.')+'</div>'; return; }
+  if(opps.length===0) { c.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--text-3);font-size:12px;">'+(searchQuery||activeFilter!=='all'?'No matches.':'No opportunities yet.')+'</div>'; return; }
   c.innerHTML = opps.map(opp => editingId===opp.id ? renderEditForm(opp) : renderItem(opp)).join('');
 }
 
 function renderItem(opp) {
   const tag = opp.tag || 'long';
-  return '<div class="opp-item" data-id="'+opp.id+'"><div class="opp-top"><span class="opp-symbol" onclick="loadChart(\''+escapeAttr(getFullSymbol(opp.symbol))+'\')">'+escapeHtml(opp.symbol)+'</span><span class="badge '+tag+'">'+tag+'</span><span class="opp-date">'+(opp.date||'')+'</span></div>'+(opp.note?'<div class="opp-note">'+escapeHtml(opp.note)+'</div>':'')+'<div class="opp-actions">'+(opp.picUrl?'<button class="icon-btn" onclick="openLightbox(\''+escapeAttr(opp.picUrl)+'\')" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button>':'')+'<button class="icon-btn" onclick="startEdit('+opp.id+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="icon-btn danger" onclick="deleteOpportunity('+opp.id+')" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>';
+  const picUrl = opp.picUrl || '';
+  // Safer click handler — use data-pic attribute to avoid any URL escaping issues
+  const thumbHtml = picUrl ? '<div class="opp-thumb" data-pic="'+escapeAttr(picUrl)+'" onclick="openLightbox(this.dataset.pic)" title="Click to enlarge"><img src="'+escapeHtml(picUrl)+'" alt="Chart" onerror="this.parentElement.style.display=\'none\'"><div class="opp-thumb-overlay"><span><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15 3h6v6\'/><path d=\'M9 21H3v-6\'/><path d=\'M21 3l-7 7\'/><path d=\'M3 21l7-7\'/></svg>Click to enlarge</span></div></div>' : '';
+  const viewBtn = picUrl ? '<button class="icon-btn" data-pic="'+escapeAttr(picUrl)+'" onclick="openLightbox(this.dataset.pic)" title="View image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button>' : '';
+  return '<div class="opp-item" data-id="'+opp.id+'"><div class="opp-top"><span class="opp-symbol" onclick="loadChart(\''+escapeAttr(getFullSymbol(opp.symbol))+'\')">'+escapeHtml(opp.symbol)+'</span><span class="badge '+tag+'">'+tag+'</span><span class="opp-date">'+(opp.date||'')+'</span></div>'+(opp.note?'<div class="opp-note">'+escapeHtml(opp.note)+'</div>':'')+thumbHtml+'<div class="opp-actions">'+viewBtn+'<button class="icon-btn" onclick="startEdit('+opp.id+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="icon-btn danger" onclick="deleteOpportunity('+opp.id+')" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>';
 }
 
 function renderEditForm(opp) {
@@ -1525,8 +1820,24 @@ function getFullSymbol(sym) {
 function escapeHtml(s) { if(s==null||s===undefined) return ''; return String(s).replace(/[&<>"'`\n\r]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','\n':' ','\r':''}[c])); }
 function escapeAttr(s) { if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\\/g,'\\\\'); }
 
-function openLightbox(url) { $('lightbox-img').src=url; $('lightbox').classList.add('active'); }
-function closeLightbox() { $('lightbox').classList.remove('active'); }
+function openLightbox(url) { 
+  if (!url) { showToast('No image to view'); return; }
+  const img = $('lightbox-img'); 
+  // Reset src first to clear any previous broken image
+  img.removeAttribute('src');
+  img.onerror = function() { 
+    img.onerror = null; 
+    img.alt = 'Failed to load image'; 
+    showToast('Image failed to load — check URL'); 
+  };
+  img.src = url; 
+  $('lightbox').classList.add('active'); 
+}
+function closeLightbox() { 
+  $('lightbox').classList.remove('active'); 
+  const img = $('lightbox-img');
+  if (img) { img.onerror = null; setTimeout(() => { if (!$('lightbox').classList.contains('active')) img.removeAttribute('src'); }, 300); }
+}
 
 function switchView(view) {
   $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
@@ -1699,7 +2010,7 @@ function restoreAll(event) {
   reader.onerror=()=>{showToast('Failed to read file');event.target.value='';};
   reader.readAsText(file);
 }
-function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; const accounts=getAccounts(); let tt=0,ts=0; accounts.forEach(a=>{try{const t=JSON.parse(localStorage.getItem('trading_journal_'+a.id)||'[]');if(Array.isArray(t))tt+=t.length; const s=JSON.parse(localStorage.getItem('trading_opportunities_'+a.id)||'[]');if(Array.isArray(s))ts+=s.length;}catch(e){}}); info.textContent=accounts.length+' accounts · '+tt+' trades · '+ts+' setups'; }
+function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; const accounts=getAccounts(); let tt=0,ts=0; accounts.forEach(a=>{try{const t=JSON.parse(localStorage.getItem('trading_journal_'+a.id)||'[]');if(Array.isArray(t))tt+=t.length; const s=JSON.parse(localStorage.getItem('trading_opportunities_'+a.id)||'[]');if(Array.isArray(s))ts+=s.length;}catch(e){}}); info.textContent=accounts.length+' accounts · '+tt+' trades · '+ts+' opportunities'; }
 
 function initAccounts() { let accounts=JSON.parse(localStorage.getItem('trading_accounts')||'[]'); if(accounts.length===0){accounts=[{id:'default',name:'Main Account',created:Date.now()}]; localStorage.setItem('trading_accounts',JSON.stringify(accounts));} currentAccountId=localStorage.getItem('current_account')||accounts[0].id; if(!accounts.find(a=>a.id===currentAccountId)) currentAccountId=accounts[0].id; renderAccountSelect(); }
 function getAccounts() { return JSON.parse(localStorage.getItem('trading_accounts')||'[]'); }
@@ -1866,24 +2177,131 @@ function renderStrategies() {
     c.innerHTML = '<div class="empty-state glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div class="e-title">No strategies yet</div><div class="e-sub">Create your first strategy on the left.</div></div>';
     return;
   }
-  c.innerHTML = strategies.map(s => renderStrategyCard(s)).join('');
+  c.innerHTML = strategies.map((s, i) => renderStrategyCard(s, i + 1)).join('');
 }
 
-function renderStrategyCard(s) {
+function getChecklistState(strategyId) {
+  try {
+    const key = 'strat_checklist_' + currentAccountId + '_' + strategyId;
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch(e) { return []; }
+}
+function setChecklistState(strategyId, items) {
+  try {
+    const key = 'strat_checklist_' + currentAccountId + '_' + strategyId;
+    localStorage.setItem(key, JSON.stringify(items));
+  } catch(e) {}
+}
+function toggleChecklistItem(strategyId, itemIdx) {
+  const state = getChecklistState(strategyId);
+  state[itemIdx] = !state[itemIdx];
+  setChecklistState(strategyId, state);
+  // Re-render only the affected card to preserve state
+  const strategies = getStrategies();
+  const idx = strategies.findIndex(s => s.id === strategyId);
+  if (idx === -1) return;
+  const card = document.querySelector('.strategy-card[data-id="' + strategyId + '"]');
+  if (card) {
+    const newHtml = renderStrategyCard(strategies[idx], idx + 1);
+    card.outerHTML = newHtml;
+  }
+}
+
+function renderStrategyCard(s, num) {
+  num = num || 0;
   const checklistItems = s.checklist ? s.checklist.split('\n').filter(l => l.trim()) : [];
+  const checklistState = getChecklistState(s.id);
+  const checkedCount = checklistItems.filter((_, i) => checklistState[i]).length;
+  const allChecked = checklistItems.length > 0 && checkedCount === checklistItems.length;
   const videoEmbed = s.video ? getVideoEmbed(s.video) : '';
-  const videoLink = s.video ? '<a href="' + escapeAttr(s.video) + '" target="_blank" style="color:var(--accent-h);font-size:12px;font-weight:600;text-decoration:none;">Watch video ↗</a>' : '';
-  return '<div class="trade-card glass" data-id="' + s.id + '" style="padding: 16px 18px;">' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' +
-      '<h3 style="font-size:16px;font-weight:700;flex:1;">' + escapeHtml(s.name) + '</h3>' +
-      '<button class="tc-action delete" onclick="deleteStrategy(' + s.id + ')" style="margin:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>' +
-    '</div>' +
-    (checklistItems.length ? '<div style="margin-bottom:10px;"><div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Checklist</div><ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;">' + checklistItems.map(item => '<li style="font-size:12px;color:var(--text-2);display:flex;align-items:flex-start;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg><span>' + escapeHtml(item) + '</span></li>').join('') + '</ul></div>' : '') +
-    (s.notes ? '<div style="margin-bottom:10px;"><div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Notes</div><div class="md-content" style="font-size:12px;color:var(--text-2);line-height:1.55;">' + renderMarkdown(s.notes) + '</div></div>' : '') +
-    (videoEmbed ? '<div style="margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid var(--border);"><iframe src="' + escapeAttr(videoEmbed) + '" style="width:100%;height:200px;border:0;" allowfullscreen></iframe></div>' : '') +
-    (videoLink ? '<div style="margin-top:8px;">' + videoLink + '</div>' : '') +
-  '</div>';
+  const created = s.created ? new Date(s.created) : null;
+  const createdStr = created ? created.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const relativeStr = created ? getRelativeTime(created) : '';
+
+  // Meta chips
+  const chipsHtml = [];
+  if (checklistItems.length > 0) {
+    chipsHtml.push('<span class="strat-meta-chip has-value"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' + checklistItems.length + ' checklist</span>');
+  }
+  if (s.notes && s.notes.trim()) {
+    chipsHtml.push('<span class="strat-meta-chip has-value"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Notes</span>');
+  } else {
+    chipsHtml.push('<span class="strat-meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>No notes</span>');
+  }
+  if (s.video && s.video.trim()) {
+    chipsHtml.push('<span class="strat-meta-chip has-value"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>Video</span>');
+  }
+
+  let html = '<div class="strategy-card" data-id="' + s.id + '">';
+  html += '<div class="strat-card-accent"></div>';
+  // Header
+  html += '<div class="strat-card-header">';
+  html += '<div class="strat-card-num">#' + num + '</div>';
+  html += '<div class="strat-card-title-block">';
+  html += '<h3 class="strat-card-title">' + escapeHtml(s.name) + '</h3>';
+  if (chipsHtml.length > 0) {
+    html += '<div class="strat-card-meta">' + chipsHtml.join('') + '</div>';
+  }
+  html += '</div>';
+  html += '<button class="strat-card-delete" onclick="deleteStrategy(' + s.id + ')" title="Delete strategy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
+  html += '</div>';
+  // Body
+  html += '<div class="strat-card-body">';
+  // Checklist section
+  if (checklistItems.length > 0) {
+    html += '<div class="strat-section">';
+    html += '<div class="strat-section-header"><span class="strat-section-title">Checklist</span><span class="strat-progress' + (allChecked ? ' complete' : '') + '">' + checkedCount + '/' + checklistItems.length + '</span></div>';
+    html += '<ul class="strat-checklist">';
+    checklistItems.forEach((item, i) => {
+      const isChecked = checklistState[i];
+      html += '<li class="strat-check-item' + (isChecked ? ' checked' : '') + '" onclick="toggleChecklistItem(' + s.id + ',' + i + ')">';
+      html += '<span class="strat-check-box"></span>';
+      html += '<span class="strat-check-text">' + escapeHtml(item) + '</span>';
+      html += '</li>';
+    });
+    html += '</ul>';
+    html += '</div>';
+  }
+  // Notes section
+  if (s.notes && s.notes.trim()) {
+    html += '<div class="strat-section">';
+    html += '<div class="strat-section-header"><span class="strat-section-title">Notes</span></div>';
+    html += '<div class="strat-notes md-content">' + renderMarkdown(s.notes) + '</div>';
+    html += '</div>';
+  }
+  // Video section
+  if (videoEmbed) {
+    html += '<div class="strat-section">';
+    html += '<div class="strat-section-header"><span class="strat-section-title">Video Reference</span><a href="' + escapeAttr(s.video) + '" target="_blank" class="strat-video-link">Open ↗</a></div>';
+    html += '<div class="strat-video-embed"><iframe src="' + escapeAttr(videoEmbed) + '" allowfullscreen></iframe></div>';
+    html += '</div>';
+  }
+  html += '</div>'; // /body
+  // Footer
+  html += '<div class="strat-card-footer">';
+  html += '<span class="strat-created">Created ' + escapeHtml(createdStr) + (relativeStr ? ' · ' + escapeHtml(relativeStr) : '') + '</span>';
+  html += '<span class="strat-tag">Strategy</span>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function getRelativeTime(date) {
+  if (!date) return '';
+  const now = Date.now();
+  const diff = now - date.getTime();
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return minutes + 'm ago';
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours + 'h ago';
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days + 'd ago';
+  const months = Math.floor(days / 30);
+  if (months < 12) return months + 'mo ago';
+  return Math.floor(months / 12) + 'y ago';
 }
 
 function deleteStrategy(id) {
@@ -2144,6 +2562,7 @@ function removeFromWatchlist(sym) {
 }
 function toggleTVWatchlist() {
   showTVWatchlist = !showTVWatchlist;
+  try { localStorage.setItem('tv_wl_visible', showTVWatchlist ? 'true' : 'false'); } catch(e) {}
   $('tvWlToggle').style.color = showTVWatchlist ? 'var(--accent-h)' : 'var(--text-3)';
   loadChart(currentChartSymbol);
   showToast(showTVWatchlist ? 'TV watchlist shown' : 'TV watchlist hidden');
