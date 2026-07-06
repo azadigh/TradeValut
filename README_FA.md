@@ -121,3 +121,29 @@
 - ویجت چارت پیشرفته TradingView
 - Cloudflare Workers + D1 + KV (نسخه Worker)
 - فونت‌های Inter + JetBrains Mono
+
+---
+
+<div align="center">
+
+# 💛 Donate / حمایت مالی
+
+If TradeVault helps your trading, consider supporting development.
+
+</div>
+
+### 💎 Crypto Wallets / کیف پول‌های ارز دیجیتال
+
+| Currency | Address |
+|----------|---------|
+| **BTC** | `bc1q580tzk2h9277mk6waepl4unuvpdwlzlj9cvx6c` |
+| **ETH** | `0x59947E23B37778722efC7afF7D5f19D71B4FE703` |
+| **USDT (TRC20)** | `TRBMdyWNfDja5NMcKQQTK5nFRjjV5tRDXE` |
+| **USDT (BEP20)** | `0x59947E23B37778722efC7afF7D5f19D71B4FE703` |
+| **SOL** | `7CUoigTM2nfzFXchzmwWZ53xgdKMS29HzUQqwpj8vNBg` |
+
+
+
+[⬆ بازگشت به بالا](#-tradevault)
+
+</div>
