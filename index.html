@@ -532,7 +532,7 @@ svg[stroke-width] { stroke-width: inherit; }
 .md-content em { color: var(--accent-h); }
 .md-content ul { padding-left: 16px; margin: 4px 0; }
 .tc-images { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.tc-img-thumb { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; transition: border-color var(--t-fast); }
+.tc-img-thumb { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; transition: border-color var(--t-fast); referrerpolicy: no-referrer; }
 .tc-img-thumb:hover { border-color: var(--border-accent); }
 .tc-img-lbl { font-size: 10px; color: var(--text-3); text-align: center; margin-top: 3px; }
 .tc-img-wrap { display: flex; flex-direction: column; }
@@ -660,8 +660,8 @@ svg[stroke-width] { stroke-width: inherit; }
 
 .list-header { padding: 12px 16px 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-3); }
 .list-area { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
-.opp-item { padding: 10px; border-radius: var(--r); margin-bottom: 2px; border: 1px solid transparent; transition: all var(--t-fast); }
-.opp-item:hover { background: var(--surface-2); border-color: var(--border); }
+.opp-item { padding: 12px 14px; border-radius: var(--r); margin-bottom: 6px; border: 1px solid var(--border); background: var(--surface); transition: border-color var(--t-fast); }
+.opp-item:hover { border-color: var(--border-2); }
 .opp-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .opp-symbol { font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer; transition: color var(--t-fast); }
 .opp-symbol:hover { color: var(--accent-h); }
@@ -845,10 +845,24 @@ svg[stroke-width] { stroke-width: inherit; }
 .modal-add-btn { background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background var(--t-fast); }
 .modal-add-btn:hover { background: var(--accent-h); }
 
-.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; opacity: 0; visibility: hidden; transition: opacity var(--t), visibility var(--t); }
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity var(--t), visibility var(--t); }
 .lightbox.active { opacity: 1; visibility: visible; }
-.lightbox-img { max-width: 88%; max-height: 88%; object-fit: contain; border-radius: 8px; box-shadow: 0 12px 32px rgba(0,0,0,.5); transform: scale(.98); transition: transform var(--t); }
+.lightbox-img { max-width: 80%; max-height: 70vh; object-fit: contain; border-radius: 8px; box-shadow: 0 12px 32px rgba(0,0,0,.5); transform: scale(.98); transition: transform var(--t), opacity var(--t-fast); }
 .lightbox.active .lightbox-img { transform: scale(1); }
+.lb-content { display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 90vw; cursor: zoom-out; }
+.lb-info { max-width: 700px; text-align: center; padding: 0 20px; }
+.lb-meta { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: rgba(255,255,255,.6); margin-bottom: 8px; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.lb-meta .lb-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.lb-note { font-size: 15px; color: rgba(255,255,255,.9); line-height: 1.5; word-break: break-word; }
+.lb-close { position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,.1); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background var(--t-fast); z-index: 1001; }
+.lb-close:hover { background: rgba(255,255,255,.2); }
+.lb-close svg { width: 20px; height: 20px; }
+.lb-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.1); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background var(--t-fast); z-index: 1001; }
+.lb-nav:hover { background: rgba(255,255,255,.2); }
+.lb-nav svg { width: 24px; height: 24px; }
+.lb-prev { left: 20px; }
+.lb-next { right: 20px; }
+.lb-counter { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: rgba(255,255,255,.7); background: rgba(0,0,0,.4); padding: 6px 14px; border-radius: 999px; z-index: 1001; }
 
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r); padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--text); z-index: 3000; opacity: 0; pointer-events: none; transition: all var(--t); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -1262,6 +1276,7 @@ svg[stroke-width] { stroke-width: inherit; }
   width: 100%;
   max-height: 160px;
   object-fit: cover;
+  referrerpolicy: no-referrer;
 }
 .opp-thumb-overlay {
   position: absolute;
@@ -1312,7 +1327,7 @@ svg[stroke-width] { stroke-width: inherit; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
     <span class="nav-tip">Watchlist</span>
   </button>
-  <button class="nav-btn" onclick="openPanel()">
+  <button class="nav-btn" data-view="opportunities" onclick="switchView('opportunities')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     <span class="nav-tip">Opportunities</span>
   </button>
@@ -1367,7 +1382,6 @@ svg[stroke-width] { stroke-width: inherit; }
   <!-- CHART VIEW -->
   <div class="chart-view" id="chartView">
     <div id="tv_chart_container"></div>
-    <div class="quick-chips" id="quickChips"></div>
   </div>
 
   <!-- WATCHLIST VIEW -->
@@ -1576,24 +1590,44 @@ svg[stroke-width] { stroke-width: inherit; }
       </div>
     </div>
   </section>
+
+  <!-- OPPORTUNITIES VIEW -->
+  <section class="journal-view" id="opportunitiesView">
+    <div class="journal-grid" style="grid-template-columns: 360px 1fr;">
+      <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;">
+        <h2 style="font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Opportunities</h2>
+        <span class="log-count" id="oppCountBadge">0 opportunities</span>
+      </div>
+
+      <!-- Add opportunity form (left) -->
+      <div class="form-wrap glass" style="position: sticky; top: 0;">
+        <div class="form-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><h3>New Opportunity</h3></div>
+        <form class="form-body" id="oppForm" onsubmit="saveOpportunity(event)">
+          <div class="f-section">
+            <div class="f-section-lbl">Details</div>
+            <div class="f-row"><div class="f-field"><label>Symbol</label><input type="text" id="input_symbol" class="mono" placeholder="XAUUSD" required autocomplete="off"></div></div>
+            <div class="f-row"><div class="f-field"><label>Direction</label><div class="tag-selector" id="tagSelector"><button type="button" class="tag-btn active" data-tag="long">Long</button><button type="button" class="tag-btn" data-tag="short">Short</button><button type="button" class="tag-btn" data-tag="watch">Watch</button></div></div></div>
+            <div class="f-row"><div class="f-field"><label>Note</label><input type="text" id="input_note" placeholder="Price note..." autocomplete="off"></div></div>
+            <div class="f-row"><div class="f-field"><label>Image URL</label><input type="url" id="input_pic" placeholder="https://..." autocomplete="off"></div></div>
+          </div>
+          <button type="submit" class="save-btn">Save Opportunity</button>
+        </form>
+      </div>
+
+      <!-- Opportunity list (right) -->
+      <div style="grid-column: 2; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <div class="fb-search" style="flex:1;min-width:160px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="oppSearch" placeholder="Search opportunities..." style="height:32px;background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 10px 0 30px;color:var(--text);font-size:13px;width:100%;"></div>
+          <button class="chip active" data-opp-filter="all" onclick="setOppFilter('all')">All</button>
+          <button class="chip" data-opp-filter="long" onclick="setOppFilter('long')">Long</button>
+          <button class="chip" data-opp-filter="short" onclick="setOppFilter('short')">Short</button>
+          <button class="chip" data-opp-filter="watch" onclick="setOppFilter('watch')">Watch</button>
+        </div>
+        <div id="oppListContainer"></div>
+      </div>
+    </div>
+  </section>
 </div>
-
-<!-- BACKDROP -->
-<div class="backdrop" id="backdrop"></div>
-
-<!-- OPPORTUNITIES PANEL -->
-<aside class="panel" id="panel">
-  <div class="panel-header"><h2>New Opportunity</h2><button class="icon-btn" id="closeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
-  <form class="form-section" id="oppForm" onsubmit="saveOpportunity(event)">
-    <div class="form-row"><div class="form-grp"><input type="text" id="input_symbol" class="mono" placeholder="SYMBOL (e.g. XAUUSD)" required autocomplete="off"></div><button type="submit" class="tbtn primary">Save</button></div>
-    <div class="tag-selector" id="tagSelector"><button type="button" class="tag-btn active" data-tag="long">Long</button><button type="button" class="tag-btn" data-tag="short">Short</button><button type="button" class="tag-btn" data-tag="watch">Watch</button></div>
-    <div class="form-row"><div class="form-grp"><input type="text" id="input_note" placeholder="Price note..." autocomplete="off"></div></div>
-    <div class="form-row"><div class="form-grp"><input type="url" id="input_pic" placeholder="Image URL..." autocomplete="off"></div></div>
-  </form>
-  <div class="list-header"><span>Saved Opportunities</span><span id="setupCount">0</span></div>
-  <div class="list-area" id="oppListContainer"></div>
-  <div class="panel-stats"><div class="ps-item"><div class="ps-val" id="sfTotal">0</div><div class="ps-lbl">Total</div></div><div class="ps-item"><div class="ps-val" id="sfToday">0</div><div class="ps-lbl">Today</div></div><div class="ps-item"><div class="ps-val" id="sfTop" style="font-size:13px;">—</div><div class="ps-lbl">Top Symbol</div></div></div>
-</aside>
 
 <!-- ACCOUNT MODAL -->
 <div class="modal-overlay" id="accountModal">
@@ -1620,8 +1654,20 @@ svg[stroke-width] { stroke-width: inherit; }
   </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" class="lightbox" onclick="closeLightbox()"><img id="lightbox-img" class="lightbox-img" src="" alt=""></div>
+<!-- LIGHTBOX (slideshow) -->
+<div id="lightbox" class="lightbox">
+  <button class="lb-close" onclick="closeLightbox()" title="Close (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  <button class="lb-nav lb-prev" onclick="event.stopPropagation();navLightbox(-1)" title="Previous (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+  <div class="lb-content" onclick="closeLightbox()">
+    <img id="lightbox-img" class="lightbox-img" src="" alt="">
+    <div class="lb-info" id="lbInfo">
+      <div class="lb-meta" id="lbMeta"></div>
+      <div class="lb-note" id="lbNote"></div>
+    </div>
+  </div>
+  <button class="lb-nav lb-next" onclick="event.stopPropagation();navLightbox(1)" title="Next (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+  <div class="lb-counter" id="lbCounter"></div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1671,11 +1717,22 @@ function toggleLoginMode(mode) {}
 function logout() { showToast('Logout disabled in local version'); }
 
 function bindEvents() {
-  $('closeBtn').addEventListener('click', closePanel);
-  $('backdrop').addEventListener('click', closePanel);
-  $('tagSelector').addEventListener('click', e => { const b = e.target.closest('.tag-btn'); if(!b) return; $$('#tagSelector .tag-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); currentTag = b.dataset.tag; });
-  document.addEventListener('keydown', e => { if(e.key==='Escape'){if($('lightbox').classList.contains('active'))closeLightbox();else closePanel();} if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openPanel();} });
-  $('restoreFile').addEventListener('change', restoreAll);
+  const tagSel = $('tagSelector');
+  if (tagSel) tagSel.addEventListener('click', e => { const b = e.target.closest('.tag-btn'); if(!b) return; $$('#tagSelector .tag-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); currentTag = b.dataset.tag; });
+  document.addEventListener('keydown', e => {
+    if($('lightbox').classList.contains('active')) {
+      if(e.key==='Escape') closeLightbox();
+      else if(e.key==='ArrowLeft') { e.preventDefault(); navLightbox(-1); }
+      else if(e.key==='ArrowRight') { e.preventDefault(); navLightbox(1); }
+      return;
+    }
+    if(e.key==='Escape') { closeDayModal(); closeAccountModal(); }
+  });
+  const restoreFile = $('restoreFile');
+  if (restoreFile) restoreFile.addEventListener('change', restoreAll);
+  // Opportunity search + filter
+  const oppSearch = $('oppSearch');
+  if (oppSearch) oppSearch.addEventListener('input', e => { searchQuery = e.target.value.toLowerCase(); renderOpportunities(); });
   // Session clock — live update every second
   updateSessionClock();
   setInterval(updateSessionClock, 1000);
@@ -1704,9 +1761,9 @@ function updateSessionClock() {
   const irstEl = $('scIRST'); if (irstEl) irstEl.textContent = irstStr;
   const estEl = $('scEST'); if (estEl) estEl.textContent = estStr;
 }
-function togglePanel() { $('panel').classList.contains('open') ? closePanel() : openPanel(); }
-function openPanel() { $('panel').classList.add('open'); $('backdrop').classList.add('active'); }
-function closePanel() { $('panel').classList.remove('open'); $('backdrop').classList.remove('active'); }
+function togglePanel() {}
+function openPanel() {}
+function closePanel() {}
 
 let showTVWatchlist = (function(){ try { return localStorage.getItem('tv_wl_visible') !== 'false'; } catch(e) { return true; } })();
 
@@ -1724,7 +1781,7 @@ function loadChart(symbol) {
   // De-duplicate while preserving order
   wlSyms = wlSyms.filter((v, i, a) => a.indexOf(v) === i);
   s.text = JSON.stringify({ allow_symbol_change:true, calendar:false, details:false, hide_side_toolbar:!showTVWatchlist, hide_top_toolbar:false, hide_legend:false, hide_volume:false, hotlist:false, interval:'15', locale:'en', save_image:true, style:'1', symbol:symbol, theme:currentTheme, timezone:'Asia/Tehran', backgroundColor: currentTheme==='dark'?'#0E0E10':'#FFFFFF', gridColor: currentTheme==='dark'?'rgba(255,255,255,0.04)':'rgba(15,15,20,0.05)', watchlist: wlSyms, withdateranges:false, compareSymbols:[], studies:['STD;RSI'], autosize:true });
-  w.appendChild(d); w.appendChild(s); c.appendChild(w); renderQuickChips(); renderWatchlist();
+  w.appendChild(d); w.appendChild(s); c.appendChild(w); renderWatchlist();
   // Update TV sidebar toggle button color to reflect current state
   const tvToggle = $('tvWlToggle'); if (tvToggle) tvToggle.style.color = showTVWatchlist ? 'var(--accent-h)' : 'var(--text-3)';
 }
@@ -1733,31 +1790,36 @@ function saveOpportunity(event) {
   event.preventDefault();
   const symbol = $('input_symbol').value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
   if(!symbol) return;
-  const opp = { id:Date.now(), symbol, note:str($('input_note').value,1000), picUrl:str($('input_pic').value,800000), tag:currentTag, timestamp:Date.now(), date:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) };
+  const opp = { id:Date.now(), symbol, note:str($('input_note').value,1000), picUrl:normalizeImageUrl(str($('input_pic').value,800000)), tag:currentTag, timestamp:Date.now(), date:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) };
   const opps = getOpportunities(); opps.unshift(opp);
   if(!saveOpportunities(opps)) return;
-  loadChart(symbol.includes(':')?symbol:'OANDA:'+symbol);
   $('input_symbol').value=''; $('input_note').value=''; $('input_pic').value='';
   renderOpportunities(); updateStats(); updateBackupInfo();
 }
+
+let _oppSlideshowItems = [];
 
 function renderOpportunities() {
   const c = $('oppListContainer'); let opps = getOpportunities();
   if(activeFilter!=='all') opps = opps.filter(o => o.tag===activeFilter);
   if(searchQuery) opps = opps.filter(o => o.symbol.toLowerCase().includes(searchQuery) || (o.note&&o.note.toLowerCase().includes(searchQuery)));
   const total = getOpportunities().length;
-  $('setupCount').textContent = opps.length+'/'+total;
-  if(opps.length===0) { c.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--text-3);font-size:12px;">'+(searchQuery||activeFilter!=='all'?'No matches.':'No opportunities yet.')+'</div>'; return; }
+  if($('setupCount')) $('setupCount').textContent = opps.length+'/'+total;
+  if($('oppCountBadge')) $('oppCountBadge').textContent = total + (total===1?' opportunity':' opportunities');
+  // Build slideshow items from opps that have images
+  _oppSlideshowItems = opps.filter(o => o.picUrl).map(o => ({ url: normalizeImageUrl(o.picUrl), note: o.note||'', symbol: o.symbol||'', tag: o.tag||'', date: o.date||'' }));
+  if(opps.length===0) { c.innerHTML = '<div class="empty-state glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><div class="e-title">No opportunities yet</div><div class="e-sub">Add your first opportunity using the form on the left.</div></div>'; return; }
   c.innerHTML = opps.map(opp => editingId===opp.id ? renderEditForm(opp) : renderItem(opp)).join('');
 }
 
 function renderItem(opp) {
   const tag = opp.tag || 'long';
-  const picUrl = opp.picUrl || '';
-  // Safer click handler — use data-pic attribute to avoid any URL escaping issues
-  const thumbHtml = picUrl ? '<div class="opp-thumb" data-pic="'+escapeAttr(picUrl)+'" onclick="openLightbox(this.dataset.pic)" title="Click to enlarge"><img src="'+escapeHtml(picUrl)+'" alt="Chart" onerror="this.parentElement.style.display=\'none\'"><div class="opp-thumb-overlay"><span><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15 3h6v6\'/><path d=\'M9 21H3v-6\'/><path d=\'M21 3l-7 7\'/><path d=\'M3 21l7-7\'/></svg>Click to enlarge</span></div></div>' : '';
-  const viewBtn = picUrl ? '<button class="icon-btn" data-pic="'+escapeAttr(picUrl)+'" onclick="openLightbox(this.dataset.pic)" title="View image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button>' : '';
-  return '<div class="opp-item" data-id="'+opp.id+'"><div class="opp-top"><span class="opp-symbol" onclick="loadChart(\''+escapeAttr(getFullSymbol(opp.symbol))+'\')">'+escapeHtml(opp.symbol)+'</span><span class="badge '+tag+'">'+tag+'</span><span class="opp-date">'+(opp.date||'')+'</span></div>'+(opp.note?'<div class="opp-note">'+escapeHtml(opp.note)+'</div>':'')+thumbHtml+'<div class="opp-actions">'+viewBtn+'<button class="icon-btn" onclick="startEdit('+opp.id+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="icon-btn danger" onclick="deleteOpportunity('+opp.id+')" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>';
+  const picUrl = normalizeImageUrl(opp.picUrl || '');
+  const slideshowIdx = picUrl ? _oppSlideshowItems.findIndex(s => s.url === picUrl && s.symbol === opp.symbol) : -1;
+  const openCall = slideshowIdx >= 0 ? 'openOppLightbox('+slideshowIdx+')' : (picUrl ? 'openLightbox(\''+escapeAttr(picUrl)+'\')' : '');
+  const thumbHtml = picUrl ? '<div class="opp-thumb" onclick="'+openCall+'" title="Click to enlarge"><img src="'+escapeHtml(picUrl)+'" alt="Chart" referrerpolicy="no-referrer" loading="lazy"><div class="opp-thumb-overlay"><span><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15 3h6v6\'/><path d=\'M9 21H3v-6\'/><path d=\'M21 3l-7 7\'/><path d=\'M3 21l7-7\'/></svg>Click to enlarge</span></div></div>' : '';
+  const viewBtn = picUrl ? '<button class="icon-btn" onclick="'+openCall+'" title="View image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button>' : '';
+  return '<div class="opp-item" data-id="'+opp.id+'"><div class="opp-top"><span class="opp-symbol" onclick="loadChart(\''+escapeAttr(getFullSymbol(opp.symbol))+'\');switchView(\'chart\')">'+escapeHtml(opp.symbol)+'</span><span class="badge '+tag+'">'+tag+'</span><span class="opp-date">'+(opp.date||'')+'</span></div>'+(opp.note?'<div class="opp-note">'+escapeHtml(opp.note)+'</div>':'')+thumbHtml+'<div class="opp-actions">'+viewBtn+'<button class="icon-btn" onclick="startEdit('+opp.id+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="icon-btn danger" onclick="deleteOpportunity('+opp.id+')" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>';
 }
 
 function renderEditForm(opp) {
@@ -1770,19 +1832,18 @@ function saveEdit(id) {
   const opps = getOpportunities(); const idx = opps.findIndex(o => o.id===id); if(idx===-1) return;
   const symbol = $('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
   if(!symbol) return;
-  opps[idx] = { ...opps[idx], symbol, note:str($('edit_note_'+id).value,1000), picUrl:str($('edit_pic_'+id).value,800000) };
+  opps[idx] = { ...opps[idx], symbol, note:str($('edit_note_'+id).value,1000), picUrl:normalizeImageUrl(str($('edit_pic_'+id).value,800000)) };
   if(!saveOpportunities(opps)) return; editingId = null; renderOpportunities(); updateStats(); updateBackupInfo();
 }
 function deleteOpportunity(id) { let opps = getOpportunities().filter(o => o.id!==id); saveOpportunities(opps); renderOpportunities(); updateBackupInfo(); }
 
-function renderQuickChips() {
-  const c = $('quickChips'); if(!c) return;
-  const opps = getOpportunities(); const counts = {};
-  opps.forEach(o => { counts[o.symbol] = (counts[o.symbol]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,6);
-  if(sorted.length===0) { c.innerHTML=''; return; }
-  c.innerHTML = sorted.map(([sym,count]) => { const full=getFullSymbol(sym); const active=currentChartSymbol===full?'active':''; return '<button class="quick-chip '+active+'" onclick="loadChart(\''+escapeAttr(full)+'\')"><span>'+escapeHtml(sym)+'</span><span class="qc-c">'+count+'</span></button>'; }).join('');
+function setOppFilter(filter) {
+  activeFilter = filter;
+  document.querySelectorAll('[data-opp-filter]').forEach(b => b.classList.toggle('active', b.dataset.oppFilter === filter));
+  renderOpportunities();
 }
+
+function renderQuickChips() { /* removed — quick chips no longer displayed on chart view */ }
 
 function updateStats() {
   const opps = getOpportunities(); const total = opps.length; const now = new Date();
@@ -1791,7 +1852,6 @@ function updateStats() {
   let topSym='—', topCount=0; for(const [s,c] of Object.entries(counts)) { if(c>topCount){topSym=s;topCount=c;} }
   const topDisplay = topSym.length>8 ? topSym.slice(0,7)+'…' : topSym;
   if($('statTotal'))$('statTotal').textContent=total; if($('statToday'))$('statToday').textContent=today; if($('statTop'))$('statTop').textContent=topDisplay;
-  $('sfTotal').textContent=total; $('sfToday').textContent=today; $('sfTop').textContent=topDisplay;
 }
 
 function getFullSymbol(sym) {
@@ -1808,23 +1868,103 @@ function getFullSymbol(sym) {
 function escapeHtml(s) { if(s==null||s===undefined) return ''; return String(s).replace(/[&<>"'`\n\r]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','\n':' ','\r':''}[c])); }
 function escapeAttr(s) { if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\\/g,'\\\\'); }
 
-function openLightbox(url) { 
-  if (!url) { showToast('No image to view'); return; }
-  const img = $('lightbox-img'); 
-  // Reset src first to clear any previous broken image
-  img.removeAttribute('src');
-  img.onerror = function() { 
-    img.onerror = null; 
-    img.alt = 'Failed to load image'; 
-    showToast('Image failed to load — check URL'); 
-  };
-  img.src = url; 
-  $('lightbox').classList.add('active'); 
+// Convert TradingView snapshot page URLs to direct image URLs
+// https://www.tradingview.com/x/CODE/ → https://s3.tradingview.com/snapshots/{first_char}/CODE.png
+function normalizeImageUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  url = url.trim();
+  // Already a direct S3 image URL — return as-is
+  if (url.includes('s3.tradingview.com/snapshots/')) return url;
+  // TradingView snapshot page URL → direct image URL
+  var tvMatch = url.match(/^https?:\/\/(?:www\.)?tradingview\.com\/x\/([A-Za-z0-9]+)\/?/);
+  if (tvMatch) {
+    var code = tvMatch[1];
+    var firstChar = code.charAt(0).toLowerCase();
+    return 'https://s3.tradingview.com/snapshots/' + firstChar + '/' + code + '.png';
+  }
+  return url;
 }
-function closeLightbox() { 
-  $('lightbox').classList.remove('active'); 
+
+let lightboxItems = [];
+let lightboxIndex = 0;
+
+function openLightbox(url) {
+  // Single image mode (trade screenshots)
+  lightboxItems = [{ url: url, note: '', symbol: '', tag: '', date: '' }];
+  lightboxIndex = 0;
+  renderLightbox();
+  $('lightbox').classList.add('active');
+}
+
+function openOppLightbox(idx) {
+  if (!_oppSlideshowItems || _oppSlideshowItems.length === 0) { showToast('No images to view'); return; }
+  lightboxItems = _oppSlideshowItems;
+  lightboxIndex = Math.max(0, Math.min(idx, lightboxItems.length - 1));
+  renderLightbox();
+  $('lightbox').classList.add('active');
+}
+
+function renderLightbox() {
+  const item = lightboxItems[lightboxIndex];
+  if (!item) return;
+  const img = $('lightbox-img');
+  // Show loading state
+  img.style.opacity = '0';
+  img.onload = function() { img.style.opacity = '1'; };
+  img.onerror = function() {
+    img.onerror = null;
+    img.style.opacity = '1';
+    img.alt = 'Failed to load image';
+    showToast('Image failed to load — check URL');
+  };
+  // Set referrerpolicy to bypass hotlink protection
+  img.referrerPolicy = 'no-referrer';
+  img.src = normalizeImageUrl(item.url);
+  // Note text below image
+  const noteEl = $('lbNote');
+  if (noteEl) {
+    noteEl.textContent = item.note || '';
+    noteEl.style.display = item.note ? 'block' : 'none';
+  }
+  // Meta info (symbol, tag, date)
+  const metaEl = $('lbMeta');
+  if (metaEl) {
+    let html = '';
+    if (item.symbol) html += '<span>'+escapeHtml(item.symbol)+'</span>';
+    if (item.tag) {
+      const tagColors = { long: '#3DD68C', short: '#E5484D', watch: '#F5A623' };
+      const tc = tagColors[item.tag] || '#A1A1AA';
+      html += '<span class="lb-tag" style="background:'+tc+'22;color:'+tc+'">'+escapeHtml(item.tag)+'</span>';
+    }
+    if (item.date) html += '<span style="opacity:.6">'+escapeHtml(item.date)+'</span>';
+    metaEl.innerHTML = html;
+    metaEl.style.display = html ? 'flex' : 'none';
+  }
+  // Counter
+  const counterEl = $('lbCounter');
+  if (counterEl) {
+    counterEl.textContent = (lightboxIndex + 1) + ' / ' + lightboxItems.length;
+    counterEl.style.display = lightboxItems.length > 1 ? 'block' : 'none';
+  }
+  // Arrows
+  const prevBtn = document.querySelector('.lb-prev');
+  const nextBtn = document.querySelector('.lb-next');
+  if (prevBtn) prevBtn.style.display = lightboxItems.length > 1 ? 'flex' : 'none';
+  if (nextBtn) nextBtn.style.display = lightboxItems.length > 1 ? 'flex' : 'none';
+}
+
+function navLightbox(dir) {
+  if (lightboxItems.length <= 1) return;
+  lightboxIndex = (lightboxIndex + dir + lightboxItems.length) % lightboxItems.length;
+  renderLightbox();
+}
+
+function closeLightbox() {
+  $('lightbox').classList.remove('active');
   const img = $('lightbox-img');
   if (img) { img.onerror = null; setTimeout(() => { if (!$('lightbox').classList.contains('active')) img.removeAttribute('src'); }, 300); }
+  lightboxItems = [];
+  lightboxIndex = 0;
 }
 
 function switchView(view) {
@@ -1833,9 +1973,11 @@ function switchView(view) {
   $('journalView').classList.remove('active');
   const sv = $('strategyView'); if (sv) sv.classList.remove('active');
   const wv = $('watchlistView'); if (wv) wv.classList.remove('active');
-  if (view === 'journal') { $('journalView').classList.add('active'); closePanel(); renderTrades(); updateJournalStats(); renderEquityCurve(); }
-  else if (view === 'strategy') { sv.classList.add('active'); closePanel(); renderStrategies(); }
-  else if (view === 'watchlist') { wv.classList.add('active'); closePanel(); renderWatchlistPage(); }
+  const ov = $('opportunitiesView'); if (ov) ov.classList.remove('active');
+  if (view === 'journal') { $('journalView').classList.add('active'); renderTrades(); updateJournalStats(); renderEquityCurve(); }
+  else if (view === 'strategy') { sv.classList.add('active'); renderStrategies(); }
+  else if (view === 'watchlist') { wv.classList.add('active'); renderWatchlistPage(); }
+  else if (view === 'opportunities') { ov.classList.add('active'); renderOpportunities(); }
   else { $('chartView').classList.remove('hidden'); }
 }
 
@@ -2002,12 +2144,12 @@ function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; cons
 
 function initAccounts() { let accounts=JSON.parse(localStorage.getItem('trading_accounts')||'[]'); if(accounts.length===0){accounts=[{id:'default',name:'Main Account',created:Date.now()}]; localStorage.setItem('trading_accounts',JSON.stringify(accounts));} currentAccountId=localStorage.getItem('current_account')||accounts[0].id; if(!accounts.find(a=>a.id===currentAccountId)) currentAccountId=accounts[0].id; renderAccountSelect(); }
 function getAccounts() { return JSON.parse(localStorage.getItem('trading_accounts')||'[]'); }
-function renderAccountSelect() { const sel=$('accountSelect'); if(!sel) return; const accounts=getAccounts(); sel.innerHTML=accounts.map(a=>'<option value="'+a.id+'"'+(a.id===currentAccountId?' selected':'')+'>'+escapeHtml(a.name)+'</option>').join(''); sel.onchange=function(){currentAccountId=this.value;localStorage.setItem('current_account',currentAccountId);renderOpportunities();renderQuickChips();updateStats();renderTrades();updateJournalStats();renderEquityCurve();updateBackupInfo();showToast('Switched to '+accounts.find(a=>a.id===currentAccountId).name);}; }
+function renderAccountSelect() { const sel=$('accountSelect'); if(!sel) return; const accounts=getAccounts(); sel.innerHTML=accounts.map(a=>'<option value="'+a.id+'"'+(a.id===currentAccountId?' selected':'')+'>'+escapeHtml(a.name)+'</option>').join(''); sel.onchange=function(){currentAccountId=this.value;localStorage.setItem('current_account',currentAccountId);renderOpportunities();updateStats();renderTrades();updateJournalStats();renderEquityCurve();updateBackupInfo();showToast('Switched to '+accounts.find(a=>a.id===currentAccountId).name);}; }
 function bindAccountManagement() {}
 function openAccountModal() { renderAccountList(); $('accountModal').classList.add('active'); }
 function closeAccountModal() { $('accountModal').classList.remove('active'); }
 function renderAccountList() { const c=$('accountList'); const accounts=getAccounts(); c.innerHTML=accounts.map(a=>{const trades=JSON.parse(localStorage.getItem('trading_journal_'+a.id)||'[]'); const pnl=trades.reduce((s,t)=>s+(t.pnl||0),0); return '<div class="account-row '+(a.id===currentAccountId?'active':'')+'"><span class="account-row-name">'+escapeHtml(a.name)+'</span><span class="account-row-stats">'+trades.length+' trades · '+(pnl>=0?'+':'')+'$'+pnl.toFixed(0)+'</span><div class="account-row-actions"><button onclick="switchAccount(\''+a.id+'\')" title="Switch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>'+(accounts.length>1?'<button class="del" onclick="deleteAccount(\''+a.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>':'')+'</div></div>';}).join(''); }
-function switchAccount(id) { currentAccountId=id; localStorage.setItem('current_account',id); renderAccountSelect(); renderAccountList(); renderOpportunities(); renderQuickChips(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist(); closeAccountModal(); showToast('Switched account'); }
+function switchAccount(id) { currentAccountId=id; localStorage.setItem('current_account',id); renderAccountSelect(); renderAccountList(); renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist(); closeAccountModal(); showToast('Switched account'); }
 function addAccount() { const name=$('newAccountName').value.trim(); if(!name) return; const accounts=getAccounts(); const id='acc_'+Date.now(); accounts.push({id,name,created:Date.now()}); localStorage.setItem('trading_accounts',JSON.stringify(accounts)); $('newAccountName').value=''; renderAccountList(); renderAccountSelect(); updateBackupInfo(); showToast('Account created'); }
 function deleteAccount(id) { if(!confirm('Delete this account and all its trades?')) return; let accounts=getAccounts().filter(a=>a.id!==id); if(accounts.length===0) accounts=[{id:'default',name:'Main Account',created:Date.now()}]; localStorage.setItem('trading_accounts',JSON.stringify(accounts)); localStorage.removeItem('trading_journal_'+id); localStorage.removeItem('trading_opportunities_'+id); if(currentAccountId===id){currentAccountId=accounts[0].id; localStorage.setItem('current_account',currentAccountId);} renderAccountList(); renderAccountSelect(); renderTrades(); updateJournalStats(); updateBackupInfo(); showToast('Account deleted'); }
 
