@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TradeVault — Trading Journal & Analytics</title>
-<meta name="description" content="TradeVault is a modern trading journal with P&L tracking, strategy analytics, equity curve, calendar heatmap, and TradingView chart integration. Log trades, analyze performance, and improve your edge.">
+<title>TradeVault Local — Trading Journal (Browser Storage)</title>
+<meta name="description" content="TradeVault Local — standalone trading journal that saves all data in your browser's localStorage. No backend, no signup, no network required.">
 <meta name="keywords" content="trading journal, trade tracker, P&L calculator, forex journal, crypto trading log, trading analytics, equity curve, drawdown analysis, trading strategy, risk management">
 <meta name="author" content="TradeVault">
 <meta name="robots" content="index, follow">
@@ -1475,8 +1475,31 @@ svg[stroke-width] { stroke-width: inherit; }
 </style>
 </head>
 <body>
+<!-- LOCAL MODE BADGE -->
+<div style="position:fixed;bottom:12px;right:12px;z-index:9999;background:#1e293b;color:#94a3b8;font-size:11px;padding:4px 10px;border-radius:999px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">LOCAL · browser storage</div>
 
-<!-- LOGIN SCREEN REMOVED FOR LOCAL VERSION -->
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l4-4 3 3 5-6"/><circle cx="17" cy="8" r="2" fill="currentColor"/></svg>
+    </div>
+    <h1 class="login-title">TradeVault</h1>
+    <p class="login-subtitle">Your trading edge, quantified</p>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+      <div class="login-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" autofocus>
+        <button type="button" class="login-toggle-pw" onclick="togglePasswordVisibility()" title="Show/hide">
+          <svg id="pwEye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <button type="submit" class="login-btn" id="loginSubmitBtn">Login</button>
+    </form>
+    <div class="login-demo-hint">Password is set in Worker env: PASSWORD</div>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -1918,7 +1941,7 @@ svg[stroke-width] { stroke-width: inherit; }
         <div id="settingsAccountList"></div>
         <div style="display:flex;gap:8px;margin-top:10px;">
           <input type="text" class="modal-input" id="settingsNewAccountName" placeholder="New account name..." style="flex:1;">
-          <button class="save-btn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="addAccount()">Add</button>
+          <button class="save-btn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="addAccount('settingsNewAccountName')">Add</button>
         </div>
       </div>
 
@@ -1979,6 +2002,43 @@ svg[stroke-width] { stroke-width: inherit; }
     <p style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Each account has its own trades and opportunities.</p>
     <div class="account-list" id="accountList"></div>
     <div class="modal-input-row"><input type="text" class="modal-input" id="newAccountName" placeholder="New account name..."><button class="modal-add-btn" onclick="addAccount()">Add</button></div>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT CHOICE MODAL -->
+<div class="modal-overlay" id="deleteAccountModal">
+  <div class="modal" style="width:460px;max-width:92vw;">
+    <button class="modal-close" onclick="closeDeleteAccountModal()">&times;</button>
+    <h3>Delete account</h3>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;">
+      You are about to delete <b id="deleteAccountName">this account</b>.
+      Choose what to do with its trades and data:
+    </p>
+
+    <label style="display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border-2);border-radius:8px;cursor:pointer;margin-bottom:10px;">
+      <input type="radio" name="deleteMode" value="reassign" checked style="margin-top:3px;">
+      <div>
+        <div style="font-weight:600;font-size:14px;">Move trades to another account</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">All trades, strategies, watchlist, notes and settings are reassigned. Nothing is lost.</div>
+        <div style="margin-top:8px;">
+          <label style="font-size:12px;color:var(--text-2);">Target account:</label>
+          <select id="deleteAccountTarget" class="modal-input" style="width:100%;margin-top:4px;"></select>
+        </div>
+      </div>
+    </label>
+
+    <label style="display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border-2);border-radius:8px;cursor:pointer;margin-bottom:14px;">
+      <input type="radio" name="deleteMode" value="hard" style="margin-top:3px;">
+      <div>
+        <div style="font-weight:600;font-size:14px;color:#e53935;">Permanently delete all trades</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">All trades, strategies, watchlist, notes and settings are erased forever. This cannot be undone.</div>
+      </div>
+    </label>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="modal-add-btn" style="background:var(--surface-2);color:var(--text-1);" onclick="closeDeleteAccountModal()">Cancel</button>
+      <button id="confirmDeleteBtn" class="modal-add-btn" style="background:#e53935;color:#fff;" onclick="confirmDeleteAccount(event)">Delete account</button>
+    </div>
   </div>
 </div>
 
@@ -2064,6 +2124,7 @@ svg[stroke-width] { stroke-width: inherit; }
     <div id="tradeLbRight" style="width:340px;flex-shrink:0;background:#111;overflow-y:auto;padding:16px;color:rgba(255,255,255,.9);font-size:13px;line-height:1.6;">
       <div id="tradeLbHeader" style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);"></div>
       <div id="tradeLbDetails"></div>
+      <div id="tradeLbActions" style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;"></div>
     </div>
   </div>
   <button class="lb-nav lb-next" onclick="event.stopPropagation();navTradeImage(1)" title="Next (→)" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
@@ -2073,9 +2134,420 @@ svg[stroke-width] { stroke-width: inherit; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== LOCAL STORAGE DATA ADAPTER =====
+// All data lives in browser localStorage. No backend, no auth, no network.
+// Keys:
+//   tv_accounts               = [{id, name, created, trade_count, pnl}, ...]
+//   tv_current_account        = <id>
+//   tv_trades_<id>            = [trade, ...]
+//   tv_setups_<id>            = [setup, ...]
+//   tv_strategies_<id>        = [strategy, ...]
+//   tv_custom_fields_<id>     = [name, ...]
+//   tv_watchlist_<id>         = [symbol, ...]
+//   tv_review_notes_<id>      = {label: notes, ...}
+//   tv_propfirms_<id>         = [propfirm, ...]
+//   tv_settings_<id>          = {key: value, ...}
+//   dashboard_theme           = 'light' | 'dark'
+
+const LS = {
+  get(key, def) {
+    try { const v = localStorage.getItem(key); return v === null ? def : JSON.parse(v); }
+    catch (_) { return def; }
+  },
+  set(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch (e) { showToast('Storage full — delete unused accounts or trades'); return false; }
+  },
+  remove(key) { try { localStorage.removeItem(key); } catch (_) {} },
+  raw(key, def) { try { const v = localStorage.getItem(key); return v === null ? def : v; } catch (_) { return def; } }
+};
+
+function lsKey(kind, accId) { return 'tv_' + kind + '_' + accId; }
+
+let _tc=[], _sc=[], _ac=[], _stc=[], _cfc=[], _wlc=[], _pfCache=[], _settingsCache={};
+
+// Per-account data cache. Loaded by loadAccountData(), kept in sync by the
+// save*() helpers which write through to localStorage.
+let _reviewNotesCache = {};
+
+async function loadData() {
+  // Accounts
+  _ac = LS.get('tv_accounts', []);
+  if (_ac.length === 0) {
+    _ac = [{ id: 1, name: 'Main Account', created: Date.now(), trade_count: 0, pnl: 0 }];
+    LS.set('tv_accounts', _ac);
+  }
+  // Validate / pick current account
+  const saved = LS.raw('tv_current_account', null);
+  if (saved && _ac.find(a => String(a.id) === String(saved))) {
+    currentAccountId = isNaN(parseInt(saved, 10)) ? saved : parseInt(saved, 10);
+  } else {
+    currentAccountId = _ac[0].id;
+    LS.set('tv_current_account', String(currentAccountId));
+  }
+  API.accountId = currentAccountId;
+  await loadAccountData(currentAccountId);
+}
+
+async function loadAccountData(accId) {
+  _tc       = LS.get(lsKey('trades',        accId), []);
+  _sc       = LS.get(lsKey('setups',        accId), []);
+  _stc      = LS.get(lsKey('strategies',    accId), []);
+  _cfc      = LS.get(lsKey('custom_fields', accId), []);
+  _wlc      = LS.get(lsKey('watchlist',     accId), []);
+  _pfCache  = LS.get(lsKey('propfirms',     accId), []);
+  _settingsCache = LS.get(lsKey('settings', accId), {});
+  _reviewNotesCache = LS.get(lsKey('review_notes', accId), {});
+  // Recompute trade_count + pnl for this account in the accounts list.
+  const acc = _ac.find(a => String(a.id) === String(accId));
+  if (acc) {
+    acc.trade_count = _tc.length;
+    acc.pnl = _tc.reduce((s, t) => s + (Number(t.pnl) || 0), 0);
+    LS.set('tv_accounts', _ac);
+  }
+}
+
+async function saveSetting(key, value) {
+  _settingsCache = _settingsCache || {};
+  _settingsCache[key] = String(value);
+  LS.set(lsKey('settings', currentAccountId), _settingsCache);
+}
+function getSetting(key, defaultVal) {
+  if (_settingsCache && _settingsCache[key] !== undefined && _settingsCache[key] !== '') return _settingsCache[key];
+  return defaultVal;
+}
+
+function getTrades()        { return _tc; }
+function saveTrades(a)      { _tc = a; LS.set(lsKey('trades', currentAccountId), _tc); return true; }
+function getOpportunities() { return _sc || []; }
+function saveOpportunities(a) { _sc = a; LS.set(lsKey('setups', currentAccountId), _sc); return true; }
+function getAccounts()      { return _ac; }
+function getStrategies()    { return _stc || []; }
+function saveStrategies(a)  { _stc = a; LS.set(lsKey('strategies', currentAccountId), _stc); return true; }
+function getCustomFields()  { return _cfc || []; }
+function saveCustomFields(f){ _cfc = f; LS.set(lsKey('custom_fields', currentAccountId), _cfc); }
+function getWatchlist()     { return _wlc || []; }
+function saveWatchlist(l)   { _wlc = l; LS.set(lsKey('watchlist', currentAccountId), _wlc); }
+function getPropFirms()     { return _pfCache || []; }
+function savePropFirms(p)   { _pfCache = p; LS.set(lsKey('propfirms', currentAccountId), _pfCache); }
+function getReviewNotesObj(){ return _reviewNotesCache || {}; }
+function saveReviewNotesObj(n) { _reviewNotesCache = n || {}; LS.set(lsKey('review_notes', currentAccountId), _reviewNotesCache); }
+
+// ---- local API router ----
+// The UI code calls API.req('/api/...', {method, body}). In local mode we
+// intercept every route and operate on localStorage instead of a server.
+const API = {
+  token: 'local-mode',
+  accountId: null,
+  async req(p, o = {}) {
+    const method = (o.method || 'GET').toUpperCase();
+    let body = null;
+    try { body = o.body ? JSON.parse(o.body) : null; } catch (_) {}
+    const [pathOnly, queryStr] = p.split('?');
+    const params = new URLSearchParams(queryStr || '');
+    const r = await localApi(method, pathOnly, body, params);
+    if (r && r.error) throw new Error(r.error);
+    return r || { success: true };
+  },
+  setToken(_) {},
+  setAccountId(i) { this.accountId = i; },
+  async login(_)  { return { token: 'local', accountId: 1 }; },
+  async logout()  { /* no-op in local mode */ }
+};
+
+function nextAccountId() { return Math.max(0, ..._ac.map(a => Number(a.id) || 0)) + 1; }
+function nextIdFromList(list) {
+  let max = 0;
+  for (const x of list) { const n = Number(x.id); if (Number.isInteger(n) && n > max) max = n; }
+  return max + 1;
+}
+function tmpId() { return Date.now() * 1000 + Math.floor(Math.random() * 1000); }
+
+async function localApi(method, path, body, params) {
+  // --- AUTH ---
+  if (path === '/api/auth/login' && method === 'POST') return { token: 'local', accountId: _ac[0]?.id || 1 };
+  if (path === '/api/auth/logout' && method === 'POST') return { success: true };
+  if (path === '/api/auth/me'     && method === 'GET')  return { user: { loggedIn: true } };
+
+  // --- ACCOUNTS ---
+  if (path === '/api/accounts' && method === 'GET') {
+    // Recompute trade_count + pnl on the fly for every account.
+    return _ac.map(a => {
+      const trades = LS.get(lsKey('trades', a.id), []);
+      return { ...a, trade_count: trades.length, pnl: trades.reduce((s, t) => s + (Number(t.pnl) || 0), 0) };
+    });
+  }
+  if (path === '/api/accounts' && method === 'POST') {
+    if (!body || !body.name || !String(body.name).trim()) return { error: 'Name required' };
+    const id = nextAccountId();
+    const newAcc = { id, name: String(body.name).trim().slice(0, 100), created: Date.now(), trade_count: 0, pnl: 0 };
+    _ac.push(newAcc);
+    LS.set('tv_accounts', _ac);
+    // Seed empty data for the new account so loadAccountData has something.
+    LS.set(lsKey('trades', id), []);
+    LS.set(lsKey('setups', id), []);
+    LS.set(lsKey('strategies', id), []);
+    LS.set(lsKey('custom_fields', id), []);
+    LS.set(lsKey('watchlist', id), []);
+    LS.set(lsKey('review_notes', id), {});
+    LS.set(lsKey('propfirms', id), []);
+    LS.set(lsKey('settings', id), {});
+    return newAcc;
+  }
+  const accMatch = path.match(/^\/api\/accounts\/(\d+)$/);
+  if (accMatch && method === 'DELETE') {
+    const accId = parseInt(accMatch[1], 10);
+    const mode = params.get('mode');
+    const target = parseInt(params.get('target') || '0', 10);
+    if (_ac.length <= 1) return { error: 'Cannot delete last account' };
+    if (mode !== 'reassign' && mode !== 'hard') return { error: 'Missing or invalid mode' };
+
+    const childKinds = ['trades', 'setups', 'strategies', 'custom_fields', 'watchlist', 'review_notes', 'propfirms', 'settings'];
+    if (mode === 'reassign') {
+      if (!target) return { error: 'Reassign requires a target account id.' };
+      if (!_ac.find(a => a.id === target)) return { error: 'Target account does not exist.' };
+      if (target === accId) return { error: 'Cannot reassign to the account being deleted.' };
+      for (const kind of childKinds) {
+        const src = LS.get(lsKey(kind, accId), kind === 'review_notes' || kind === 'settings' ? {} : []);
+        const tgt = LS.get(lsKey(kind, target), kind === 'review_notes' || kind === 'settings' ? {} : []);
+        if (kind === 'review_notes' || kind === 'settings') {
+          LS.set(lsKey(kind, target), { ...tgt, ...src });
+        } else {
+          // Dedup on name / symbol (UNIQUE-like behaviour, mirrors the server).
+          const uniqField = { custom_fields: 'name', watchlist: 'symbol' }[kind];
+          let merged;
+          if (uniqField) {
+            const tgtKeys = new Set(tgt.map(x => x[uniqField]));
+            merged = [...tgt, ...src.filter(x => !tgtKeys.has(x[uniqField]))];
+          } else {
+            merged = [...tgt, ...src];
+          }
+          LS.set(lsKey(kind, target), merged);
+        }
+        LS.remove(lsKey(kind, accId));
+      }
+      _ac = _ac.filter(a => a.id !== accId);
+      LS.set('tv_accounts', _ac);
+      return { success: true, mode: 'reassign', reassigned_to: target };
+    }
+    // hard
+    for (const kind of childKinds) LS.remove(lsKey(kind, accId));
+    _ac = _ac.filter(a => a.id !== accId);
+    LS.set('tv_accounts', _ac);
+    return { success: true, mode: 'hard' };
+  }
+
+  // --- TRADES ---
+  if (path === '/api/trades' && method === 'GET') {
+    const limit = Math.min(parseInt(params.get('limit') || '500', 10) || 500, 5000);
+    const offset = parseInt(params.get('offset') || '0', 10) || 0;
+    // Already sorted desc on save, but ensure it.
+    const sorted = [..._tc].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    return { trades: sorted.slice(offset, offset + limit), total: _tc.length, limit, offset };
+  }
+  if (path === '/api/trades' && method === 'POST') {
+    if (!body || !body.symbol || !String(body.symbol).trim()) return { error: 'Symbol required' };
+    const id = tmpId();
+    const trade = {
+      ...body,
+      id,
+      accountId: currentAccountId,
+      symbol: String(body.symbol).trim().toUpperCase().slice(0, 20),
+      tags: body.tags || [],
+      custom: body.custom || {}
+    };
+    _tc.unshift(trade);
+    saveTrades(_tc);
+    return { id, ...body };
+  }
+  const tradeMatch = path.match(/^\/api\/trades\/(\d+)$/);
+  if (tradeMatch && method === 'PUT') {
+    const id = parseInt(tradeMatch[1], 10);
+    const idx = _tc.findIndex(t => t.id === id);
+    if (idx === -1) return { error: 'Trade not found in this account' };
+    _tc[idx] = { ..._tc[idx], ...body, id, accountId: currentAccountId };
+    saveTrades(_tc);
+    return { success: true };
+  }
+  if (tradeMatch && method === 'DELETE') {
+    const id = parseInt(tradeMatch[1], 10);
+    const before = _tc.length;
+    _tc = _tc.filter(t => t.id !== id);
+    saveTrades(_tc);
+    return _tc.length < before ? { success: true } : { error: 'Trade not found in this account' };
+  }
+
+  // --- STRATEGIES ---
+  if (path === '/api/strategies' && method === 'GET') return _stc;
+  if (path === '/api/strategies' && method === 'POST') {
+    if (!body || !body.name) return { error: 'Name required' };
+    const id = tmpId();
+    const s = { id, accountId: currentAccountId, name: body.name, checklist: body.checklist || '', notes: body.notes || '', video: body.video || '', created: Date.now() };
+    _stc.unshift(s);
+    saveStrategies(_stc);
+    return s;
+  }
+  const stratMatch = path.match(/^\/api\/strategies\/(\d+)$/);
+  if (stratMatch && method === 'DELETE') {
+    const id = parseInt(stratMatch[1], 10);
+    const before = _stc.length;
+    _stc = _stc.filter(s => s.id !== id);
+    saveStrategies(_stc);
+    return _stc.length < before ? { success: true } : { error: 'Strategy not found in this account' };
+  }
+
+  // --- SETUPS / OPPORTUNITIES ---
+  if (path === '/api/setups' && method === 'GET') return _sc;
+  if (path === '/api/setups' && method === 'POST') {
+    if (!body || !body.symbol) return { error: 'Symbol required' };
+    const id = tmpId();
+    const s = { id, accountId: currentAccountId, symbol: body.symbol, note: body.note || '', picUrl: body.picUrl || '', tag: body.tag || 'long', timestamp: body.timestamp || Date.now(), date: body.date || '' };
+    _sc.unshift(s);
+    saveOpportunities(_sc);
+    return s;
+  }
+  const setupMatch = path.match(/^\/api\/setups\/(\d+)$/);
+  if (setupMatch && method === 'PUT') {
+    const id = parseInt(setupMatch[1], 10);
+    const idx = _sc.findIndex(s => s.id === id);
+    if (idx === -1) return { error: 'Setup not found in this account' };
+    _sc[idx] = { ..._sc[idx], ...body, id, accountId: currentAccountId };
+    saveOpportunities(_sc);
+    return { success: true };
+  }
+  if (setupMatch && method === 'DELETE') {
+    const id = parseInt(setupMatch[1], 10);
+    const before = _sc.length;
+    _sc = _sc.filter(s => s.id !== id);
+    saveOpportunities(_sc);
+    return _sc.length < before ? { success: true } : { error: 'Setup not found in this account' };
+  }
+
+  // --- CUSTOM FIELDS ---
+  if (path === '/api/custom-fields' && method === 'GET') return _cfc;
+  if (path === '/api/custom-fields' && method === 'POST') {
+    if (!body || !body.name) return { error: 'Name required' };
+    const n = String(body.name).slice(0, 50);
+    if (!_cfc.includes(n)) { _cfc.push(n); saveCustomFields(_cfc); }
+    return { success: true };
+  }
+  const cfMatch = path.match(/^\/api\/custom-fields\/(.+)$/);
+  if (cfMatch && method === 'DELETE') {
+    const name = decodeURIComponent(cfMatch[1]);
+    _cfc = _cfc.filter(n => n !== name);
+    saveCustomFields(_cfc);
+    return { success: true };
+  }
+
+  // --- WATCHLIST ---
+  if (path === '/api/watchlist' && method === 'GET') return _wlc;
+  if (path === '/api/watchlist' && method === 'POST') {
+    const sym = String(body.symbol).toUpperCase().replace(/[^A-Z0-9.:]/g, '').slice(0, 30);
+    if (sym && !_wlc.includes(sym)) { _wlc.push(sym); saveWatchlist(_wlc); }
+    return { success: true, symbol: sym };
+  }
+  const wlMatch = path.match(/^\/api\/watchlist\/(.+)$/);
+  if (wlMatch && method === 'DELETE') {
+    const sym = decodeURIComponent(wlMatch[1]).toUpperCase();
+    _wlc = _wlc.filter(s => s !== sym);
+    saveWatchlist(_wlc);
+    return { success: true };
+  }
+
+  // --- REVIEW NOTES ---
+  if (path === '/api/review-notes' && method === 'GET') return _reviewNotesCache;
+  if (path === '/api/review-notes' && method === 'POST') {
+    if (!body || !body.label) return { error: 'Label required' };
+    _reviewNotesCache = _reviewNotesCache || {};
+    _reviewNotesCache[body.label] = body.notes || '';
+    saveReviewNotesObj(_reviewNotesCache);
+    return { success: true };
+  }
+
+  // --- PROP FIRMS ---
+  if (path === '/api/propfirms' && method === 'GET') return _pfCache;
+  if (path === '/api/propfirms' && method === 'POST') {
+    if (!body || !body.name) return { error: 'Name required' };
+    const id = tmpId();
+    const pf = { id, accountId: currentAccountId, ...body };
+    _pfCache.unshift(pf);
+    savePropFirms(_pfCache);
+    return pf;
+  }
+  const pfMatch = path.match(/^\/api\/propfirms\/(\d+)$/);
+  if (pfMatch && method === 'PUT') {
+    const id = parseInt(pfMatch[1], 10);
+    const idx = _pfCache.findIndex(p => p.id === id);
+    if (idx === -1) return { error: 'Prop firm not found in this account' };
+    _pfCache[idx] = { ..._pfCache[idx], ...body, id, accountId: currentAccountId };
+    savePropFirms(_pfCache);
+    return { success: true };
+  }
+  if (pfMatch && method === 'DELETE') {
+    const id = parseInt(pfMatch[1], 10);
+    const before = _pfCache.length;
+    _pfCache = _pfCache.filter(p => p.id !== id);
+    savePropFirms(_pfCache);
+    return _pfCache.length < before ? { success: true } : { error: 'Prop firm not found in this account' };
+  }
+
+  // --- USER SETTINGS ---
+  if (path === '/api/settings' && method === 'GET') return _settingsCache;
+  if (path === '/api/settings' && method === 'POST') {
+    if (!body || !body.key) return { error: 'Key required' };
+    _settingsCache = _settingsCache || {};
+    _settingsCache[body.key] = String(body.value);
+    LS.set(lsKey('settings', currentAccountId), _settingsCache);
+    return { success: true };
+  }
+
+  // --- BACKUP ---
+  if (path === '/api/backup' && method === 'GET') {
+    const data = { accounts: _ac, trades: {}, strategies: {}, setups: {}, custom_fields: {}, watchlist: {}, review_notes: {}, prop_firms: {}, user_settings: {} };
+    for (const acc of _ac) {
+      const id = acc.id;
+      data.trades[id]        = LS.get(lsKey('trades', id), []);
+      data.strategies[id]    = LS.get(lsKey('strategies', id), []);
+      data.setups[id]        = LS.get(lsKey('setups', id), []);
+      data.custom_fields[id] = LS.get(lsKey('custom_fields', id), []);
+      data.watchlist[id]     = LS.get(lsKey('watchlist', id), []);
+      data.review_notes[id]  = LS.get(lsKey('review_notes', id), {});
+      data.prop_firms[id]    = LS.get(lsKey('propfirms', id), []);
+      data.user_settings[id] = LS.get(lsKey('settings', id), {});
+    }
+    return { version: 3, type: 'trading-dashboard-local-backup', created: new Date().toISOString(), data };
+  }
+
+  // --- CALENDAR (pass-through to upstream; fails gracefully offline) ---
+  if (path === '/api/calendar' && method === 'GET') {
+    try {
+      const res = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.csv');
+      if (!res.ok) return { events: [] };
+      let csv = await res.text();
+      if (csv.charCodeAt(0) === 0xFEFF) csv = csv.slice(1);
+      const lines = csv.trim().split('\n');
+      const events = lines.slice(1).map(line => {
+        const vals = []; let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { inQ = !inQ; continue; }
+          if (ch === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
+          cur += ch;
+        }
+        vals.push(cur);
+        return { date: (vals[0]||'').trim(), time: (vals[1]||'').trim(), title: (vals[2]||'').trim(), country: (vals[3]||'').trim(), impact: (vals[4]||'').toLowerCase().trim(), forecast: (vals[5]||'').trim(), previous: (vals[6]||'').trim() };
+      });
+      return { events };
+    } catch (e) { return { events: [] }; }
+  }
+
+  return { error: 'Not found: ' + path };
+}
+</script>
+<script>
 const defaultSymbol = 'OANDA:XAUUSD';
 let currentTag='long', activeFilter='all', searchQuery='', editingId=null;
-let currentChartSymbol = (function(){ try { const s = localStorage.getItem('last_chart_symbol'); return s || defaultSymbol; } catch(e) { return defaultSymbol; } })(), currentAccountId=null;
+let currentChartSymbol = (function(){ try { var s = getSetting('last_chart_symbol', null); if(!s) s = localStorage.getItem('last_chart_symbol'); return s || defaultSymbol; } catch(e) { return defaultSymbol; } })(), currentAccountId=null;
 let currentRating=0, currentTags=[];
 let tradeSearchQuery='', tradeFilters={symbol:'',status:'',direction:'',session:'',dateFrom:'',dateTo:''};
 let calCurrentMonth=new Date(), editingTradeId=null;
@@ -2088,33 +2560,62 @@ const $$ = sel => document.querySelectorAll(sel);
 function num(v) { v = parseFloat(v); return isFinite(v) ? v : 0; }
 function str(v, max) { max = max || 10000; return (typeof v === 'string') ? v.trim().slice(0, max) : ''; }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  initAccounts(); loadChart(currentChartSymbol);
-  renderOpportunities(); renderQuickChips(); renderTrades();
-  updateStats(); updateJournalStats(); renderEquityCurve();
-  [bindEvents, bindJournalEvents, bindFilterEvents, bindStarRating,
-   bindTagInput, bindPasteHandler, bindExportImport, bindAccountManagement,
-   bindSubtabs, bindCalendarNav, bindBackupRestore
-  ].forEach(fn => { try { fn(); } catch(e) { console.error('Bind failed:', fn.name, e); } });
-  updateBackupInfo();
-  populateStrategyDropdown();
-  renderCustomFieldDefs();
-  renderWatchlist();
-  updateSessionClock();
-  setInterval(updateSessionClock, 1000);
-});
+document.addEventListener('DOMContentLoaded', () => { initTheme(); checkAuth(); });
 
-// ============ AUTH SYSTEM (disabled in local version) ============
-function checkAuth() { return true; }
-function showLoginScreen() {}
-function hideLoginScreen() {}
-function handleLogin(event) { event.preventDefault(); }
-function showLoginError(msg) {}
-function togglePasswordVisibility() {}
+// ============ AUTH SYSTEM (password-only, API-based) ============
+let loginMode = 'signin';
+function checkAuth() {
+  // LOCAL MODE: no auth. Jump straight to the app.
+  API.token = 'local-mode';
+  hideLoginScreen();
+  return true;
+}
+function showLoginScreen() { $('loginScreen').classList.add('active'); }
+function hideLoginScreen() {
+  $('loginScreen').classList.remove('active');
+  setTimeout(async () => {
+    initTheme(); initAccounts();
+    await loadData();
+    loadChart(currentChartSymbol);
+    renderOpportunities(); renderTrades();
+    updateStats(); updateJournalStats(); renderEquityCurve();
+    [bindEvents, bindJournalEvents, bindFilterEvents, bindStarRating,
+     bindTagInput, bindPasteHandler, bindExportImport, bindAccountManagement,
+     bindSubtabs, bindCalendarNav, bindBackupRestore
+    ].forEach(fn => { try { fn(); } catch(e) { console.error('Bind:', fn.name, e); } });
+    updateBackupInfo(); populateStrategyDropdown();
+    renderCustomFieldDefs(); renderWatchlist();
+    updateSessionClock(); setInterval(updateSessionClock, 1000);
+  }, 400);
+}
+async function handleLogin(event) {
+  event.preventDefault();
+  const pw = $('loginPassword').value;
+  const errEl = $('loginError'); errEl.classList.remove('show');
+  if (!pw) { showLoginError('Password required'); return; }
+  const btn = $('loginSubmitBtn'); btn.textContent = 'Please wait...'; btn.disabled = true;
+  try {
+    await API.login(pw);
+    await loadData();
+    btn.textContent = 'Login'; btn.disabled = false;
+    hideLoginScreen(); showToast('Welcome back!');
+  } catch (err) {
+    btn.textContent = 'Login'; btn.disabled = false;
+    showLoginError(err.message || 'Login failed');
+  }
+}
+function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.add('show'); }
+function togglePasswordVisibility() {
+  const pw = $('loginPassword'), eye = $('pwEye');
+  if (pw.type === 'password') { pw.type = 'text'; eye.style.opacity = '1'; } else { pw.type = 'password'; eye.style.opacity = '.5'; }
+}
 function showLoggedInUser() {}
 function toggleLoginMode(mode) {}
-function logout() { showToast('Logout disabled in local version'); }
+async function logout() {
+  // LOCAL MODE: no real logout. Reload the page instead.
+  if (!confirm('Reload the app? (Your data is saved in browser storage.)')) return;
+  location.reload();
+}
 
 function bindEvents() {
   const tagSel = $('tagSelector');
@@ -2193,12 +2694,12 @@ function togglePanel() {}
 function openPanel() {}
 function closePanel() {}
 
-let showTVWatchlist = (function(){ try { return localStorage.getItem('tv_wl_visible') !== 'false'; } catch(e) { return true; } })();
+let showTVWatchlist = (function(){ try { var v = getSetting('tv_wl_visible', 'true'); return v !== 'false'; } catch(e) { return true; } })();
 
 function loadChart(symbol) {
   if (!symbol) symbol = defaultSymbol;
   currentChartSymbol = symbol;
-  try { localStorage.setItem('last_chart_symbol', symbol); } catch(e) {}
+  try { saveSetting('last_chart_symbol', symbol); } catch(e) {}
   const c = $('tv_chart_container'); c.innerHTML = '';
   const w = document.createElement('div'); w.className = 'tradingview-widget-container'; w.style.height = w.style.width = '100%';
   const d = document.createElement('div'); d.className = 'tradingview-widget-container__widget'; d.style.height = d.style.width = '100%';
@@ -2219,7 +2720,7 @@ function saveOpportunity(event) {
   const symbol = $('input_symbol').value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
   if(!symbol) return;
   const opp = { id:Date.now(), symbol, note:str($('input_note').value,1000), picUrl:normalizeImageUrl(str($('input_pic').value,800000)), tag:currentTag, timestamp:Date.now(), date:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) };
-  const opps = getOpportunities(); opps.unshift(opp);
+  const opps = getOpportunities(); opps.unshift(opp); API.req('/api/setups',{method:'POST',body:JSON.stringify(opp)}).then(r=>{opp.id=r.id;}).catch(e=>showToast('Sync: '+e.message));
   if(!saveOpportunities(opps)) return;
   $('input_symbol').value=''; $('input_note').value=''; $('input_pic').value='';
   renderOpportunities(); updateStats(); updateBackupInfo();
@@ -2263,7 +2764,7 @@ function saveEdit(id) {
   opps[idx] = { ...opps[idx], symbol, note:str($('edit_note_'+id).value,1000), picUrl:normalizeImageUrl(str($('edit_pic_'+id).value,800000)) };
   if(!saveOpportunities(opps)) return; editingId = null; renderOpportunities(); updateStats(); updateBackupInfo();
 }
-function deleteOpportunity(id) { let opps = getOpportunities().filter(o => o.id!==id); saveOpportunities(opps); renderOpportunities(); updateBackupInfo(); }
+function deleteOpportunity(id) { let opps = getOpportunities().filter(o => o.id!==id); saveOpportunities(opps); API.req('/api/setups/'+id,{method:'DELETE'}).catch(()=>{}); renderOpportunities(); updateBackupInfo(); }
 
 function setOppFilter(filter) {
   activeFilter = filter;
@@ -2415,7 +2916,8 @@ function switchView(view) {
     calV.classList.add('active');
     if(_ecData.length === 0) {
       try {
-        var cached = JSON.parse(localStorage.getItem('ec_data_cache') || '[]');
+        var cachedStr = getSetting('ec_data_cache', null);
+        var cached = cachedStr ? JSON.parse(cachedStr) : [];
         if(cached.length > 0) { _ecData = cached; renderEconomicCalendar(); }
         else showEconomicCalendarPrompt();
       } catch(e) { showEconomicCalendarPrompt(); }
@@ -2466,7 +2968,7 @@ function saveTrade(event) {
   const pnl=calculatePnl(symbol,tradeDirection,entry,exit,size); const risk=calculateRisk(symbol,tradeDirection,entry,sl,size); const rMult=risk>0?pnl/risk:0;
   const now=new Date();
   const trade={id:Date.now(),symbol,direction:tradeDirection,setup:str($('t_setup').value,100),entry,exit,sl,tp,size,pnl,rMultiple:rMult,status:tradeStatus,mae:num($('t_mae').value),mfe:num($('t_mfe').value),tp1:num($('t_tp1').value),tp2:num($('t_tp2').value),tp3:num($('t_tp3').value),tp1Hit:$('t_tp1Hit').checked,tp2Hit:$('t_tp2Hit').checked,tp3Hit:$('t_tp3Hit').checked,mtf4h:str($('t_mtf4h').value),mtf1h:str($('t_mtf1h').value),mtf15m:str($('t_mtf15m').value),notes:str($('t_notes').value),lessons:str($('t_lessons').value),emotion:str($('t_emotion').value,50),entryPic:str($('t_entryPic').value,800000),exitPic:str($('t_exitPic').value,800000),rating:Math.max(0,Math.min(5,currentRating)),tags:[...currentTags].slice(0,20),custom:collectCustomFields(),propfirmId:($('t_propfirm')?$('t_propfirm').value:''),session:detectSession(now),timestamp:Date.now(),date:now.toLocaleDateString('en-US',{month:'short',day:'numeric'}),time:now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false})};
-  const trades=getTrades(); trades.unshift(trade); if(!saveTrades(trades)) return;
+  const trades=getTrades(); trades.unshift(trade); if(!saveTrades(trades)) return; API.req('/api/trades',{method:'POST',body:JSON.stringify(trade)}).then(r=>{trade.id=r.id;}).catch(e=>showToast('Sync: '+e.message));
   $('tradeForm').reset(); currentRating=0; currentTags=[]; updateStarDisplay(); renderTagChips(); if($('t_mae'))$('t_mae').value=''; if($('t_mfe'))$('t_mfe').value=''; if($('t_tp1')){$('t_tp1').value='';$('t_tp2').value='';$('t_tp3').value='';$('t_tp1Hit').checked=false;$('t_tp2Hit').checked=false;$('t_tp3Hit').checked=false;} if($('t_mtf4h'))$('t_mtf4h').value=''; if($('t_mtf1h'))$('t_mtf1h').value=''; if($('t_mtf15m'))$('t_mtf15m').value='';
   dirManualOverride=false; statusManualOverride=false; setModeBadge('dirMode','auto'); setModeBadge('statusMode','auto');
   $$('#dirToggle .dir-btn').forEach(b=>b.classList.remove('active')); document.querySelector('#dirToggle .dir-btn[data-dir="long"]').classList.add('active'); tradeDirection='long';
@@ -2474,10 +2976,10 @@ function saveTrade(event) {
   renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo();
 }
 
-function getTrades() { const k=currentAccountId?'trading_journal_'+currentAccountId:'trading_journal'; try{const p=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(p)?p:[];}catch(e){try{localStorage.removeItem(k);}catch(_){}return [];} }
-function saveTrades(arr) { if(!Array.isArray(arr)) return false; const k=currentAccountId?'trading_journal_'+currentAccountId:'trading_journal'; try{localStorage.setItem(k,JSON.stringify(arr));return true;}catch(e){if(e.name==='QuotaExceededError')showToast('Storage full! Export & delete old trades.');else showToast('Save failed: '+e.message);return false;} }
-function getOpportunities() { const k=currentAccountId?'trading_opportunities_'+currentAccountId:'trading_opportunities'; try{const p=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(p)?p:[];}catch(e){try{localStorage.removeItem(k);}catch(_){}return [];} }
-function saveOpportunities(arr) { if(!Array.isArray(arr)) return false; const k=currentAccountId?'trading_opportunities_'+currentAccountId:'trading_opportunities'; try{localStorage.setItem(k,JSON.stringify(arr));return true;}catch(e){if(e.name==='QuotaExceededError')showToast('Storage full!');return false;} }
+// getTrades defined in API adapter
+// saveTrades defined in API adapter
+// getOpportunities defined in API adapter
+// saveOpportunities defined in API adapter
 
 let tradeRenderLimit = 200;
 function renderTrades() {
@@ -2518,7 +3020,7 @@ function renderTradeCard(t) {
 }
 
 function toggleTradeCard(id) { openTradeLightbox(id); }
-function deleteTrade(id) { const _t = getTrades().find(t=>t.id===id); if(_t && isTradeLocked(_t)) { showToast('Trade locked after 48h'); return; } const trades=getTrades().filter(t=>t.id!==id); saveTrades(trades); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); }
+function deleteTrade(id) { const _t = getTrades().find(t=>t.id===id); if(_t && isTradeLocked(_t)) { showToast('Trade locked after 48h'); return; } const trades=getTrades().filter(t=>t.id!==id); saveTrades(trades); API.req('/api/trades/'+id,{method:'DELETE'}).catch(()=>{}); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); }
 
 function updateJournalStats() {
   // Sharpe ratio
@@ -2570,40 +3072,207 @@ function renderEquityCurve() {
   } catch(e) { console.error('Equity curve error:', e); }
 }
 
-function initTheme() { currentTheme=localStorage.getItem('dashboard_theme')||'light'; applyTheme(currentTheme); }
-function applyTheme(theme) { currentTheme=theme; document.documentElement.setAttribute('data-theme',theme); try{localStorage.setItem('dashboard_theme',theme);}catch(e){} }
+function initTheme() { currentTheme=getSetting('dashboard_theme','light')||'light'; applyTheme(currentTheme); }
+function applyTheme(theme) { currentTheme=theme; document.documentElement.setAttribute('data-theme',theme); saveSetting('dashboard_theme',theme); }
 function toggleTheme() { applyTheme(currentTheme==='dark'?'light':'dark'); loadChart(currentChartSymbol); showToast('Switched to '+currentTheme+' theme'); }
 function bindThemeToggle() {}
 
 function bindBackupRestore() {}
 function backupAll() {
-  const backup={version:2,type:'trading-dashboard-full-backup',created:new Date().toISOString(),theme:localStorage.getItem('dashboard_theme')||'light',data:{}};
-  const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k.startsWith('trading_')||k==='current_account'||k==='dashboard_theme') keys.push(k);}
-  keys.forEach(k=>{backup.data[k]=localStorage.getItem(k);}); backup.keyCount=keys.length;
-  downloadFile(JSON.stringify(backup,null,2),'dashboard-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');
-  showToast('Backup created: '+keys.length+' items');
+  // LOCAL MODE: dump every tv_* key + dashboard_theme + tv_accounts + tv_current_account
+  const backup = { version: 3, type: 'trading-dashboard-local-backup', created: new Date().toISOString(), theme: localStorage.getItem('dashboard_theme') || 'light', data: {} };
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('tv_') || k === 'dashboard_theme') keys.push(k);
+  }
+  keys.forEach(k => { backup.data[k] = localStorage.getItem(k); });
+  backup.keyCount = keys.length;
+  downloadFile(JSON.stringify(backup, null, 2), 'tradevault-local-backup-' + new Date().toISOString().slice(0, 10) + '.json', 'application/json');
+  showToast('Backup created: ' + keys.length + ' items');
 }
 function restoreAll(event) {
-  const file=event.target.files[0]; if(!file) return;
-  if(file.size>50*1024*1024){showToast('Backup too large (max 50MB)');event.target.value='';return;}
-  if(!confirm('This will REPLACE all current data with the backup. Continue?')){event.target.value='';return;}
-  const reader=new FileReader();
-  reader.onload=e=>{try{const backup=JSON.parse(e.target.result); if(!backup||!backup.data) throw new Error('Not a valid backup file'); const toRemove=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k.startsWith('trading_')||k==='current_account'||k==='dashboard_theme') toRemove.push(k);} toRemove.forEach(k=>localStorage.removeItem(k)); let restored=0; Object.entries(backup.data).forEach(([k,v])=>{if(typeof v==='string'){localStorage.setItem(k,v);restored++;}}); if(backup.theme) localStorage.setItem('dashboard_theme',backup.theme); showToast('Restored '+restored+' items. Reloading...'); setTimeout(()=>location.reload(),1200);}catch(err){showToast('Restore failed: '+(err.message||'invalid file'));} event.target.value='';};
-  reader.onerror=()=>{showToast('Failed to read file');event.target.value='';};
+  const file = event.target.files[0]; if (!file) return;
+  if (file.size > 50 * 1024 * 1024) { showToast('Backup too large (max 50MB)'); event.target.value = ''; return; }
+  if (!confirm('This will REPLACE all current data with the backup. Continue?')) { event.target.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup || !backup.data) throw new Error('Not a valid backup file');
+      // Wipe every tv_* key + dashboard_theme before restoring.
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k.startsWith('tv_') || k === 'dashboard_theme') toRemove.push(k);
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+      // Restore. Values are JSON strings (since we did JSON.stringify on save).
+      let restored = 0;
+      Object.entries(backup.data).forEach(([k, v]) => {
+        if (typeof v === 'string') { localStorage.setItem(k, v); restored++; }
+      });
+      if (backup.theme) localStorage.setItem('dashboard_theme', backup.theme);
+      showToast('Restored ' + restored + ' items. Reloading...');
+      setTimeout(() => location.reload(), 1200);
+    } catch (err) { showToast('Restore failed: ' + (err.message || 'invalid file')); }
+    event.target.value = '';
+  };
+  reader.onerror = () => { showToast('Failed to read file'); event.target.value = ''; };
   reader.readAsText(file);
 }
-function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; const accounts=getAccounts(); let tt=0,ts=0; accounts.forEach(a=>{try{const t=JSON.parse(localStorage.getItem('trading_journal_'+a.id)||'[]');if(Array.isArray(t))tt+=t.length; const s=JSON.parse(localStorage.getItem('trading_opportunities_'+a.id)||'[]');if(Array.isArray(s))ts+=s.length;}catch(e){}}); info.textContent=accounts.length+' accounts · '+tt+' trades · '+ts+' opportunities'; }
+function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; info.textContent=(_ac||[]).length+' accounts · '+(_tc||[]).length+' trades · '+(_sc||[]).length+' opportunities'; }
 
-function initAccounts() { let accounts=JSON.parse(localStorage.getItem('trading_accounts')||'[]'); if(accounts.length===0){accounts=[{id:'default',name:'Main Account',created:Date.now()}]; try{localStorage.setItem('trading_accounts',JSON.stringify(accounts));}catch(e){showToast('Storage full');}} currentAccountId=localStorage.getItem('current_account')||accounts[0].id; if(!accounts.find(a=>a.id===currentAccountId)) currentAccountId=accounts[0].id; renderAccountSelect(); }
-function getAccounts() { return JSON.parse(localStorage.getItem('trading_accounts')||'[]'); }
-function renderAccountSelect() { const sel=$('accountSelect'); if(!sel) return; const accounts=getAccounts(); sel.innerHTML=accounts.map(a=>'<option value="'+a.id+'"'+(a.id===currentAccountId?' selected':'')+'>'+escapeHtml(a.name)+'</option>').join(''); sel.onchange=function(){currentAccountId=this.value;localStorage.setItem('current_account',currentAccountId);renderOpportunities();updateStats();renderTrades();updateJournalStats();renderEquityCurve();updateBackupInfo();showToast('Switched to '+accounts.find(a=>a.id===currentAccountId).name);}; }
+// B20: initAccounts is now a no-op — accounts come from the backend via loadData().
+// We keep the function for backward-compat with the DOMContentLoaded handler chain.
+function initAccounts() { renderAccountSelect(); }
+// getAccounts defined in API adapter above
+function renderAccountSelect() {
+  const sel=$('accountSelect'); if(!sel) return; const accounts=getAccounts();
+  if (!accounts || accounts.length === 0) { sel.innerHTML='<option value="">(no accounts)</option>'; return; }
+  // B6/B40: validate currentAccountId against the real account list.
+  if (!accounts.find(a => String(a.id) === String(currentAccountId))) {
+    currentAccountId = accounts[0].id;
+    API.setAccountId(parseInt(currentAccountId, 10) || 0);
+  }
+  sel.innerHTML = accounts.map(a =>
+    '<option value="'+a.id+'"'+(String(a.id)===String(currentAccountId)?' selected':'')+'>'+escapeHtml(a.name)+'</option>'
+  ).join('');
+  sel.onchange = async function() {
+    currentAccountId = parseInt(this.value, 10);
+    API.setAccountId(currentAccountId);
+    await loadData();
+    renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo();
+    showToast('Switched account');
+  };
+}
 function bindAccountManagement() {}
 function openAccountModal() { renderAccountList(); $('accountModal').classList.add('active'); }
 function closeAccountModal() { $('accountModal').classList.remove('active'); }
-function renderAccountList() { const c=$('accountList'); if(!c) return; const accounts=getAccounts(); c.innerHTML=accounts.map(a=>{const trades=JSON.parse(localStorage.getItem('trading_journal_'+a.id)||'[]'); const pnl=trades.reduce((s,t)=>s+(t.pnl||0),0); return '<div class="account-row '+(a.id===currentAccountId?'active':'')+'"><span class="account-row-name">'+escapeHtml(a.name)+'</span><span class="account-row-stats">'+trades.length+' trades · '+(pnl>=0?'+':'')+'$'+pnl.toFixed(0)+'</span><div class="account-row-actions"><button onclick="switchAccount(\''+a.id+'\')" title="Switch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>'+(accounts.length>1?'<button class="del" onclick="deleteAccount(\''+a.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>':'')+'</div></div>';}).join(''); }
-function switchAccount(id) { currentAccountId=id; try{localStorage.setItem('current_account',id);}catch(e){} renderAccountSelect(); renderAccountList(); renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist(); closeAccountModal(); showToast('Switched account'); }
-function addAccount() { const name=$('newAccountName').value.trim(); if(!name) return; const accounts=getAccounts(); const id='acc_'+Date.now(); accounts.push({id,name,created:Date.now()}); try{localStorage.setItem('trading_accounts',JSON.stringify(accounts));}catch(e){showToast('Storage full');} $('newAccountName').value=''; renderAccountList(); renderAccountSelect(); updateBackupInfo(); showToast('Account created'); }
-function deleteAccount(id) { if(!confirm('Delete this account and all its trades?')) return; let accounts=getAccounts().filter(a=>a.id!==id); if(accounts.length===0) accounts=[{id:'default',name:'Main Account',created:Date.now()}]; try{localStorage.setItem('trading_accounts',JSON.stringify(accounts));}catch(e){showToast('Storage full');} localStorage.removeItem('trading_journal_'+id); localStorage.removeItem('trading_opportunities_'+id); if(currentAccountId===id){currentAccountId=accounts[0].id; localStorage.setItem('current_account',currentAccountId);} renderAccountList(); renderAccountSelect(); renderTrades(); updateJournalStats(); updateBackupInfo(); showToast('Account deleted'); }
+// B7: read trade counts from _tc (the cached backend response) — not localStorage.
+function renderAccountList() {
+  const c=$('accountList'); if(!c) return;
+  const accounts=getAccounts() || [];
+  // B19: empty-state fallback
+  if (accounts.length === 0) { c.innerHTML='<div style="padding:12px;color:var(--text-3);font-size:13px;">No accounts yet.</div>'; return; }
+  const allTrades = _tc || [];
+  c.innerHTML = accounts.map(a => {
+    const trades = allTrades.filter(t => String(t.accountId) === String(a.id));
+    const pnl = trades.reduce((s,t) => s + (Number(t.pnl) || 0), 0);
+    const count = a.trade_count != null ? a.trade_count : trades.length;
+    return '<div class="account-row '+(String(a.id)===String(currentAccountId)?'active':'')+'">' +
+      '<span class="account-row-name">'+escapeHtml(a.name)+'</span>' +
+      '<span class="account-row-stats">'+count+' trades · '+(pnl>=0?'+':'')+'$'+pnl.toFixed(0)+'</span>' +
+      '<div class="account-row-actions">' +
+        '<button onclick="switchAccount(\''+a.id+'\')" title="Switch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>' +
+        (accounts.length>1 ? '<button class="del" onclick="deleteAccount(\''+a.id+'\')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+// B2: switchAccount now syncs to backend (sets X-Account-Id header + reloads data).
+async function switchAccount(id) {
+  currentAccountId = id;
+  API.setAccountId(parseInt(id, 10) || 0);
+  saveSetting('current_account', String(id));
+  renderAccountSelect();
+  renderAccountList();
+  await loadData();
+  renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve();
+  populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist(); updateBackupInfo();
+  closeAccountModal();
+  showToast('Switched account');
+}
+// B1: addAccount now POSTs to the real backend instead of pushing a fake id into _ac.
+// B21: accepts an optional inputId so the settings-page input can be wired up too.
+async function addAccount(inputId) {
+  const inp = $(inputId || 'newAccountName');
+  if (!inp) { showToast('Input not found'); return; }
+  const name = inp.value.trim();
+  if (!name) return;
+  try {
+    const r = await API.req('/api/accounts', { method:'POST', body: JSON.stringify({ name }) });
+    _ac = (getAccounts() || []).concat([{ id: r.id, name: r.name, created: r.created, trade_count: 0, pnl: 0 }]);
+    inp.value = '';
+    renderAccountList(); renderAccountSelect(); updateBackupInfo();
+    showToast('Account created');
+  } catch (e) {
+    showToast('Create failed: ' + (e.message || e));
+  }
+}
+function deleteAccount(id) {
+  const accounts = getAccounts() || [];
+  if (accounts.length <= 1) { showToast('Cannot delete last account'); return; }
+  const acc = accounts.find(a => String(a.id) === String(id));
+  if (!acc) { showToast('Account not found'); return; }
+
+  const nameEl = $('deleteAccountName');
+  if (nameEl) nameEl.textContent = acc.name || ('#' + acc.id);
+  const sel = $('deleteAccountTarget');
+  if (sel) {
+    sel.innerHTML = accounts
+      .filter(a => String(a.id) !== String(id))
+      .map(a => '<option value="' + a.id + '">' + escapeHtml(a.name || ('#' + a.id)) + '</option>')
+      .join('');
+  }
+  const reassignRadio = document.querySelector('input[name="deleteMode"][value="reassign"]');
+  if (reassignRadio) reassignRadio.checked = true;
+
+  pendingDeleteAccountId = id;
+  $('deleteAccountModal').classList.add('active');
+}
+
+let pendingDeleteAccountId = null;
+
+function closeDeleteAccountModal() {
+  $('deleteAccountModal').classList.remove('active');
+  pendingDeleteAccountId = null;
+}
+
+// B9: pass `event` explicitly so we don't depend on the global window.event
+// (which is null in Firefox after an await).
+async function confirmDeleteAccount(evt) {
+  if (pendingDeleteAccountId === null) { closeDeleteAccountModal(); return; }
+  const mode = (document.querySelector('input[name="deleteMode"]:checked') || {}).value || 'reassign';
+  const targetSel = $('deleteAccountTarget');
+  const target = targetSel ? targetSel.value : null;
+
+  let apiUrl = '/api/accounts/' + encodeURIComponent(pendingDeleteAccountId) + '?mode=' + mode;
+  if (mode === 'reassign') {
+    // B26: also validate target belongs to the current account list (not stale).
+    const stillThere = (getAccounts() || []).find(a => String(a.id) === String(target));
+    if (!target || !stillThere) { showToast('Pick a valid target account'); return; }
+    apiUrl += '&target=' + encodeURIComponent(target);
+  }
+
+  const btn = evt && evt.currentTarget ? evt.currentTarget : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting…'; }
+
+  try {
+    const res = await API.req(apiUrl, { method: 'DELETE' });
+    // B10: API.req throws on non-2xx, so res here is always a success body — drop dead error branch.
+    await loadData();
+
+    const remaining = getAccounts() || [];
+    if (remaining.length && !remaining.find(a => String(a.id) === String(currentAccountId))) {
+      currentAccountId = remaining[0].id;
+      API.setAccountId(parseInt(currentAccountId, 10) || 0);
+      saveSetting('current_account', String(currentAccountId));
+    }
+
+    closeDeleteAccountModal();
+    renderAccountList && renderAccountList();
+    renderAccountSelect && renderAccountSelect();
+    renderTrades && renderTrades();
+    updateJournalStats && updateJournalStats();
+    updateBackupInfo && updateBackupInfo();
+    showToast(res.mode === 'reassign' ? 'Account deleted — trades moved' : 'Account and trades deleted');
+  } catch (e) {
+    // B18: clear pending state so a failed attempt doesn't leave the modal half-open.
+    showToast('Delete failed: ' + (e.message || e));
+    if (btn) { btn.disabled = false; btn.textContent = 'Delete account'; }
+  }
+}
 
 function bindSubtabs() { document.querySelector('.subtabs').addEventListener('click', e => { const tab=e.target.closest('.subtab'); if(!tab) return; $$('.subtab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); const sub=tab.dataset.subtab; $$('.tab-content').forEach(c=>c.classList.remove('active')); $('tab-'+sub).classList.add('active'); if(sub==='analytics') renderAnalytics(); if(sub==='reviews') renderReviews(); }); }
 
@@ -2633,12 +3302,12 @@ function exportCsv() { const trades=getTrades(); if(trades.length===0){showToast
 function exportJson() { const data={exported:new Date().toISOString(),account:getAccounts().find(a=>a.id===currentAccountId),trades:getTrades(),setups:getOpportunities()}; downloadFile(JSON.stringify(data,null,2),'trading-journal.json','application/json'); showToast('JSON exported'); }
 function downloadFile(content,filename,type) { const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
 function importJson(event) { const file=event.target.files[0]; if(!file) return; if(file.size>10*1024*1024){showToast('File too large');event.target.value='';return;} const reader=new FileReader(); reader.onload=e=>{try{const data=JSON.parse(e.target.result); if(!data||!data.trades||!Array.isArray(data.trades)) throw new Error('Invalid'); const existing=getTrades(); const ids=new Set(existing.map(t=>t.id)); let imp=0,skip=0; data.trades.forEach(t=>{const s=sanitizeTrade(t); if(!s){skip++;return;} if(!ids.has(s.id)){existing.unshift(s);imp++;}else{skip++;}}); saveTrades(existing); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); showToast(imp+' imported'+(skip>0?', '+skip+' skipped':''));}catch(err){showToast('Import failed: '+err.message);} event.target.value='';}; reader.readAsText(file); }
-function sanitizeTrade(t) { if(!t||typeof t!=='object') return null; const arr=v=>(Array.isArray(v))?v.filter(x=>typeof x==='string').map(x=>x.slice(0,100)):[]; const id=num(t.id)||Date.now(); return {id,symbol:str(t.symbol).replace(/[^A-Z0-9.]/gi,'').toUpperCase().slice(0,20)||'UNKNOWN',direction:(t.direction==='long'||t.direction==='short')?t.direction:'long',setup:str(t.setup,100),entry:num(t.entry),exit:num(t.exit),sl:num(t.sl),tp:num(t.tp),size:Math.abs(num(t.size)),pnl:num(t.pnl),rMultiple:num(t.rMultiple),status:['open','win','loss','be'].includes(t.status)?t.status:'open',notes:str(t.notes),lessons:str(t.lessons),emotion:str(t.emotion,50),entryPic:str(t.entryPic,800000),exitPic:str(t.exitPic,800000),rating:Math.max(0,Math.min(5,Math.floor(num(t.rating)))),tags:arr(t.tags),propfirmId:t.propfirmId||'',session:['asia','london','newyork'].includes(t.session)?t.session:detectSession(new Date(num(t.timestamp)||Date.now())),timestamp:num(t.timestamp)||Date.now(),date:str(t.date,20),time:str(t.time,10)}; }
+function sanitizeTrade(t) { if(!t||typeof t!=='object') return null; const arr=v=>(Array.isArray(v))?v.filter(x=>typeof x==='string').map(x=>x.slice(0,100)):[]; const id=num(t.id)||Date.now(); return {id,symbol:str(t.symbol).replace(/[^A-Z0-9.]/gi,'').toUpperCase().slice(0,20)||'UNKNOWN',direction:(t.direction==='long'||t.direction==='short')?t.direction:'long',setup:str(t.setup,100),entry:num(t.entry),exit:num(t.exit),sl:num(t.sl),tp:num(t.tp),size:Math.abs(num(t.size)),pnl:num(t.pnl),rMultiple:num(t.rMultiple),status:['open','win','loss','be'].includes(t.status)?t.status:'open',notes:str(t.notes),lessons:str(t.lessons),emotion:str(t.emotion,50),entryPic:str(t.entryPic,800000),exitPic:str(t.exitPic,800000),rating:Math.max(0,Math.min(5,Math.floor(num(t.rating)))),tags:arr(t.tags),propfirmId:t.propfirmId||'',tp1:num(t.tp1),tp2:num(t.tp2),tp3:num(t.tp3),tp1Hit:!!t.tp1Hit,tp2Hit:!!t.tp2Hit,tp3Hit:!!t.tp3Hit,session:['asia','london','newyork'].includes(t.session)?t.session:detectSession(new Date(num(t.timestamp)||Date.now())),timestamp:num(t.timestamp)||Date.now(),date:str(t.date,20),time:str(t.time,10)}; }
 
 function startEditTrade(id) { const _t = getTrades().find(t=>t.id===id); if(_t && isTradeLocked(_t)) { showToast('Trade locked after 48h'); return; } editingTradeId=id; renderTrades(); }
 function cancelEditTrade() { editingTradeId=null; renderTrades(); }
-function saveEditTrade(id) { const trades=getTrades(); const idx=trades.findIndex(t=>t.id===id); if(idx===-1) return; const symbol=$('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20); if(!symbol){showToast('Symbol required');return;} trades[idx].symbol=symbol; trades[idx].setup=str($('edit_setup_'+id).value,100); trades[idx].entry=num($('edit_entry_'+id).value); trades[idx].exit=num($('edit_exit_'+id).value); trades[idx].sl=num($('edit_sl_'+id).value); trades[idx].tp=num($('edit_tp_'+id).value); trades[idx].size=Math.abs(num($('edit_size_'+id).value)); trades[idx].notes=str($('edit_notes_'+id).value); trades[idx].lessons=str($('edit_lessons_'+id).value); trades[idx].emotion=str($('edit_emotion_'+id).value,50); trades[idx].entryPic=str($('edit_entryPic_'+id).value,800000); trades[idx].exitPic=str($('edit_exitPic_'+id).value,800000); trades[idx].rating=Math.max(0,Math.min(5,parseInt($('edit_rating_'+id).value)||0)); trades[idx].tags=$('edit_tags_'+id).value.split(',').map(s=>s.trim().slice(0,100)).filter(Boolean); trades[idx].propfirmId=$('edit_propfirm_'+id)?$('edit_propfirm_'+id).value:(trades[idx].propfirmId||'');trades[idx].tp1=num($('edit_tp1_'+id)?.value||0);trades[idx].tp2=num($('edit_tp2_'+id)?.value||0);trades[idx].tp3=num($('edit_tp3_'+id)?.value||0);trades[idx].mae=num($('edit_mae_'+id)?.value||0); trades[idx].mfe=num($('edit_mfe_'+id)?.value||0); trades[idx].mtf4h=str($('edit_mtf4h_'+id)?.value); trades[idx].mtf1h=str($('edit_mtf1h_'+id)?.value); trades[idx].mtf15m=str($('edit_mtf15m_'+id)?.value); if(!trades[idx].session) trades[idx].session=detectSession(new Date(trades[idx].timestamp||Date.now())); saveTrades(trades); editingTradeId=null; renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); showToast('Trade updated'); }
-function renderTradeEditForm(t) { const strategies=getStrategies(); const stratOpts='<option value="">None</option>'+strategies.map(s=>'<option value="'+escapeHtml(s.name)+'"'+(s.name===(t.setup||'')?' selected':'')+'>'+escapeHtml(s.name)+'</option>').join(''); return '<div class="trade-card glass expanded" data-id="'+t.id+'"><div class="tc-edit-form"><div class="ef-row"><div class="ef-field"><label>Symbol</label><input type="text" id="edit_symbol_'+t.id+'" value="'+escapeAttr(t.symbol)+'" class="mono"></div><div class="ef-field"><label>Strategy</label><select id="edit_setup_'+t.id+'">'+stratOpts+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Prop Firm</label><select id="edit_propfirm_'+t.id+'"><option value=\"\">None</option>'+getPropFirms().map(function(p){return '<option value=\"'+p.id+'\"'+(String(p.id)===String(t.propfirmId||'')?' selected':'')+'>'+escapeHtml(p.name)+'</option>';}).join('')+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Entry</label><input type="number" step="any" id="edit_entry_'+t.id+'" value="'+(t.entry||'')+'" class="mono"></div><div class="ef-field"><label>Exit</label><input type="number" step="any" id="edit_exit_'+t.id+'" value="'+(t.exit||'')+'" class="mono"></div><div class="ef-field"><label>SL</label><input type="number" step="any" id="edit_sl_'+t.id+'" value="'+(t.sl||'')+'" class="mono"></div><div class="ef-field"><label>TP</label><input type="number" step="any" id="edit_tp_'+t.id+'" value="'+(t.tp||'')+'" class="mono"></div><div class="ef-field"><label>Size</label><input type="number" step="any" id="edit_size_'+t.id+'" value="'+(t.size||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>Rating (0-5)</label><input type="number" min="0" max="5" id="edit_rating_'+t.id+'" value="'+(t.rating||0)+'"></div><div class="ef-field"><label>Tags (comma-sep)</label><input type="text" id="edit_tags_'+t.id+'" value="'+escapeAttr((t.tags||[]).join(', '))+'"></div><div class="ef-field"><label>Emotion</label><input type="text" id="edit_emotion_'+t.id+'" value="'+escapeAttr(t.emotion||'')+'"></div></div><div class="ef-row"><div class="ef-field"><label>Notes</label><textarea id="edit_notes_'+t.id+'" rows="2">'+escapeHtml(t.notes||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Lessons</label><textarea id="edit_lessons_'+t.id+'" rows="2">'+escapeHtml(t.lessons||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>TP1</label><input type="number" step="any" id="edit_tp1_'+t.id+'" value="'+(t.tp1||'')+'" class="mono"></div><div class="ef-field"><label>TP2</label><input type="number" step="any" id="edit_tp2_'+t.id+'" value="'+(t.tp2||'')+'" class="mono"></div><div class="ef-field"><label>TP3</label><input type="number" step="any" id="edit_tp3_'+t.id+'" value="'+(t.tp3||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>MAE</label><input type="number" step="any" id="edit_mae_'+t.id+'" value="'+(t.mae||'')+'" class="mono"></div><div class="ef-field"><label>MFE</label><input type="number" step="any" id="edit_mfe_'+t.id+'" value="'+(t.mfe||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>4H</label><textarea id="edit_mtf4h_'+t.id+'" rows="2">'+escapeHtml(t.mtf4h||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>1H</label><textarea id="edit_mtf1h_'+t.id+'" rows="2">'+escapeHtml(t.mtf1h||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>15m</label><textarea id="edit_mtf15m_'+t.id+'" rows="2">'+escapeHtml(t.mtf15m||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Entry Pic URL</label><input type="url" id="edit_entryPic_<div class="ef-row"><div class="ef-field"><label>Entry Pic URL</label><input type="url" id="edit_entryPic_'+t.id+'" value="'+escapeAttr(t.entryPic||'')+'"></div><div class="ef-field"><label>Exit Pic URL</label><input type="url" id="edit_exitPic_'+t.id+'" value="'+escapeAttr(t.exitPic||'')+'"></div></div><div class="ef-actions"><button class="ef-cancel" onclick="cancelEditTrade()">Cancel</button><button class="ef-save" onclick="saveEditTrade('+t.id+')">Save Changes</button></div></div></div>'; }
+function saveEditTrade(id) { const trades=getTrades(); const idx=trades.findIndex(t=>t.id===id); if(idx===-1) return; const symbol=$('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20); if(!symbol){showToast('Symbol required');return;} trades[idx].symbol=symbol; trades[idx].setup=str($('edit_setup_'+id).value,100); trades[idx].entry=num($('edit_entry_'+id).value); trades[idx].exit=num($('edit_exit_'+id).value); trades[idx].sl=num($('edit_sl_'+id).value); trades[idx].tp=num($('edit_tp_'+id).value); trades[idx].size=Math.abs(num($('edit_size_'+id).value)); trades[idx].notes=str($('edit_notes_'+id).value); trades[idx].lessons=str($('edit_lessons_'+id).value); trades[idx].emotion=str($('edit_emotion_'+id).value,50); trades[idx].entryPic=str($('edit_entryPic_'+id).value,800000); trades[idx].exitPic=str($('edit_exitPic_'+id).value,800000); trades[idx].rating=Math.max(0,Math.min(5,parseInt($('edit_rating_'+id).value)||0)); trades[idx].tags=$('edit_tags_'+id).value.split(',').map(s=>s.trim().slice(0,100)).filter(Boolean); trades[idx].propfirmId=$('edit_propfirm_'+id)?$('edit_propfirm_'+id).value:(trades[idx].propfirmId||'');trades[idx].tp1=num($('edit_tp1_'+id)?.value||0);trades[idx].tp2=num($('edit_tp2_'+id)?.value||0);trades[idx].tp3=num($('edit_tp3_'+id)?.value||0);trades[idx].mae=num($('edit_mae_'+id)?.value||0); trades[idx].mfe=num($('edit_mfe_'+id)?.value||0); trades[idx].mtf4h=str($('edit_mtf4h_'+id)?.value); trades[idx].mtf1h=str($('edit_mtf1h_'+id)?.value); trades[idx].mtf15m=str($('edit_mtf15m_'+id)?.value); if(!trades[idx].session) trades[idx].session=detectSession(new Date(trades[idx].timestamp||Date.now())); saveTrades(trades); API.req('/api/trades/'+id,{method:'PUT',body:JSON.stringify(trades[idx])}).catch(()=>{}); editingTradeId=null; renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); showToast('Trade updated'); }
+function renderTradeEditForm(t) { const strategies=getStrategies(); const stratOpts='<option value="">None</option>'+strategies.map(s=>'<option value="'+escapeHtml(s.name)+'"'+(s.name===(t.setup||'')?' selected':'')+'>'+escapeHtml(s.name)+'</option>').join(''); return '<div class="trade-card glass expanded" data-id="'+t.id+'"><div class="tc-edit-form"><div class="ef-row"><div class="ef-field"><label>Symbol</label><input type="text" id="edit_symbol_'+t.id+'" value="'+escapeAttr(t.symbol)+'" class="mono"></div><div class="ef-field"><label>Strategy</label><select id="edit_setup_'+t.id+'">'+stratOpts+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Prop Firm</label><select id="edit_propfirm_'+t.id+'"><option value=\"\">None</option>'+getPropFirms().map(function(p){return '<option value=\"'+p.id+'\"'+(String(p.id)===String(t.propfirmId||'')?' selected':'')+'>'+escapeHtml(p.name)+'</option>';}).join('')+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Entry</label><input type="number" step="any" id="edit_entry_'+t.id+'" value="'+(t.entry||'')+'" class="mono"></div><div class="ef-field"><label>Exit</label><input type="number" step="any" id="edit_exit_'+t.id+'" value="'+(t.exit||'')+'" class="mono"></div><div class="ef-field"><label>SL</label><input type="number" step="any" id="edit_sl_'+t.id+'" value="'+(t.sl||'')+'" class="mono"></div><div class="ef-field"><label>TP</label><input type="number" step="any" id="edit_tp_'+t.id+'" value="'+(t.tp||'')+'" class="mono"></div><div class="ef-field"><label>Size</label><input type="number" step="any" id="edit_size_'+t.id+'" value="'+(t.size||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>Rating (0-5)</label><input type="number" min="0" max="5" id="edit_rating_'+t.id+'" value="'+(t.rating||0)+'"></div><div class="ef-field"><label>Tags (comma-sep)</label><input type="text" id="edit_tags_'+t.id+'" value="'+escapeAttr((t.tags||[]).join(', '))+'"></div><div class="ef-field"><label>Emotion</label><input type="text" id="edit_emotion_'+t.id+'" value="'+escapeAttr(t.emotion||'')+'"></div></div><div class="ef-row"><div class="ef-field"><label>Notes</label><textarea id="edit_notes_'+t.id+'" rows="2">'+escapeHtml(t.notes||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Lessons</label><textarea id="edit_lessons_'+t.id+'" rows="2">'+escapeHtml(t.lessons||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>TP1</label><input type="number" step="any" id="edit_tp1_'+t.id+'" value="'+(t.tp1||'')+'" class="mono"></div><div class="ef-field"><label>TP2</label><input type="number" step="any" id="edit_tp2_'+t.id+'" value="'+(t.tp2||'')+'" class="mono"></div><div class="ef-field"><label>TP3</label><input type="number" step="any" id="edit_tp3_'+t.id+'" value="'+(t.tp3||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>MAE</label><input type="number" step="any" id="edit_mae_'+t.id+'" value="'+(t.mae||'')+'" class="mono"></div><div class="ef-field"><label>MFE</label><input type="number" step="any" id="edit_mfe_'+t.id+'" value="'+(t.mfe||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>4H</label><textarea id="edit_mtf4h_'+t.id+'" rows="2">'+escapeHtml(t.mtf4h||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>1H</label><textarea id="edit_mtf1h_'+t.id+'" rows="2">'+escapeHtml(t.mtf1h||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>15m</label><textarea id="edit_mtf15m_'+t.id+'" rows="2">'+escapeHtml(t.mtf15m||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Entry Pic URL</label><input type="url" id="edit_entryPic_'+t.id+'" value="'+escapeAttr(t.entryPic||'')+'"></div><div class="ef-field"><label>Exit Pic URL</label><input type="url" id="edit_exitPic_'+t.id+'" value="'+escapeAttr(t.exitPic||'')+'"></div></div><div class="ef-actions"><button class="ef-cancel" onclick="cancelEditTrade()">Cancel</button><button class="ef-save" onclick="saveEditTrade('+t.id+')">Save Changes</button></div></div></div>'; }
 function duplicateTrade(id) { const t=getTrades().find(tr=>tr.id===id); if(!t) return; $('t_symbol').value=t.symbol||''; populateStrategyDropdown(t.setup); $('t_entry').value=t.entry||''; $('t_exit').value=t.exit||''; $('t_sl').value=t.sl||''; $('t_tp').value=t.tp||''; $('t_size').value=t.size||''; $('t_notes').value=t.notes||''; $('t_lessons').value=t.lessons||''; $('t_emotion').value=t.emotion||''; $('t_entryPic').value=t.entryPic||''; $('t_exitPic').value=t.exitPic||''; if($('t_mae'))$('t_mae').value=t.mae||''; if($('t_mfe'))$('t_mfe').value=t.mfe||''; if($('t_mtf4h'))$('t_mtf4h').value=t.mtf4h||''; if($('t_mtf1h'))$('t_mtf1h').value=t.mtf1h||''; if($('t_mtf15m'))$('t_mtf15m').value=t.mtf15m||''; currentRating=t.rating||0; currentTags=[...(t.tags||[])]; updateStarDisplay(); renderTagChips(); dirManualOverride=false; statusManualOverride=false; setModeBadge('dirMode','auto'); setModeBadge('statusMode','auto'); ['t_entry','t_exit','t_sl','t_tp','t_size','t_symbol'].forEach(id2=>$(id2).dispatchEvent(new Event('input'))); document.querySelector('.form-wrap').scrollIntoView({behavior:'smooth',block:'start'}); showToast('Trade duplicated — edit and save'); }
 
 function detectSession(date) {
@@ -2733,8 +3402,8 @@ function renderSymbolBreakdown() { const trades=getTrades(); const tb=$('symbolT
 function renderTimeAnalysis() { const trades=getTrades(); const dc=$('dowChart'),hc=$('hourChart'); if(!dc||!hc) return; const dow=Array(7).fill(0).map(()=>({pnl:0,count:0})); const hr=Array(24).fill(0).map(()=>({pnl:0,count:0})); trades.forEach(function(t){if(!t||!t.timestamp)return;var d=new Date(t.timestamp);if(isNaN(d.getTime()))return;var dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long';var pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size);if(!isNaN(pnl)){dow[d.getDay()].pnl+=pnl;dow[d.getDay()].count++;hr[d.getHours()].pnl+=pnl;hr[d.getHours()].count++;}}); const dn=['S','M','T','W','T','F','S']; const maxD=Math.max(...dow.map(d=>Math.abs(d.pnl)),1); const maxH=Math.max(...hr.map(d=>Math.abs(d.pnl)),1); dc.innerHTML=dow.map((d,i)=>{const h=Math.abs(d.pnl)/maxD*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=dn[i]+': '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:h)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+dn[i]+'</div></div>';}).join(''); const active=[]; for(let i=0;i<24;i++) if(hr[i].count>0) active.push(i); const show=active.length>=8?active:Array.from({length:24},(_,i)=>i); hc.innerHTML=show.map(h=>{const d=hr[h]; const height=Math.abs(d.pnl)/maxH*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=h+':00 - '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:height)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+(h%6===0?h+'h':'')+'</div></div>';}).join(''); }
 
 function renderReviews() { const trades=getTrades().slice().sort((a,b)=>b.timestamp-a.timestamp); const c=$('reviewGrid'); if(!c) return; if(trades.length===0){c.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-3);font-size:12px;padding:40px;">Log trades to see weekly and monthly reviews</div>';return;} const now=new Date(); const ws=new Date(now); ws.setDate(now.getDate()-now.getDay()); ws.setHours(0,0,0,0); const ms=new Date(now.getFullYear(),now.getMonth(),1); const wt=trades.filter(t=>t.timestamp>=ws.getTime()); const mt=trades.filter(t=>t.timestamp>=ms.getTime()); c.innerHTML=renderReviewCard('This Week',wt)+renderReviewCard('This Month',mt); }
-function renderReviewCard(label,trades) { if(trades.length===0) return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">No trades yet</div><div class="review-summary">Start logging trades to see your auto-summary here.</div></div>'; let netPnl=0,wins=0,losses=0,rSum=0; let dm={},sm={}; trades.forEach(t=>{const dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long'; const pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size); const risk=calculateRisk(t.symbol,dir,t.entry,t.sl,t.size); const rMult=risk>0?pnl/risk:0; const status=(t.entry&&t.exit)?autoDetectStatus(t.symbol,dir,t.entry,t.exit,t.sl,t.tp,t.size):'open'; netPnl+=pnl; rSum+=rMult; if(status==='win')wins++; if(status==='loss')losses++; const dk=new Date(t.timestamp).toLocaleDateString('en-US',{weekday:'short'}); dm[dk]=(dm[dk]||0)+pnl; sm[t.symbol]=(sm[t.symbol]||0)+pnl;}); const closed=wins+losses; const wr=closed>0?(wins/closed*100).toFixed(1):'0.0'; const avgR=trades.length>0?(rSum/trades.length).toFixed(2):'0.00'; let bD='—',bP=0,wD='—',wP=0; for(const[day,pnl] of Object.entries(dm)){if(pnl>bP){bP=pnl;bD=day;} if(pnl<wP){wP=pnl;wD=day;}} let tS='—',tP=0; for(const[s,p] of Object.entries(sm)){if(Math.abs(p)>Math.abs(tP)){tP=p;tS=s;}} const period=new Date(trades[trades.length-1].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' - '+new Date(trades[0].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}); const cls=netPnl>=0?'pos':'neg'; let sum='<strong>'+trades.length+' trades</strong> · '+wr+'% win rate · '+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(2)+' net P&L. '; if(bP>0)sum+='Best day: <strong>'+bD+'</strong> (+'+bP.toFixed(0)+'). '; if(wP<0)sum+='Worst day: <strong>'+wD+'</strong> ('+wP.toFixed(0)+'). '; sum+='Top symbol: <strong>'+tS+'</strong>. Avg R: '+(parseFloat(avgR)>=0?'+':'')+avgR+'R.'; const key='review_'+label.replace(/\s/g,'_')+'_'+currentAccountId; const notes=localStorage.getItem(key)||''; return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">'+period+'</div><div class="review-stats"><div class="review-stat"><div class="rs-val '+cls+'">'+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(0)+'</div><div class="rs-lbl">Net P&L</div></div><div class="review-stat"><div class="rs-val">'+wr+'%</div><div class="rs-lbl">Win Rate</div></div><div class="review-stat"><div class="rs-val">'+trades.length+'</div><div class="rs-lbl">Trades</div></div><div class="review-stat"><div class="rs-val '+(parseFloat(avgR)>=0?'pos':'neg')+'">'+(parseFloat(avgR)>=0?'+':'')+avgR+'R</div><div class="rs-lbl">Avg R</div></div></div><div class="review-summary">'+sum+'</div><textarea class="review-notes" placeholder="Your reflection for '+label+'..." onblur="saveReviewNotes(\''+label.replace(/\s/g,'_')+'\',this.value)">'+escapeHtml(notes)+'</textarea></div>'; }
-function saveReviewNotes(label,notes) { try{localStorage.setItem('review_'+label+'_'+currentAccountId,notes);}catch(e){} }
+function renderReviewCard(label,trades) { if(trades.length===0) return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">No trades yet</div><div class="review-summary">Start logging trades to see your auto-summary here.</div></div>'; let netPnl=0,wins=0,losses=0,rSum=0; let dm={},sm={}; trades.forEach(t=>{const dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long'; const pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size); const risk=calculateRisk(t.symbol,dir,t.entry,t.sl,t.size); const rMult=risk>0?pnl/risk:0; const status=(t.entry&&t.exit)?autoDetectStatus(t.symbol,dir,t.entry,t.exit,t.sl,t.tp,t.size):'open'; netPnl+=pnl; rSum+=rMult; if(status==='win')wins++; if(status==='loss')losses++; const dk=new Date(t.timestamp).toLocaleDateString('en-US',{weekday:'short'}); dm[dk]=(dm[dk]||0)+pnl; sm[t.symbol]=(sm[t.symbol]||0)+pnl;}); const closed=wins+losses; const wr=closed>0?(wins/closed*100).toFixed(1):'0.0'; const avgR=trades.length>0?(rSum/trades.length).toFixed(2):'0.00'; let bD='—',bP=0,wD='—',wP=0; for(const[day,pnl] of Object.entries(dm)){if(pnl>bP){bP=pnl;bD=day;} if(pnl<wP){wP=pnl;wD=day;}} let tS='—',tP=0; for(const[s,p] of Object.entries(sm)){if(Math.abs(p)>Math.abs(tP)){tP=p;tS=s;}} const period=new Date(trades[trades.length-1].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' - '+new Date(trades[0].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}); const cls=netPnl>=0?'pos':'neg'; let sum='<strong>'+trades.length+' trades</strong> · '+wr+'% win rate · '+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(2)+' net P&L. '; if(bP>0)sum+='Best day: <strong>'+bD+'</strong> (+'+bP.toFixed(0)+'). '; if(wP<0)sum+='Worst day: <strong>'+wD+'</strong> ('+wP.toFixed(0)+'). '; sum+='Top symbol: <strong>'+tS+'</strong>. Avg R: '+(parseFloat(avgR)>=0?'+':'')+avgR+'R.'; const notes=''; return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">'+period+'</div><div class="review-stats"><div class="review-stat"><div class="rs-val '+cls+'">'+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(0)+'</div><div class="rs-lbl">Net P&L</div></div><div class="review-stat"><div class="rs-val">'+wr+'%</div><div class="rs-lbl">Win Rate</div></div><div class="review-stat"><div class="rs-val">'+trades.length+'</div><div class="rs-lbl">Trades</div></div><div class="review-stat"><div class="rs-val '+(parseFloat(avgR)>=0?'pos':'neg')+'">'+(parseFloat(avgR)>=0?'+':'')+avgR+'R</div><div class="rs-lbl">Avg R</div></div></div><div class="review-summary">'+sum+'</div><textarea class="review-notes" placeholder="Your reflection for '+label+'..." onblur="saveReviewNotes(\''+label.replace(/\s/g,'_')+'\',this.value)">'+escapeHtml(notes)+'</textarea></div>'; }
+function saveReviewNotes(label,notes) { saveSetting('review_'+label+'_'+(currentAccountId||'default'), notes); }
 
 // ============ STRATEGY SYSTEM ============
 function getStrategies() {
@@ -2756,14 +3425,34 @@ function saveStrategy(event) {
   const checklist = $('strat_checklist').value.trim().slice(0, 5000);
   const notes = $('strat_notes').value.trim().slice(0, 5000);
   const video = $('strat_video').value.trim().slice(0, 500);
-  const strategy = { id: Date.now(), name, checklist, notes, video, created: Date.now() };
   const strategies = getStrategies();
-  strategies.unshift(strategy);
-  if (!saveStrategies(strategies)) return;
-  $('strategyForm').reset();
-  renderStrategies();
-  populateStrategyDropdown();
-  showToast('Strategy saved');
+  
+  if (_editingStrategyId) {
+    // Edit mode — update existing strategy
+    const idx = strategies.findIndex(s => s.id === _editingStrategyId);
+    if (idx >= 0) {
+      strategies[idx] = { ...strategies[idx], name, checklist, notes, video };
+      if (!saveStrategies(strategies)) return; API.req('/api/strategies/'+_editingStrategyId,{method:'PUT',body:JSON.stringify(strategies[idx])}).catch(()=>{});
+      _editingStrategyId = null;
+      $('strategyForm').reset();
+      var formHead = document.querySelector('#strategyForm').closest('.form-wrap').querySelector('.form-head h3');
+      if (formHead) formHead.textContent = 'New Strategy';
+      var submitBtn = document.querySelector('#strategyForm button[type="submit"]');
+      if (submitBtn) submitBtn.textContent = 'Save Strategy';
+      renderStrategies();
+      populateStrategyDropdown();
+      showToast('Strategy updated');
+    }
+  } else {
+    // Create mode — add new strategy
+    const strategy = { id: Date.now(), name, checklist, notes, video, created: Date.now() };
+    strategies.unshift(strategy);
+    if (!saveStrategies(strategies)) return; API.req('/api/strategies',{method:'POST',body:JSON.stringify(strategy)}).then(r=>{strategy.id=r.id;}).catch(e=>showToast('Sync: '+e.message));
+    $('strategyForm').reset();
+    renderStrategies();
+    populateStrategyDropdown();
+    showToast('Strategy saved');
+  }
 }
 
 function renderStrategies() {
@@ -2780,15 +3469,17 @@ function renderStrategies() {
 
 function getChecklistState(strategyId) {
   try {
-    const key = 'strat_checklist_' + currentAccountId + '_' + strategyId;
+    const key = 'strat_checklist_' + (currentAccountId||'default') + '_' + strategyId;
+    var cached = getSetting(key, null);
+    if (cached) { var arr3 = JSON.parse(cached); return Array.isArray(arr3) ? arr3 : []; }
     const arr = JSON.parse(localStorage.getItem(key) || '[]');
     return Array.isArray(arr) ? arr : [];
   } catch(e) { return []; }
 }
 function setChecklistState(strategyId, items) {
   try {
-    const key = 'strat_checklist_' + currentAccountId + '_' + strategyId;
-    localStorage.setItem(key, JSON.stringify(items));
+    const key = 'strat_checklist_' + (currentAccountId||'default') + '_' + strategyId;
+    saveSetting(key, JSON.stringify(items));
   } catch(e) {}
 }
 function toggleChecklistItem(strategyId, itemIdx) {
@@ -2842,7 +3533,10 @@ function renderStrategyCard(s, num) {
     html += '<div class="strat-card-meta">' + chipsHtml.join('') + '</div>';
   }
   html += '</div>';
+  html += '<div style="display:flex;gap:4px;">';
+  html += '<button class="strat-card-delete" onclick="editStrategy(' + s.id + ')" title="Edit strategy" style="background:var(--accent-dim);border-color:var(--border-accent);color:var(--accent-h);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>';
   html += '<button class="strat-card-delete" onclick="deleteStrategy(' + s.id + ')" title="Delete strategy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
+  html += '</div>';
   html += '</div>';
   // Body
   html += '<div class="strat-card-body">';
@@ -2902,10 +3596,38 @@ function getRelativeTime(date) {
   return Math.floor(months / 12) + 'y ago';
 }
 
+let _editingStrategyId = null;
+
+function editStrategy(id) {
+  var s = getStrategies().find(function(st) { return st.id === id; });
+  if (!s) return;
+  _editingStrategyId = id;
+  $('strat_name').value = s.name || '';
+  $('strat_checklist').value = s.checklist || '';
+  $('strat_notes').value = s.notes || '';
+  $('strat_video').value = s.video || '';
+  // Update form header and button
+  var formHead = document.querySelector('#strategyForm').closest('.form-wrap').querySelector('.form-head h3');
+  if (formHead) formHead.textContent = 'Edit Strategy';
+  var submitBtn = document.querySelector('#strategyForm button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = 'Update Strategy';
+  // Scroll to form
+  document.querySelector('#strategyForm').closest('.form-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEditStrategy() {
+  _editingStrategyId = null;
+  $('strategyForm').reset();
+  var formHead = document.querySelector('#strategyForm').closest('.form-wrap').querySelector('.form-head h3');
+  if (formHead) formHead.textContent = 'New Strategy';
+  var submitBtn = document.querySelector('#strategyForm button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = 'Save Strategy';
+}
+
 function deleteStrategy(id) {
   if (!confirm('Delete this strategy?')) return;
   const strategies = getStrategies().filter(s => s.id !== id);
-  saveStrategies(strategies);
+  saveStrategies(strategies); API.req('/api/strategies/'+id,{method:'DELETE'}).catch(()=>{});
   renderStrategies();
   populateStrategyDropdown();
   showToast('Strategy deleted');
@@ -2941,7 +3663,8 @@ function saveCustomFields(fields) {
   const key = currentAccountId ? 'custom_fields_' + currentAccountId : 'custom_fields';
   localStorage.setItem(key, JSON.stringify(fields));
 }
-function addCustomField() {
+async function addCustomField() {
+  
   const name = $('cf_new_name').value.trim().slice(0, 50);
   if (!name) return;
   const fields = getCustomFields();
@@ -3150,19 +3873,18 @@ function addToWatchlist() {
   const sym = input.value.trim().toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 20);
   if (!sym) return;
   const list = getWatchlist();
-  if (!list.includes(sym)) { list.push(sym); saveWatchlist(list); loadChart(currentChartSymbol); }
+  if (!list.includes(sym)) { list.push(sym); saveWatchlist(list); API.req('/api/watchlist',{method:'POST',body:JSON.stringify({symbol:sym})}).catch(()=>{}); loadChart(currentChartSymbol); }
   input.value = '';
   renderWatchlist();
 }
 function removeFromWatchlist(sym) {
   const list = getWatchlist().filter(s => s !== sym);
-  saveWatchlist(list);
-  loadChart(currentChartSymbol);
+  saveWatchlist(list); API.req('/api/watchlist/'+encodeURIComponent(sym),{method:'DELETE'}).catch(()=>{}); loadChart(currentChartSymbol);
   renderWatchlist();
 }
 function toggleTVWatchlist() {
   showTVWatchlist = !showTVWatchlist;
-  try { localStorage.setItem('tv_wl_visible', showTVWatchlist ? 'true' : 'false'); } catch(e) {}
+  try { saveSetting('tv_wl_visible', showTVWatchlist ? 'true' : 'false'); } catch(e) {}
   $('tvWlToggle').style.color = showTVWatchlist ? 'var(--accent-h)' : 'var(--text-3)';
   loadChart(currentChartSymbol);
   showToast(showTVWatchlist ? 'TV watchlist shown' : 'TV watchlist hidden');
@@ -3172,8 +3894,7 @@ function addCategoryToWatchlist(catKey) {
   const list = getWatchlist();
   let added = 0;
   syms.forEach(s => { if (!list.includes(s)) { list.push(s); added++; } });
-  saveWatchlist(list);
-  loadChart(currentChartSymbol);
+  saveWatchlist(list); syms.forEach(s=>{API.req('/api/watchlist',{method:'POST',body:JSON.stringify({symbol:s})}).catch(()=>{});}); loadChart(currentChartSymbol);
   renderWatchlist();
   showToast(added + ' symbols added from ' + SYMBOL_CATEGORIES[catKey].label);
 }
@@ -3265,7 +3986,7 @@ function bindExtraEvents() {
 function setThemeSetting(theme) {
   currentTheme = theme;
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('dashboard_theme', theme);
+  saveSetting('dashboard_theme', theme);
   $('themeLightBtn').classList.toggle('active', theme === 'light');
   $('themeDarkBtn').classList.toggle('active', theme === 'dark');
   loadChart(currentChartSymbol);
@@ -3286,11 +4007,13 @@ function renderSettingsPage() {
   }
   // Accounts
   const al = $('settingsAccountList'); if(al) {
-    const accounts = getAccounts();
+    const accounts = getAccounts() || [];
     al.innerHTML = accounts.map(a => {
-      const trades = (_tc||getTrades()||[]).filter(t=>t.accountId===a.id);
-      const pnl = trades.reduce((s,t)=>s+(t.pnl||0),0);
-      return '<div class="settings-account-row"><div><div class="settings-account-name">'+escapeHtml(a.name)+'</div><div class="settings-account-stats">'+(a.trade_count||trades.length)+' trades</div></div><div style="display:flex;gap:4px;"><button class="icon-btn" onclick="switchAccount('+a.id+');switchView(\'chart\')" title="Switch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>'+(accounts.length>1?'<button class="icon-btn danger" onclick="deleteAccount('+a.id+')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>':'')+'</div></div>';
+      // B29: use trade_count returned by getAccounts() (already computed server-side).
+      const trades = (_tc||getTrades()||[]).filter(t => String(t.accountId) === String(a.id));
+      const pnl = trades.reduce((s,t) => s + (Number(t.pnl) || 0), 0);
+      const count = a.trade_count != null ? a.trade_count : trades.length;
+      return '<div class="settings-account-row"><div><div class="settings-account-name">'+escapeHtml(a.name)+'</div><div class="settings-account-stats">'+count+' trades · '+(pnl>=0?'+':'')+'$'+pnl.toFixed(0)+'</div></div><div style="display:flex;gap:4px;"><button class="icon-btn" onclick="switchAccount('+a.id+');switchView(\'chart\')" title="Switch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>'+(accounts.length>1?'<button class="icon-btn danger" onclick="deleteAccount('+a.id+')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>':'')+'</div></div>';
     }).join('');
   }
 }
@@ -3301,13 +4024,14 @@ function saveSessionSettingsFromPage() {
     if(startEl) settings[key].start = startEl.value;
     if(endEl) settings[key].end = endEl.value;
   });
-  localStorage.setItem('session_times', JSON.stringify(settings));
+  saveSetting('session_times', JSON.stringify(settings));
   showToast('Session times saved');
   updateSessionClock();
 }
 
 function getFeeSettings() {
-  try { return JSON.parse(localStorage.getItem('fee_settings') || '{}'); }
+  var v = getSetting('fee_settings', '{}');
+  try { return typeof v === 'string' ? JSON.parse(v) : v; }
   catch(e) { return {}; }
 }
 function saveFeeSettings() {
@@ -3317,7 +4041,7 @@ function saveFeeSettings() {
     forex: num($('set_fee_forex').value),
     defaultOrder: $('set_fee_default').value
   };
-  localStorage.setItem('fee_settings', JSON.stringify(fees));
+  saveSetting('fee_settings', JSON.stringify(fees));
   showToast('Fee settings saved');
 }
 function loadFeeSettingsToUI() {
@@ -3411,6 +4135,19 @@ function openTradeLightbox(tradeId) {
   if (t.lessons) d += '<div style="margin-bottom:10px;"><strong style="color:rgba(255,255,255,.6);font-size:11px;">Lessons:</strong><br>' + renderMarkdown(t.lessons) + '</div>';
   $('tradeLbDetails').innerHTML = d;
 
+  // Action buttons (Edit / Delete — only if trade is not locked)
+  var actEl = $('tradeLbActions');
+  if (actEl) {
+    if (isTradeLocked(t)) {
+      actEl.innerHTML = '<div style="font-size:11px;color:rgba(255,200,0,.6);display:flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Trade locked (48h passed)</div>';
+    } else {
+      actEl.innerHTML = 
+        '<button onclick="closeTradeLightbox();startEditTrade(' + t.id + ')" style="flex:1;padding:8px;background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.4);color:#60A5FA;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit</button>' +
+        '<button onclick="closeTradeLightbox();deleteTrade(' + t.id + ')" style="flex:1;padding:8px;background:rgba(229,72,77,.2);border:1px solid rgba(229,72,77,.4);color:#E5484D;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>' +
+        '<button onclick="closeTradeLightbox();duplicateTrade(' + t.id + ')" style="flex:1;padding:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate</button>';
+    }
+  }
+
   $('tradeLightbox').classList.add('active');
 }
 function detailRow(label, value) {
@@ -3459,14 +4196,26 @@ let _ecFallbackActive = false;
 
 // Single unified function: triggers download via hidden iframe, then shows file picker
 function loadEconomicCalendar() {
-  // Step 1: Trigger download via hidden iframe (no new tab, no popup)
-  var iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = 'https://nfs.faireconomy.media/ff_calendar_thisweek.csv';
-  document.body.appendChild(iframe);
+  if (API.token) {
+    var c = $('ecContainer'); if(c) c.innerHTML = '<div class="ec-loading">Loading from server...</div>';
+    API.req('/api/calendar').then(function(data) {
+      if(data.error) throw new Error(data.error);
+      _ecData = data.events || [];
+      if(_ecData.length > 0) {
+        saveSetting('ec_data_cache', JSON.stringify(_ecData)); saveSetting('ec_data_time', String(Date.now()));
+        var fb = $('ecFilterBar'); if(fb) fb.style.display = 'flex';
+        renderEconomicCalendar();
+        showToast('Calendar loaded: ' + _ecData.length + ' events');
+      } else { showEconomicCalendarSelectUI(); }
+    }).catch(function(e) {
+      var iframe = document.createElement('iframe'); iframe.style.display = 'none'; iframe.src = 'https://nfs.faireconomy.media/ff_calendar_thisweek.csv'; document.body.appendChild(iframe);
+      setTimeout(function() { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 30000);
+      showEconomicCalendarSelectUI();
+    });
+    return;
+  }
+  var iframe = document.createElement('iframe'); iframe.style.display = 'none'; iframe.src = 'https://nfs.faireconomy.media/ff_calendar_thisweek.csv'; document.body.appendChild(iframe);
   setTimeout(function() { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 30000);
-
-  // Step 2: Show "select file" UI
   showEconomicCalendarSelectUI();
 }
 
@@ -3537,7 +4286,7 @@ function handleEconomicCSVUpload(event) {
       if(!csv || csv.length < 50) throw new Error('File appears to be empty or invalid');
       _ecData = parseEconomicCSV(csv);
       if(!_ecData || _ecData.length === 0) throw new Error('No events found in CSV');
-      try { localStorage.setItem('ec_data_cache', JSON.stringify(_ecData)); localStorage.setItem('ec_data_time', String(Date.now())); } catch(e) {}
+      try { saveSetting('ec_data_cache', JSON.stringify(_ecData)); saveSetting('ec_data_time', String(Date.now())); } catch(e) {}
       const fb = $('ecFilterBar'); if(fb) fb.style.display = 'flex';
       _ecFallbackActive = false;
       renderEconomicCalendar();
@@ -3594,8 +4343,8 @@ function setEcFilter(f) {
   renderEconomicCalendar();
 }
 
-let _ecTimezone = localStorage.getItem('ec_timezone') || 'est';
-function changeEcTimezone(tz) { _ecTimezone = tz; try{localStorage.setItem('ec_timezone', tz);}catch(e){} renderEconomicCalendar(); }
+let _ecTimezone = getSetting('ec_timezone', 'est') || 'est';
+function changeEcTimezone(tz) { _ecTimezone = tz; saveSetting('ec_timezone', tz); renderEconomicCalendar(); }
 function convertEcTime(dateStr, timeStr, tz) {
   if(!dateStr) return { date: dateStr, time: timeStr };
   if(!timeStr || timeStr === 'All Day') return { date: dateStr, time: timeStr };
@@ -3821,7 +4570,9 @@ const DEFAULT_SESSIONS = {
   newyork: { label: 'New York', start: '16:00', end: '23:00' }
 };
 function getSessionSettings() {
-  try { return JSON.parse(localStorage.getItem('session_times') || 'null') || DEFAULT_SESSIONS; }
+  var v = getSetting('session_times', null);
+  if (!v) return DEFAULT_SESSIONS;
+  try { return typeof v === 'string' ? JSON.parse(v) : v; }
   catch(e) { return DEFAULT_SESSIONS; }
 }
 function openSessionSettings() {
@@ -3840,18 +4591,15 @@ function saveSessionSettings() {
     if(startEl) settings[key].start = startEl.value;
     if(endEl) settings[key].end = endEl.value;
   });
-  localStorage.setItem('session_times', JSON.stringify(settings));
+  saveSetting('session_times', JSON.stringify(settings));
   closeSessionSettings();
   showToast('Session times saved');
   updateSessionClock();
 }
 
 // ============ PROP FIRM TRACKER ============
-function getPropFirms() {
-  try { return JSON.parse(localStorage.getItem('prop_firms') || '[]'); }
-  catch(e) { return []; }
-}
-function savePropFirmsData(arr) { localStorage.setItem('prop_firms', JSON.stringify(arr)); }
+function getPropFirms() { return _pfCache || []; }
+function savePropFirmsData(arr) { _pfCache = arr || []; }
 
 function getPropFirmTrades(pfId) {
   return getTrades().filter(function(t) { return String(t.propfirmId||'') === String(pfId); });
@@ -3961,6 +4709,7 @@ function pfSave() {
     firms.unshift(pf);
   }
   savePropFirmsData(firms);
+  if (API.token) { API.req('/api/propfirms',{method:'POST',body:JSON.stringify(pf)}).then(function(r){pf.id=r.id;}).catch(function(e){showToast('Sync: '+e.message);}); }
   pfCloseModal();
   renderPropFirms();
   showToast('Challenge saved');
@@ -3969,6 +4718,7 @@ function pfSave() {
 function pfDelete(id) {
   if (!confirm('Delete this challenge?')) return;
   savePropFirmsData(getPropFirms().filter(function(p) { return p.id !== id; }));
+  if (API.token) { API.req('/api/propfirms/'+id,{method:'DELETE'}).catch(function(){}); }
   renderPropFirms();
   showToast('Deleted');
 }
@@ -4124,6 +4874,7 @@ function renderPropFirms() {
         pf.currentStep = 2;
         pf.step1Pnl = totalPnl;
         savePropFirmsData(getPropFirms());
+        if (API.token) { API.req('/api/propfirms/'+pf.id,{method:'PUT',body:JSON.stringify(pf)}).catch(function(){}); }
       }
       if (step1Passed) {
         stepPnl = totalPnl - (pf.step1Pnl || 0);
