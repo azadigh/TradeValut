@@ -2768,10 +2768,21 @@ function showLoginScreen() { $('loginScreen').classList.add('active'); }
 function hideLoginScreen() {
   $('loginScreen').classList.remove('active');
   setTimeout(async () => {
-    initTheme(); initAccounts();
+    initTheme();
+    // B83: If API.accountId is 0 (after restore cleared localStorage),
+    // we need to fetch accounts first to get a valid accountId.
+    if (!API.accountId) {
+      try {
+        const accts = await API.req('/api/accounts');
+        if (accts && accts.length > 0) {
+          API.accountId = accts[0].id;  // set in-memory only, don't save to localStorage
+        }
+      } catch(e) { console.error('Failed to fetch accounts for restore:', e); }
+    }
     await loadData();
-    // B77: If multiple accounts and no saved preference (or saved one is invalid),
-    // show the account picker so the user can choose which to load.
+    // B84: initAccounts AFTER loadData so _ac is populated
+    initAccounts();
+    // B77/B82: If multiple accounts and no saved preference, show the account picker.
     const accounts = getAccounts() || [];
     if (accounts.length > 1) {
       // Check if saved currentAccountId is valid
@@ -2783,12 +2794,21 @@ function hideLoginScreen() {
         return;  // Don't render the rest yet — wait for user to pick
       }
     }
-    // Single account, or valid saved account — proceed normally
+    // Single account, or valid saved account — sync currentAccountId and proceed
+    if (accounts.length > 0) {
+      currentAccountId = accounts[0].id;
+      API.setAccountId(parseInt(currentAccountId, 10) || 0);
+      localStorage.setItem('current_account_id', String(currentAccountId));
+    }
     proceedAfterAccountLoad();
   }, 400);
 }
 
 function proceedAfterAccountLoad() {
+  // B82: If currentAccountId wasn't set by the picker, sync it from API.accountId
+  if (!currentAccountId && API.accountId) {
+    currentAccountId = API.accountId;
+  }
   loadChart(currentChartSymbol);
   renderOpportunities(); renderTrades();
   updateStats(); updateJournalStats(); renderEquityCurve();
@@ -2835,8 +2855,12 @@ async function handleLogin(event) {
   if (!pw) { showLoginError('Password required'); return; }
   const btn = $('loginSubmitBtn'); btn.textContent = 'Please wait...'; btn.disabled = true;
   try {
-    await API.login(pw);
-    await loadData();
+    // B81/B82: Don't call loadData() here — hideLoginScreen() will do it.
+    // B82: Don't let API.login() save accountId to localStorage — we want the
+    // account picker to show if there are multiple accounts.
+    const d = await API.req('/api/auth/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
+    API.setToken(d.token);
+    API.accountId = d.accountId;  // set in-memory only, DON'T save to localStorage yet
     // B66: clear the password field on success so it doesn't linger if the user logs out later.
     $('loginPassword').value = '';
     btn.textContent = 'Login'; btn.disabled = false;
@@ -3568,6 +3592,8 @@ function restoreAll(event) {
       }
 
       if (backup.theme) localStorage.setItem('dashboard_theme', backup.theme);
+      // B80: clear saved account preference so the account picker shows after restore
+      try { localStorage.removeItem('tv_current_account'); } catch(_){}
       showToast('Restored ' + restored + ' items. Reloading...');
       setTimeout(() => location.reload(), 1200);
     } catch (err) { showToast('Restore failed: ' + (err.message || 'invalid file')); }
@@ -3615,8 +3641,12 @@ function renderAccountSelect() {
   sel.onchange = async function() {
     currentAccountId = parseInt(this.value, 10);
     API.setAccountId(currentAccountId);
+    localStorage.setItem('current_account_id', String(currentAccountId));
     await loadData();
+    // B79: re-render all UI components so data updates visually
     renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo();
+    populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist();
+    if (typeof renderCalendar === 'function') renderCalendar();
     showToast('Switched account');
   };
 }
@@ -3649,11 +3679,14 @@ async function switchAccount(id) {
   currentAccountId = id;
   API.setAccountId(parseInt(id, 10) || 0);
   saveSetting('current_account', String(id));
+  localStorage.setItem('current_account_id', String(id));
   renderAccountSelect();
   renderAccountList();
   await loadData();
+  // B79: after loadData, re-render everything so the UI shows the new account's data
   renderOpportunities(); updateStats(); renderTrades(); updateJournalStats(); renderEquityCurve();
   populateStrategyDropdown(); renderCustomFieldDefs(); renderWatchlist(); updateBackupInfo();
+  if (typeof renderCalendar === 'function') renderCalendar();
   closeAccountModal();
   showToast('Switched account');
 }
