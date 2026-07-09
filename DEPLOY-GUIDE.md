@@ -1,15 +1,15 @@
 # TradeVault — Deployment Guide
 
-This guide covers deploying the **Cloud Edition** (`TradeVault-worker.js`) to Cloudflare Workers with D1 database and KV namespace.
+This guide covers deploying the **Cloud Edition** (`worker.js`) to Cloudflare Workers with D1 database and KV namespace.
 
-For the **Local Edition** (`TradeVault-local.html`), no deployment is needed — just open the file in a browser.
+For the **Local Edition** (`index.html`), no deployment is needed — just open the file in a browser.
 
 ---
 
 ## Prerequisites
 
 - A free [Cloudflare account](https://dash.cloudflare.com/sign-up)
-- The `TradeVault-worker.js` file
+- The `worker.js` file
 
 ---
 
@@ -21,7 +21,7 @@ For the **Local Edition** (`TradeVault-local.html`), no deployment is needed —
 4. Click **Deploy**
 5. Click **Edit code**
 6. Delete the default code
-7. Open `TradeVault-worker.js` in a text editor, copy the entire contents
+7. Open `worker.js` in a text editor, copy the entire contents
 8. Paste it into the Worker editor
 9. Click **Save and Deploy**
 
@@ -197,7 +197,7 @@ To update to a new version:
 
 1. Go to your Worker → **Edit code**
 2. Delete all existing code
-3. Paste the new `TradeVault-worker.js` contents
+3. Paste the new `worker.js` contents
 4. Click **Save and Deploy**
 
 Your data is safe — D1 and KV data persist across code updates. The schema auto-migrates any new columns.
@@ -257,7 +257,7 @@ After 10 failed login attempts from the same IP, you'll get HTTP 429 for 5 minut
 
 If you don't want to deploy to Cloudflare:
 
-1. Download `TradeVault-local.html`
+1. Download `index.html`
 2. Open it in any modern browser
 3. Start using it immediately
 
