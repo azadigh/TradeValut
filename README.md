@@ -133,7 +133,7 @@ No backend, no signup, no network required. Data stays in your browser.
 
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages
 2. Create a new Worker
-3. Paste the contents of `TradeVault-worker.js`
+3. Paste the contents of `worjer.js`
 4. Add environment variables (see [Deploy Guide](DEPLOY_GUIDE.md))
 5. Create D1 database and KV namespace
 6. Save and Deploy
@@ -147,7 +147,7 @@ See [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) for detailed instructions.
 
 | Feature | Cloud Edition | Local Edition |
 |---|---|---|
-| File | `TradeVault-worker.js` | `index.html` |
+| File | `worjer.js` | `index.html` |
 | Backend | Cloudflare Worker + D1 | Browser localStorage |
 | Auth | Password (KV sessions) | None (skipped) |
 | Multi-device | Yes | No |
@@ -413,7 +413,7 @@ This converts:
 
 | File | Description |
 |---|---|
-| `TradeVault-worker.js` | Cloud edition — single Cloudflare Worker file (546 KB) |
+| `worjer.js` | Cloud edition — single Cloudflare Worker file (546 KB) |
 | `index.html` | Local edition — standalone HTML file (388 KB) |
 | `sample-backup.json` | Sample backup with 2 accounts, 150 trades, 10 strategies |
 | `CHANGELOG.md` | Full changelog (v4.0 → v4.8) |
