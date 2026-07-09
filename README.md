@@ -123,7 +123,7 @@ Available in two editions:
 
 ### Option 1: Local Edition (zero setup)
 
-1. Download `TradeVault-local.html`
+1. Download `index.html`
 2. Open it in any modern browser
 3. Start logging trades — all data saves to browser localStorage
 
@@ -147,7 +147,7 @@ See [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) for detailed instructions.
 
 | Feature | Cloud Edition | Local Edition |
 |---|---|---|
-| File | `TradeVault-worker.js` | `TradeVault-local.html` |
+| File | `TradeVault-worker.js` | `index.html` |
 | Backend | Cloudflare Worker + D1 | Browser localStorage |
 | Auth | Password (KV sessions) | None (skipped) |
 | Multi-device | Yes | No |
@@ -414,7 +414,7 @@ This converts:
 | File | Description |
 |---|---|
 | `TradeVault-worker.js` | Cloud edition — single Cloudflare Worker file (546 KB) |
-| `TradeVault-local.html` | Local edition — standalone HTML file (388 KB) |
+| `index.html` | Local edition — standalone HTML file (388 KB) |
 | `sample-backup.json` | Sample backup with 2 accounts, 150 trades, 10 strategies |
 | `CHANGELOG.md` | Full changelog (v4.0 → v4.8) |
 | `DEPLOY_GUIDE.md` | Step-by-step deployment guide |
