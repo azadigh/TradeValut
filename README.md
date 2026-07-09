@@ -15,323 +15,433 @@ A modern, full-featured trading journal & analytics dashboard with real-time cha
 
 ---
 
-## 🌟 Features
+**[English](README.md)** | **[فارسی](README_FA.md)**
 
-### 📈 Trading Journal
-- **Full trade logging** — Symbol, direction (long/short), entry, exit, SL, TP, position size
-- **Auto-detected direction & status** — Infers long/short from SL position; win/loss from P&L sign or exit matching SL/TP
-- **Accurate P&L engine** — Handles forex (lots), crypto (USDT), metals (oz), indices ($/pt), and JPY pairs
-- **MAE/MFE tracking** — Maximum Adverse/Favorable Excursion for each trade
-- **Multi-timeframe analysis** — Separate notes for 4H, 1H, and 15m timeframes
-- **Star ratings** (1–5) and custom tags per trade
-- **Markdown notes** — Bold, italic, bullet lists in trade notes and lessons
-- **Screenshot support** — Paste from clipboard (Ctrl+V) or URL; auto-compressed
-- **Trade editing & duplication** — Inline edit form + one-click duplicate
-- **Session tagging** — Auto-detects Asia/London/Overlap/New York session from timestamp
+**A professional trading journal with P&L tracking, strategy analytics, equity curve, calendar heatmap, TradingView chart integration, and prop firm challenge tracking.**
 
-### 📊 Analytics Dashboard
-- **7 stat cards** — Win Rate (with circular ring), Net P&L, Total Trades, Profit Factor, Avg R Multiple, Best Trade, Expectancy
-- **Equity curve** — SVG area chart with gradient fill
-- **Drawdown chart** — Red area chart showing drawdown from peak
-- **Daily P&L calendar** — Monthly heatmap; click any day to see all trades with details
-- **Streaks & drawdown** — Max win/loss streak, current streak, max drawdown ($ + %), peak equity, recovery factor
-- **Per-symbol breakdown** — Table with trades, win rate, net P&L, avg R, best/worst per symbol
-- **Strategy analytics** — P&L per strategy — see which strategies actually make money
-- **Symbol correlation** — Which symbols win/lose together on the same days
-- **Time analysis** — P&L by day of week and hour of day bar charts
-- **Reviews** — Auto-generated weekly and monthly summaries with personal reflection notes
-
-### 🧭 Strategy Manager
-- **Create strategies** — Name, checklist (one per line), notes, video URL
-- **Video embedding** — YouTube and Vimeo URLs auto-converted to embedded players
-- **Strategy selector** — Trades link to saved strategies via dropdown
-- **Strategy analytics** — Win rate, P&L, avg R per strategy
-
-### 👁️ Watchlist
-- **Full watchlist page** — Add/remove/reorder with drag-and-drop
-- **Prebuilt categories** — 92 symbols across 6 categories:
-  - Indices (DXY, US30, NAS100, SPX500, GER40, UK100, JP225, etc.)
-  - Major Forex (15 pairs: EURUSD, GBPUSD, USDJPY, etc.)
-  - Crypto Perpetuals (60 pairs: BTCUSDT.P, ETHUSDT.P, etc.)
-  - Metals (XAUUSD, XAGUSD, XPTUSD, XPDUSD)
-  - Dollar Index (DXY, EURX, JPYX)
-  - Crypto Dominance (BTC.D, ETH.D, OTHERS.D)
-- **TradingView sync** — All watchlist symbols appear in TradingView's built-in sidebar
-- **Smart symbol routing** — `.P` → BINANCE, `.D` → INDEX, DXY → TVC, forex → OANDA
-
-### 💾 Data & Sync
-- **Multi-account support** — Multiple trading accounts with isolated data
-- **Full backup/restore** — Export everything as JSON; restore from file
-- **CSV import/export** — Import trades from CSV; export for Excel
-- **Cloud sync** (Worker version) — All data persisted in D1 SQLite
-- **Local mode** — Full offline functionality with localStorage
-
-### 🎨 UI/UX
-- **Light & dark themes** — Light is default; toggle via sidebar
-- **Glassmorphic design** — Backdrop blur, gradient accents, smooth transitions
-- **Left icon sidebar** — Chart, Journal, Strategies, Watchlist, Setups, Backup, Restore, Theme, Accounts, Logout
-- **Session clock** — Live IRST + EST times with active session highlighted (Asia/London/Overlap/NY)
-- **Responsive** — Works on desktop, tablet, and mobile
-- **Password-only login** (Worker) — Simple, no email needed
-- **Pagination** — Handles 10,000+ trades with 200-card pagination + "show more"
-- **Performance optimized** — Debounced search, cached analytics, safe loops (no stack overflow)
-
-### 🔒 Security
-- **XSS protection** — All user input escaped with `escapeHtml` (handles `<`, `>`, `"`, `'`, backtick, newlines)
-- **Parameterized SQL** — All D1 queries use `.bind()` (no SQL injection)
-- **Session-based auth** — KV-stored tokens with 30-day TTL
-- **Input validation** — Length caps on all fields; numeric validation with `isFinite()`
-- **Import sanitization** — `sanitizeTrade()` validates every field from external imports
+Available in two editions:
+- **Cloud** (`TradeVault-worker.js`) — Cloudflare Worker + D1 + KV, multi-device sync
+- **Local** (`TradeVault-local.html`) — standalone HTML, browser localStorage, zero setup
 
 ---
 
-## 🚀 Deployment
+## Table of Contents
 
-TradeVault can be deployed in **3 ways**:
-
-### Option A: Cloudflare Workers Dashboard (Recommended — No tools needed)
-
-#### Step 1: Create D1 Database
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. **Workers & Pages** → **D1** → **Create database**
-3. Name: `tradevault-db` → **Create**
-
-#### Step 2: Create KV Namespace
-1. **Workers & Pages** → **KV** → **Create namespace**
-2. Name: `SESSIONS` → **Add**
-
-#### Step 3: Create Worker
-1. **Workers & Pages** → **Create application** → **Create Worker**
-2. Name: `tradevault` → **Deploy**
-3. Click **Edit code** (pencil icon)
-
-#### Step 4: Paste Code
-1. Delete everything in the editor
-2. Open `trading-dashboard-worker.js`
-3. Copy ALL contents → Paste into editor
-4. Click **Save and deploy**
-
-#### Step 5: Add Environment Variable
-1. Go to worker → **Settings** → **Variables**
-2. **Add variable**:
-   - Name: `PASSWORD`
-   - Value: `your-secret-password`
-   - Type: **Plaintext**
-3. **Save and deploy**
-
-#### Step 6: Bind D1 Database
-1. Go to worker → **Settings** → **Bindings**
-2. **Add binding** → **D1 database**:
-   - Variable name: `DB`
-   - Database: `tradevault-db`
-3. **Save and deploy**
-
-#### Step 7: Bind KV Namespace
-1. Still in **Bindings**
-2. **Add binding** → **KV namespace**:
-   - Variable name: `SESSIONS`
-   - Namespace: `SESSIONS`
-3. **Save and deploy**
-
-#### Step 8: Done! 🎉
-- Visit `https://tradevault.<your-subdomain>.workers.dev`
-- Enter your password → Login
-- Start logging trades!
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Two Editions](#two-editions)
+- [Architecture](#architecture)
+- [Data Model](#data-model)
+- [API Reference](#api-reference)
+- [Security](#security)
+- [Testing](#testing)
+- [Backup & Restore](#backup--restore)
+- [Files](#files)
 
 ---
 
-### Option B: Cloudflare Wrangler (CLI)
+## Features
 
-```bash
-# Install wrangler
-npm install -g wrangler
-wrangler login
+### Trade Journal
+- Log trades with symbol, direction (long/short), entry, exit, SL, TP, size
+- Auto-calculate P&L and R-multiple based on instrument type (forex, crypto, metals, indices)
+- Entry time & session picker (defaults to current time, auto-detects session)
+- Partial profits tracking (TP1, TP2, TP3 with hit checkboxes)
+- MAE/MFE (Maximum Adverse/Favorable Excursion)
+- Trade rating (1-5 stars)
+- Tags system (add custom tags, filter by tag)
+- Custom fields (define your own fields per account)
+- Up to 4 images per trade, each with a note (TradingView snapshots, MQL5 charts, or any URL)
+- 48-hour trade lock (server-side enforced — trades become read-only after 48h)
 
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/tradevault.git
-cd tradevault
+### Analytics
+- Equity curve (SVG, green above starting balance, red below)
+- Calendar heatmap (daily P&L visualization)
+- Win rate, profit factor, Sharpe ratio, expectancy, payoff ratio
+- Max drawdown calculation
+- Consecutive win/loss streaks
+- Monthly P&L bar chart
+- Weekday performance analysis
+- Symbol breakdown table
+- Best/worst trade tracking
 
-# Create D1 database
-wrangler d1 create tradevault-db
-# Copy database_id into wrangler.toml
+### Prop Firm Tracker
+- Track FTMO, FundedNext, and other prop firm challenges
+- 1-step, 2-step, and funded account types
+- Daily loss limit and overall loss limit tracking
+- Step target progress bar
+- Auto-detect step 1 pass
+- **MT5-style report modal** with:
+  - Equity curve (starting from balance, green/red split)
+  - 12 performance stat cards (P&L, profit factor, win rate, Sharpe, drawdown, etc.)
+  - Account status (balance, growth, consecutive streaks, loss limits used)
+  - Monthly P&L chart
+  - Weekday performance chart + table
+  - Symbol breakdown table
+  - Trade history table (sticky header, scrollable)
 
-# Create KV namespace
-wrangler kv namespace create SESSIONS
-# Copy id into wrangler.toml
+### Strategy Management
+- Create strategies with checklist, notes, and video URL
+- Link trades to strategies via dropdown
+- Strategy analytics (win rate, P&L per strategy)
 
-# Initialize database (local)
-wrangler d1 execute tradevault-db --local --file=./schema.sql
+### Opportunities (Setups)
+- Log potential trade setups with symbol, note, and chart image
+- Tag as long/short
+- Slideshow lightbox for chart images
 
-# Initialize database (production)
-wrangler d1 execute tradevault-db --file=./schema.sql
+### Chart Integration
+- TradingView Advanced Chart widget (15min default interval)
+- RSI study included
+- Watchlist sidebar synced with your watchlist
+- Symbol auto-resolution (OANDA, BINANCE, TVC, INDEX prefixes)
+- Dark/light theme synced
 
-# Set password
-echo "PASSWORD=your-secret-password" > .dev.vars
+### Economic Calendar
+- Server-side proxy fetches weekly economic calendar CSV
+- Fallback: manual CSV upload (with BOM stripping)
+- Filter by impact level (High, Medium, Low, All)
+- Timezone conversion (EST, GMT, local)
 
-# Run locally
-wrangler dev
+### Watchlist
+- Add/remove symbols
+- Category presets (Forex majors, Crypto, Indices, Metals, etc.)
+- Reorderable via drag-and-drop
+- Synced with TradingView chart sidebar
 
-# Deploy to production
-wrangler deploy
+### Review Notes
+- Weekly and monthly auto-summary cards
+- Editable reflection notes per period
+- Persists per account
+
+### Backup & Restore
+- Full backup (all accounts, all data) to JSON file
+- Restore from JSON (wipes current data, inserts backup)
+- Cross-edition compatible (cloud backup → local, and vice versa)
+- IDs preserved across backup/restore cycles
+- Sample backup included (`sample-backup.json`)
+
+---
+
+## Quick Start
+
+### Option 1: Local Edition (zero setup)
+
+1. Download `TradeVault-local.html`
+2. Open it in any modern browser
+3. Start logging trades — all data saves to browser localStorage
+
+No backend, no signup, no network required. Data stays in your browser.
+
+### Option 2: Cloud Edition (multi-device)
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages
+2. Create a new Worker
+3. Paste the contents of `TradeVault-worker.js`
+4. Add environment variables (see [Deploy Guide](DEPLOY_GUIDE.md))
+5. Create D1 database and KV namespace
+6. Save and Deploy
+7. Open your Worker URL, enter your password
+
+See [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) for detailed instructions.
+
+---
+
+## Two Editions
+
+| Feature | Cloud Edition | Local Edition |
+|---|---|---|
+| File | `TradeVault-worker.js` | `TradeVault-local.html` |
+| Backend | Cloudflare Worker + D1 | Browser localStorage |
+| Auth | Password (KV sessions) | None (skipped) |
+| Multi-device | Yes | No |
+| Offline | No (needs network) | Yes |
+| Storage limit | D1 free tier (5M reads/day) | ~5-10 MB localStorage |
+| Backup format | Cloud JSON (v4) | Local JSON (tv_* keys) |
+| Cross-compatible | Yes (both formats accepted) | Yes |
+
+### Migration between editions
+
+**Local → Cloud:**
+1. Open local edition → Backup → downloads JSON
+2. Deploy cloud edition
+3. Open cloud app → Backup → Restore → pick file
+
+**Cloud → Local:**
+1. Open cloud app → Backup → downloads JSON
+2. Open local edition → Backup → Restore → pick file
+
+Both editions auto-detect the backup format and convert if needed.
+
+---
+
+## Architecture
+
+### Cloud Edition
+
+```
+┌─────────────────────────────────────────┐
+│           Cloudflare Worker              │
+│  ┌─────────────────────────────────┐    │
+│  │     Worker Script (JS/ESM)      │    │
+│  │  - API routes (/api/*)          │    │
+│  │  - Auth (password + KV session) │    │
+│  │  - D1 queries (parameterized)   │    │
+│  │  - HTML served from base64      │    │
+│  └──────────┬──────────┬───────────┘    │
+│             │          │                 │
+│        ┌────▼────┐ ┌───▼────┐           │
+│        │ D1 (DB) │ │ KV     │           │
+│        │ SQLite  │ │Session │           │
+│        └─────────┘ └────────┘           │
+└─────────────────────────────────────────┘
+```
+
+### Local Edition
+
+```
+┌─────────────────────────────────────────┐
+│            Browser (HTML file)           │
+│  ┌─────────────────────────────────┐    │
+│  │     Inline JavaScript            │    │
+│  │  - API adapter (localStorage)    │    │
+│  │  - Same UI as cloud edition      │    │
+│  │  - No network calls (except      │    │
+│  │    economic calendar CSV fetch)  │    │
+│  └──────────┬───────────────────────┘    │
+│             │                             │
+│        ┌────▼────┐                       │
+│        │localStorage│                     │
+│        │ (tv_* keys)│                    │
+│        └───────────┘                     │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-### Option C: Local File (No server needed)
+## Data Model
 
-1. Download `trading-dashboard-local.html`
-2. Open in any browser (Chrome, Firefox, Safari, Edge)
-3. All data stored in browser localStorage
-4. Works offline — no internet needed (except TradingView chart)
-5. Use **Backup All** to export data before clearing browser cache
+### Tables
 
----
+| Table | Purpose | Key Columns |
+|---|---|---|
+| `accounts` | Trading accounts | id, name, created |
+| `trades` | Trade journal entries | id, account_id, symbol, direction, entry, exit, sl, tp, size, pnl, r_multiple, status, mae, mfe, mtf4h (analytics), notes, lessons, emotion, entry_pic (JSON image array), rating, tags (JSON), custom (JSON), session, propfirm_id, tp1/2/3, tp1/2/3_hit, timestamp, date, time |
+| `strategies` | Trading strategies | id, account_id, name, checklist, notes, video, created |
+| `setups` | Trade opportunities | id, account_id, symbol, note, pic_url, tag, timestamp, date |
+| `custom_fields` | User-defined fields | id, account_id, name (UNIQUE per account) |
+| `watchlist` | Watched symbols | id, account_id, symbol (UNIQUE per account) |
+| `review_notes` | Weekly/monthly notes | id, account_id, label, notes, updated (UNIQUE account+label) |
+| `prop_firms` | Prop firm challenges | id, account_id, name, type, balance, target, target2, max_daily, max_overall, time_limit, start_date, current_step, step1_passed, step1_pnl |
+| `user_settings` | Per-account settings | id, account_id, key, value (UNIQUE account+key) |
 
-## 📋 Requirements
+### Note on legacy columns
 
-### Cloudflare Worker Version
-- Cloudflare account (free tier is sufficient)
-- D1 database (free: 5GB storage, 5M reads/day, 100K writes/day)
-- KV namespace (free: 100K reads/day, 1K writes/day)
-- 1 environment variable (`PASSWORD`)
-
-### Local Version
-- Any modern browser
-- No installation needed
-
-### Free Tier Limits (10,000 trades)
-| Resource | Free Limit | 10K Trades Usage | OK? |
-|----------|-----------|------------------|-----|
-| D1 storage | 5 GB | ~2 MB | ✅ |
-| D1 reads | 5M/day | ~10K/day | ✅ |
-| D1 writes | 100K/day | ~50/day | ✅ |
-| Worker requests | 100K/day | ~500/day | ✅ |
-| KV reads | 100K/day | ~500/day | ✅ |
-| KV writes | 1K/day | ~10/day | ✅ |
+The `trades` table still has `mtf1h`, `mtf15m`, and `exit_pic` columns in the schema for backward compatibility, but they are no longer written to or read from. All MTF data is stored in `mtf4h` (renamed "Analytics" in the UI), and all images are stored as a JSON array in `entry_pic`.
 
 ---
 
-## 🛠️ Tech Stack
+## API Reference
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Single HTML file — Inter + JetBrains Mono fonts, vanilla JS, CSS variables |
-| Backend | Cloudflare Workers (edge runtime) |
-| Database | Cloudflare D1 (SQLite) |
-| Sessions | Cloudflare KV |
-| Charts | TradingView Advanced Chart Widget |
-| Icons | Inline SVG (no dependencies) |
-| Fonts | Google Fonts (Inter, JetBrains Mono) |
-
----
-
-## 📁 Project Structure
-
-```
-tradevault/
-├── worker.js                    # Single-file Cloudflare Worker (paste & deploy)
-├── local.html # Local/offline version (localStorage)
-├── DEPLOY-GUIDE.md              # Step-by-step deployment guide
-├── schema.sql                   # D1 database schema
-├── wrangler.toml                # Wrangler config
-└── README.md                    # This file
-```
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `PASSWORD` | ✅ | Login password |
-| `JWT_SECRET` | ❌ | Reserved for future password hashing |
-
-### D1 Bindings
-
-| Binding | Resource |
-|---------|----------|
-| `DB` | D1 database (`tradevault-db`) |
-
-### KV Bindings
-
-| Binding | Resource |
-|---------|----------|
-| `SESSIONS` | KV namespace for auth tokens |
-
----
-
-## 📊 Database Schema
-
-The schema auto-creates on first request. 7 tables:
-
-| Table | Purpose |
-|-------|---------|
-| `accounts` | Trading accounts (id, name, created) |
-| `trades` | Journal entries (30 columns) |
-| `strategies` | Trading strategies (name, checklist, notes, video) |
-| `setups` | Saved opportunities |
-| `custom_fields` | User-defined fields |
-| `watchlist` | Watched symbols |
-| `review_notes` | Weekly/monthly review notes |
-
----
-
-## 🌐 API Endpoints
+All endpoints require `Authorization: Bearer <token>` (except `/api/auth/login`).
+Account-scoped endpoints accept `X-Account-Id` header or `?accountId=` query param.
 
 ### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login` | Login with password |
-| POST | `/api/auth/logout` | Logout (invalidate token) |
-| GET | `/api/auth/me` | Check session |
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/auth/login` | Login with password, returns token + accountId |
+| POST | `/api/auth/logout` | Invalidate session |
+| GET | `/api/auth/me` | Check if session is valid |
+
+### Accounts
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/accounts` | List all accounts (with trade count + P&L) |
+| POST | `/api/accounts` | Create account |
+| DELETE | `/api/accounts/:id?mode=reassign&target=:id` | Delete account, move data to target |
+| DELETE | `/api/accounts/:id?mode=hard` | Delete account and all its data |
 
 ### Trades
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/trades?limit=200&offset=0` | List trades (paginated) |
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/trades?limit=500` | List trades (max 5000) |
 | POST | `/api/trades` | Create trade |
-| PUT | `/api/trades/:id` | Update trade |
-| DELETE | `/api/trades/:id` | Delete trade |
+| PUT | `/api/trades/:id` | Update trade (48h lock enforced) |
+| DELETE | `/api/trades/:id` | Delete trade (48h lock enforced) |
 
 ### Strategies
-| Method | Endpoint | Description |
-|--------|----------|-------------|
+
+| Method | Path | Description |
+|---|---|---|
 | GET | `/api/strategies` | List strategies |
 | POST | `/api/strategies` | Create strategy |
+| PUT | `/api/strategies/:id` | Update strategy |
 | DELETE | `/api/strategies/:id` | Delete strategy |
 
-### Accounts, Setups, Custom Fields, Watchlist, Reviews, Backup
-All follow similar REST patterns. See [DEPLOY-GUIDE.md](DEPLOY-GUIDE.md) for details.
+### Setups (Opportunities)
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/setups` | List setups |
+| POST | `/api/setups` | Create setup |
+| PUT | `/api/setups/:id` | Update setup |
+| DELETE | `/api/setups/:id` | Delete setup |
+
+### Custom Fields
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/custom-fields` | List custom field names |
+| POST | `/api/custom-fields` | Add custom field |
+| DELETE | `/api/custom-fields/:name` | Remove custom field |
+
+### Watchlist
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/watchlist` | List symbols |
+| POST | `/api/watchlist` | Add symbol |
+| DELETE | `/api/watchlist/:symbol` | Remove symbol |
+
+### Review Notes
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/review-notes` | Get all notes (object: {label: notes}) |
+| POST | `/api/review-notes` | Save/update note (upsert) |
+
+### Prop Firms
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/propfirms` | List prop firms |
+| POST | `/api/propfirms` | Create prop firm |
+| PUT | `/api/propfirms/:id` | Update prop firm |
+| DELETE | `/api/propfirms/:id` | Delete prop firm |
+
+### Settings
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/settings` | Get all settings (object: {key: value}) |
+| POST | `/api/settings` | Save/update setting (upsert) |
+
+### Backup & Restore
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/backup` | Full database dump (JSON) |
+| POST | `/api/restore` | Wipe DB + restore from JSON backup |
+
+### Other
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/calendar` | Economic calendar proxy (fetches CSV from nfs.faireconomy.media) |
+| GET | `/` | Serve the dashboard HTML |
 
 ---
 
-## 🧪 Tested
+## Security
 
-- ✅ 10,000 trades — Journal renders in 172ms, Analytics in 414ms
-- ✅ XSS regression tests — All injection vectors neutralized
-- ✅ Cross-theme — Both light and dark themes verified
-- ✅ Mobile responsive — Tested at 375px width
-- ✅ Cross-browser — Chrome, Firefox, Safari, Edge
-
----
-
-## 📝 License
-
-MIT License — free for personal and commercial use.
+- **Auth:** Password-based with KV session tokens (30-day TTL, auto-refreshed on each request)
+- **Rate limiting:** 10 failed login attempts per IP per 5 minutes (KV-based)
+- **SQL injection:** All queries use parameterized bindings; symbol inputs are sanitized
+- **IDOR protection:** Every UPDATE/DELETE is scoped by `account_id` — users can only modify their own account's data
+- **48h trade lock:** Server-side enforced — trades older than 48 hours cannot be edited or deleted
+- **XSS:** All user input is escaped via `escapeHtml()` before rendering; notes support markdown via a sanitized renderer
+- **CORS:** Configurable via `ALLOWED_ORIGIN` env var (defaults to echoing request Origin)
 
 ---
 
-<div align="center">
+## Testing
 
-# 💛 Donate / حمایت مالی
+The codebase has been extensively tested with **74,727+ assertions across 11 test suites**:
+
+| Test Suite | What it covers |
+|---|---|
+| `test_1000iter_db_verified` | 1000 iterations of every CRUD operation, DB verified after each |
+| `stress_test` (cloud) | 300 iterations × 31 operations per iteration |
+| `stress_test_local` | 300 iterations × 31 operations (local edition) |
+| `test_edge_cases` | SQL injection, missing auth, malformed JSON, large payloads, rate limiting |
+| `test_strategy_persistence` | Create → logout → login → verify (both editions) |
+| `test_full_persistence` | All entity types survive logout/login (both editions) |
+| `test_trade_edit` | P&L recalculation on edit, 48h lock enforcement |
+| `test_backup_restore` | Full backup → wipe → restore roundtrip, cross-format |
+| `test_id_preservation` | IDs stable across multiple backup/restore cycles |
+| `test_chart_auth_calendar` | Logout cache clearing, BOM stripping, password clearing |
+| `verify_sample_backup` | Sample backup file loads cleanly |
+
+---
+
+## Backup & Restore
+
+### Creating a backup
+
+1. Click the **Backup** button in the app
+2. A JSON file downloads with all your data (accounts, trades, strategies, etc.)
+
+### Restoring a backup
+
+1. Click **Restore** in the app
+2. Select your backup JSON file
+3. Confirm — this **wipes all current data** and replaces it with the backup
+4. Page reloads with restored data
+
+### Cross-edition migration
+
+Backups from either edition can be restored into either edition:
+- Cloud backup → Local app: auto-converts to tv_* localStorage keys
+- Local backup → Cloud app: auto-converts to cloud format, POSTs to `/api/restore`
+
+### Migrating old-format backups
+
+If you have a backup from before v4.7 (old `entryPic` string URLs, separate `mtf1h`/`mtf15m` fields), use the migration script:
+
+```bash
+python3 scripts/migrate_backup.py old-backup.json new-backup.json
+```
+
+This converts:
+- Old `entryPic` (string URL) → new JSON array `[{"url":"...","note":"Entry"}]`
+- Old `exitPic` (string URL) → merged into `entryPic` array
+- TradingView snapshot page URLs → direct S3 image URLs
+- Old `mtf1h`/`mtf15m` → merged into `mtf4h` (Analytics)
+
+---
+
+## Files
+
+| File | Description |
+|---|---|
+| `TradeVault-worker.js` | Cloud edition — single Cloudflare Worker file (546 KB) |
+| `TradeVault-local.html` | Local edition — standalone HTML file (388 KB) |
+| `sample-backup.json` | Sample backup with 2 accounts, 150 trades, 10 strategies |
+| `CHANGELOG.md` | Full changelog (v4.0 → v4.8) |
+| `DEPLOY_GUIDE.md` | Step-by-step deployment guide |
+| `README_FA.md` | Persian/Farsi documentation |
+
+---
+
+## Tech Stack
+
+- **Backend:** Cloudflare Workers (ESM), D1 (SQLite), KV (session storage)
+- **Frontend:** Vanilla HTML/CSS/JS (no framework, no build step)
+- **Charts:** TradingView Advanced Chart widget, inline SVG for equity curves
+- **Storage:** D1 (cloud) or localStorage (local)
+- **Auth:** Password + KV session tokens with TTL refresh
+- **Testing:** Node.js + node:sqlite (D1 mock), 74,727+ assertions
+
+---
+
+## 💛 Donate / Support
 
 If TradeVault helps your trading, consider supporting development.
 
-</div>
-
-### 💎 Crypto Wallets / کیف پول‌های ارز دیجیتال
+### 💎 Crypto Wallets
 
 | Currency | Address |
 |----------|---------|
@@ -341,8 +451,8 @@ If TradeVault helps your trading, consider supporting development.
 | **USDT (BEP20)** | `0x59947E23B37778722efC7afF7D5f19D71B4FE703` |
 | **SOL** | `7CUoigTM2nfzFXchzmwWZ53xgdKMS29HzUQqwpj8vNBg` |
 
+---
 
+## License
 
-[⬆ بازگشت به بالا](#-tradevault)
-
-</div>
+Personal use. See Cloudflare Workers and D1 terms of service for platform usage.
