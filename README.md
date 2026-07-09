@@ -4,7 +4,7 @@
 
 ### Your Trading Edge, Quantified
 
-A modern, full-featured trading journal & analytics dashboard with real-time charts, P&L tracking, strategy management, and TradingView integration.
+**A professional trading journal with P&L tracking, strategy analytics, equity curve, calendar heatmap, TradingView chart integration, and prop firm challenge tracking.**
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![D1 Database](https://img.shields.io/badge/D1-Database-0052CC?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/)
@@ -15,13 +15,9 @@ A modern, full-featured trading journal & analytics dashboard with real-time cha
 
 ---
 
-**[English](README.md)** | **[فارسی](README_FA.md)**
-
-**A professional trading journal with P&L tracking, strategy analytics, equity curve, calendar heatmap, TradingView chart integration, and prop firm challenge tracking.**
-
 Available in two editions:
-- **Cloud** (`TradeVault-worker.js`) — Cloudflare Worker + D1 + KV, multi-device sync
-- **Local** (`TradeVault-local.html`) — standalone HTML, browser localStorage, zero setup
+- **Cloud** (`worker.js`) — Cloudflare Worker + D1 + KV, multi-device sync
+- **Local** (`local.html`) — standalone HTML, browser localStorage, zero setup
 
 ---
 
