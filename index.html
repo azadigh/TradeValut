@@ -1685,6 +1685,40 @@ svg[stroke-width] { stroke-width: inherit; }
 .about-footer { text-align: center; padding: 12px 0 0; border-top: 1px solid var(--border); margin-top: 12px; }
 .about-footer p { font-size: 12px; color: var(--text-3); margin: 0; }
 
+/* Changelog */
+.about-changelog { display: flex; flex-direction: column; gap: 14px; }
+.changelog-entry {
+  padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-md); position: relative;
+}
+.changelog-version {
+  font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--mono);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.changelog-date { font-size: 11px; font-weight: 400; color: var(--text-3); font-family: var(--font-sans); }
+.changelog-tag {
+  display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px;
+  border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.changelog-tag.major { background: rgba(16,185,129,0.15); color: #10b981; }
+.changelog-tag.minor { background: rgba(59,130,246,0.15); color: #3b82f6; }
+.changelog-tag.patch { background: rgba(148,163,184,0.15); color: #94a3b8; }
+.changelog-list { list-style: none; padding: 0; margin: 6px 0 0; }
+.changelog-list li {
+  font-size: 12px; line-height: 1.55; color: var(--text-2); padding: 4px 0 4px 14px;
+  position: relative; border-bottom: 1px solid rgba(148,163,184,0.08);
+}
+.changelog-list li:last-child { border-bottom: none; }
+.changelog-list li::before {
+  content: ''; position: absolute; left: 2px; top: 12px;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
+}
+.changelog-list code {
+  font-family: var(--mono); font-size: 11px; background: var(--input);
+  padding: 1px 5px; border-radius: 3px; color: var(--accent-h);
+}
+.changelog-list strong { color: var(--text); font-weight: 600; }
+
 @media (max-width: 600px) {
   .about-cols { grid-template-columns: 1fr; }
   .about-title { font-size: 22px; }
@@ -1921,7 +1955,7 @@ svg[stroke-width] { stroke-width: inherit; }
                 <div class="f-field" style="flex:1;min-width:0;"><label>Session</label><select id="t_session" style="font-size:12px;padding:7px 6px;"><option value="asia">Asia</option><option value="london">London</option><option value="newyork">New York</option></select></div>
               </div>
             </div>
-            <div class="f-section"><div class="f-section-lbl">Auto-Calculated</div><div class="calc-row"><div class="calc-box"><span class="calc-lbl">P&L</span><span class="calc-val" id="calcPnl">—</span></div><div class="calc-box"><span class="calc-lbl">R Multiple</span><span class="calc-val" id="calcR">—</span></div></div></div>
+            <div class="f-section"><div class="f-section-lbl">Auto-Calculated</div><div class="calc-row"><div class="calc-box"><span class="calc-lbl">P&L</span><span class="calc-val" id="calcPnl">—</span></div><div class="calc-box"><span class="calc-lbl">R Multiple</span><span class="calc-val" id="calcR">—</span></div></div><div id="calcPnlBreakdown" style="font-size:10px;color:var(--text-3);margin-top:4px;font-family:var(--mono);display:none;"></div></div>
             <div class="f-section">
               <div class="f-section-lbl">Rating & Tags</div>
               <div class="f-row"><div class="f-field"><label>Trade Rating</label><div class="stars" id="starRating"><button type="button" class="star" data-rating="1"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button><button type="button" class="star" data-rating="2"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button><button type="button" class="star" data-rating="3"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button><button type="button" class="star" data-rating="4"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button><button type="button" class="star" data-rating="5"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button></div></div></div>
@@ -2070,6 +2104,23 @@ svg[stroke-width] { stroke-width: inherit; }
           <div class="rc-result" id="rc2Result"><div class="rc-result-row"><span class="rc-result-lbl">Enter details to calculate</span></div></div>
         </div>
       </div>
+
+      <!-- PIP VALUE CALCULATOR -->
+      <div class="glass rc-card" style="grid-column: 1 / -1;margin-top:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <h3 style="margin:0;">Pip Value Calculator <span style="font-size:11px;font-weight:400;color:var(--text-3);">— 1 pip value per 1.00 lot, in your account currency</span></h3>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="font-size:11px;color:var(--text-3);">Lots:</label>
+            <input type="number" step="0.01" min="0.01" id="pvc_lots" value="1.00" style="width:80px;font-family:var(--mono);padding:5px 8px;background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-size:12px;" oninput="renderPipValueTable()">
+            <button class="tbtn" style="width:auto;padding:5px 12px;font-size:11px;" onclick="refreshFxRates(false);setTimeout(renderPipValueTable,800);">Refresh Rates</button>
+            <span id="pvcStatus" style="font-size:10px;color:var(--text-3);"></span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;line-height:1.5;">
+          Pip value = <code style="font-family:var(--mono);">pip_size × contract_size × lots</code> in the <strong>quote currency</strong>, then converted to your account currency using live FX rates. JPY pairs use 0.01 pip size; all others use 0.0001. Contract size = 100,000 units for forex.
+        </div>
+        <div id="pipValueTable" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;"></div>
+      </div>
     </div>
   </section>
 
@@ -2188,6 +2239,49 @@ svg[stroke-width] { stroke-width: inherit; }
         <button class="save-btn" style="width:auto;padding:7px 20px;font-size:13px;margin-top:10px;" onclick="saveFeeSettings()">Save Fees</button>
       </div>
 
+      <!-- FX Rates & Account Currency -->
+      <div class="glass settings-section">
+        <div class="settings-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>FX Rates &amp; Account Currency</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;line-height:1.5;">
+          P&amp;L is calculated in the <strong>quote currency</strong> of each pair, then converted to your <strong>account currency</strong> using the rates below.
+          Rates are fetched from TwelveData and cached for 1 hour. You can override any rate manually — your override wins.
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:12px;color:var(--text-2);">Account Currency</label>
+            <select class="modal-input" id="set_account_currency" style="width:100%;">
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="JPY">JPY — Japanese Yen</option>
+              <option value="AUD">AUD — Australian Dollar</option>
+              <option value="CAD">CAD — Canadian Dollar</option>
+              <option value="CHF">CHF — Swiss Franc</option>
+              <option value="NZD">NZD — New Zealand Dollar</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text-2);">TwelveData API Key <span style="font-weight:400;color:var(--text-3);font-size:9px;">(stored securely server-side)</span></label>
+            <input type="password" class="modal-input" id="set_twelvedata_apikey" placeholder="0515e26c..." style="width:100%;" autocomplete="off">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="save-btn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="saveFxSettings()">Save Settings</button>
+          <button class="tbtn primary" style="width:auto;padding:7px 16px;font-size:13px;" onclick="refreshFxRates(false)" id="fxRefreshBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:4px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Fetch Rates</button>
+          <button class="tbtn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="refreshFxRates(true)">Force Refresh</button>
+          <span id="fxStatus" style="font-size:11px;color:var(--text-3);"></span>
+        </div>
+
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">
+          <span id="fxLastFetched">Never fetched</span> · <span id="fxSource">—</span>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-2);">FX Rates (editable)</div>
+        <div id="fxRatesTable" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;"></div>
+      </div>
+
       <!-- Data Management -->
       <div class="glass settings-section">
         <div class="settings-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Data Management</div>
@@ -2234,7 +2328,7 @@ svg[stroke-width] { stroke-width: inherit; }
         </div>
         <h1 class="about-title">TradeVault</h1>
         <p class="about-tagline">Your trading edge, quantified.</p>
-        <div class="about-version">v4.8 · 75 bugs fixed · 74K+ tests</div>
+        <div class="about-version">v5.0 · FX-accurate P&amp;L · Pip Value Calculator · Watchlist reorder</div>
       </div>
 
       <!-- Two columns: Connect + Donate -->
@@ -2292,6 +2386,47 @@ svg[stroke-width] { stroke-width: inherit; }
               <div class="about-donate-addr">7CUoigTM2nfzFXchzmwWZ53xgdKMS29HzUQqwpj8vNBg</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Changelog -->
+      <div class="about-section" style="margin-top:24px;">
+        <h2 class="about-section-title" style="display:flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+          Changelog
+        </h2>
+        <div class="about-changelog">
+
+          <div class="changelog-entry">
+            <div class="changelog-version">v5.0 <span class="changelog-date">— Jul 14, 2026</span></div>
+            <div class="changelog-tag major">Major</div>
+            <ul class="changelog-list">
+              <li><strong>FX-accurate P&amp;L engine</strong> — Rewrote <code>calculatePnl()</code> using the correct two-step methodology: profit is computed in the <em>quote currency</em> first, then converted to your account currency. Fixes the bug where AUD/JPY, EUR/JPY, USD/CAD, USD/CHF and every other non-USD-quote pair was mis-valued by 20–30%.</li>
+              <li><strong>TwelveData FX integration</strong> — New <code>/api/fx-rates</code> endpoint fetches 7 major pair rates from TwelveData, caches them in KV for 1 hour, and keeps your API key server-side. The browser never sees the key.</li>
+              <li><strong>Auto-fetch FX rates</strong> — Rates now load silently in the background when you open the Journal, Risk Calculator, or Risk Dashboard, and whenever you type a non-USD-quote symbol. No more manual refresh.</li>
+              <li><strong>Pip Value Calculator</strong> — New section on the Risk Calculator page showing 1-pip value per lot for all 56 forex pairs composed of USD, JPY, EUR, GBP, AUD, NZD, CHF, CAD. Editable lot size, live conversion to account currency.</li>
+              <li><strong>Risk Calculator fixed</strong> — Same P&amp;L bug was producing wrong position sizes and wrong TP P&amp;L on JPY/CAD/CHF pairs. Now routes through the corrected <code>calculatePnl()</code> and shows the FX conversion rate it used.</li>
+              <li><strong>Settings persistence to D1</strong> — <code>saveSetting()</code> now fire-and-forgets a POST to the backend. Theme, session times, fee settings, FX overrides, account currency, and your TwelveData API key all survive across devices and browser cache clears.</li>
+              <li><strong>Watchlist reorder</strong> — New <code>sort_order</code> column + <code>/api/watchlist/reorder</code> endpoint. Drag-drop or use the new ↑/↓ arrow buttons — your order persists to D1 and survives reloads.</li>
+              <li><strong>Conversion breakdown</strong> — The trade form now shows the exact math used, e.g. <code>¥-4365.00 ÷ USD/JPY 150.0000 = $-29.10</code> — no more black-box P&amp;L.</li>
+              <li><strong>Account currency selector</strong> — Choose from USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. All P&amp;L, risk, and pip-value outputs respect the selection.</li>
+              <li><strong>Manual FX overrides</strong> — Edit any of the 7 rates in Settings → FX Rates &amp; Currency. Your override wins, even after a fresh fetch. Useful for locking in the rate your broker used at trade time.</li>
+              <li><strong>Removed "Recalculate All Trades" button</strong> — No longer needed: P&amp;L is computed correctly at trade-log time inside <code>saveTrade()</code>.</li>
+            </ul>
+          </div>
+
+          <div class="changelog-entry">
+            <div class="changelog-version">v4.8 <span class="changelog-date">— previous release</span></div>
+            <div class="changelog-tag patch">Patch</div>
+            <ul class="changelog-list">
+              <li>75 bug fixes across auth, schema init, calendar parsing, account scoping, and rate-limiting.</li>
+              <li>Watchlist symbols now allow <code>:</code> and <code>.</code> (e.g. <code>OANDA:XAUUSD</code>).</li>
+              <li><code>/api/auth/login</code> IP-rate-limited via KV (10 attempts / 5 min).</li>
+              <li>Trades list limit raised to 5,000.</li>
+              <li>Calendar CSV parser strips UTF-8 BOM.</li>
+            </ul>
+          </div>
+
         </div>
       </div>
 
@@ -2525,6 +2660,16 @@ async function loadAccountData(accId) {
   _pfCache  = LS.get(lsKey('propfirms',     accId), []);
   _settingsCache = LS.get(lsKey('settings', accId), {});
   _reviewNotesCache = LS.get(lsKey('review_notes', accId), {});
+  // B-SET-PERSIST: also fetch settings from backend (D1) and merge — backend
+  // wins for any key not present in localStorage (so first login on a new
+  // device pulls saved theme/fees/etc.). Local-only keys are preserved.
+  try {
+    const remote = await API.req('/api/settings').catch(()=>null);
+    if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
+      _settingsCache = Object.assign({}, remote, _settingsCache);
+      LS.set(lsKey('settings', accId), _settingsCache);
+    }
+  } catch(_) {}
   // Recompute trade_count + pnl for this account in the accounts list.
   const acc = _ac.find(a => String(a.id) === String(accId));
   if (acc) {
@@ -2538,6 +2683,14 @@ async function saveSetting(key, value) {
   _settingsCache = _settingsCache || {};
   _settingsCache[key] = String(value);
   LS.set(lsKey('settings', currentAccountId), _settingsCache);
+  // B-SET-PERSIST: also push to backend so settings (theme, fees, sessions,
+  // FX overrides, account currency, TwelveData API key) survive across
+  // devices, account switches, and browser cache clears.
+  // Fire-and-forget — the localStorage write above is the source of truth
+  // for the current session; this just syncs to D1.
+  try {
+    API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key, value: String(value) }) }).catch(()=>{});
+  } catch(_) {}
 }
 function getSetting(key, defaultVal) {
   if (_settingsCache && _settingsCache[key] !== undefined && _settingsCache[key] !== '') return _settingsCache[key];
@@ -2781,6 +2934,16 @@ async function localApi(method, path, body, params) {
     if (sym && !_wlc.includes(sym)) { _wlc.push(sym); saveWatchlist(_wlc); }
     return { success: true, symbol: sym };
   }
+  if (path === '/api/watchlist/reorder' && method === 'POST') {
+    if (!body || !Array.isArray(body.symbols)) return { error: 'symbols array required' };
+    // Reorder _wlc to match the requested order. Symbols not in the list
+    // are kept at the end (preserves any not-yet-fetched items).
+    const ordered = body.symbols.filter(s => _wlc.includes(s));
+    const remaining = _wlc.filter(s => !ordered.includes(s));
+    _wlc = ordered.concat(remaining);
+    saveWatchlist(_wlc);
+    return { success: true, count: ordered.length };
+  }
   const wlMatch = path.match(/^\/api\/watchlist\/(.+)$/);
   if (wlMatch && method === 'DELETE') {
     const sym = decodeURIComponent(wlMatch[1]).toUpperCase();
@@ -2834,6 +2997,50 @@ async function localApi(method, path, body, params) {
     _settingsCache[body.key] = String(body.value);
     LS.set(lsKey('settings', currentAccountId), _settingsCache);
     return { success: true };
+  }
+
+  // --- FX RATES (TwelveData) ---
+  // Local-mode: reads twelvedata_apikey from settings cache, fetches TwelveData
+  // directly from the browser, caches 1h in localStorage under tv_fx_rates_{accId}.
+  // ?symbols=USD/JPY,USD/CAD,... — optional override list
+  // ?force=1 — bypass cache
+  if (path === '/api/fx-rates' && method === 'GET') {
+    const DEFAULT_FX_SYMBOLS = ['USD/JPY', 'USD/CAD', 'USD/CHF', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD'];
+    const symbols = params.get('symbols')
+      ? params.get('symbols').split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+      : DEFAULT_FX_SYMBOLS;
+    const force = params.get('force') === '1';
+    const cacheKey = 'tv_fx_rates_' + currentAccountId;
+    if (!force) {
+      try {
+        const cached = LS.get(cacheKey, null);
+        if (cached && cached.fetchedAt && (Date.now() - cached.fetchedAt < 60 * 60 * 1000)) {
+          return { rates: cached.rates, errors: cached.errors || {}, fetchedAt: cached.fetchedAt, source: cached.source || 'twelvedata', cached: true };
+        }
+      } catch (_) {}
+    }
+    const apiKey = (_settingsCache && _settingsCache.twelvedata_apikey) ? String(_settingsCache.twelvedata_apikey).trim() : '';
+    if (!apiKey) {
+      return { error: 'TwelveData API key not set. Open Settings → FX Rates & Currency to add one.', rates: {}, fetchedAt: 0, source: 'none' };
+    }
+    const results = await Promise.all(symbols.map(async sym => {
+      try {
+        const r = await fetch('https://api.twelvedata.com/price?symbol=' + encodeURIComponent(sym) + '&apikey=' + encodeURIComponent(apiKey), { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) return { symbol: sym, error: 'HTTP ' + r.status };
+        const j = await r.json();
+        if (j && j.status === 'error') return { symbol: sym, error: j.message || 'API error' };
+        const price = parseFloat(j && j.price);
+        if (!Number.isFinite(price)) return { symbol: sym, error: 'No price in response' };
+        return { symbol: sym, price };
+      } catch (e) {
+        return { symbol: sym, error: e.message };
+      }
+    }));
+    const rates = {}, errors = {};
+    results.forEach(r => { if (r.price !== undefined) rates[r.symbol] = r.price; else errors[r.symbol] = r.error; });
+    const payload = { rates, errors, fetchedAt: Date.now(), source: 'twelvedata', cached: false };
+    if (Object.keys(rates).length > 0) LS.set(cacheKey, payload);
+    return payload;
   }
 
   // --- BACKUP ---
@@ -2921,6 +3128,8 @@ function hideLoginScreen() {
       } catch(e) { console.error('Failed to fetch accounts for restore:', e); }
     }
     await loadData();
+    // Auto-fetch FX rates in the background (silent — uses cache if <1h old)
+    if (typeof ensureFxRates === 'function') ensureFxRates();
     // B84: initAccounts AFTER loadData so _ac is populated
     initAccounts();
     // B77/B82: If multiple accounts and no saved preference, show the account picker.
@@ -3336,7 +3545,7 @@ function switchView(view) {
   const rdV = $('riskdashView'); if (rdV) rdV.classList.remove('active');
   const setV = $('settingsView'); if (setV) setV.classList.remove('active');
   const abV = $('aboutView'); if (abV) abV.classList.remove('active');
-  if (view === 'journal') { $('journalView').classList.add('active'); populatePropFirmDropdown(); renderTrades(); updateJournalStats(); renderEquityCurve(); }
+  if (view === 'journal') { $('journalView').classList.add('active'); populatePropFirmDropdown(); renderTrades(); updateJournalStats(); renderEquityCurve(); if (typeof ensureFxRates === 'function') ensureFxRates(); }
   else if (view === 'strategy') { sv.classList.add('active'); renderStrategies(); }
   else if (view === 'watchlist') { wv.classList.add('active'); renderWatchlistPage(); }
   else if (view === 'opportunities') { ov.classList.add('active'); renderOpportunities(); }
@@ -3351,9 +3560,9 @@ function switchView(view) {
       } catch(e) { showEconomicCalendarPrompt(); }
     } else renderEconomicCalendar();
   }
-  else if (view === 'riskcalc') { rcV.classList.add('active'); calcRisk(); calcCryptoRisk(); }
+  else if (view === 'riskcalc') { rcV.classList.add('active'); calcRisk(); calcCryptoRisk(); renderPipValueTable(); if (typeof ensureFxRates === 'function') ensureFxRates().then(()=>renderPipValueTable()); }
   else if (view === 'propfirm') { pfV.classList.add('active'); renderPropFirms(); }
-  else if (view === 'riskdash') { rdV.classList.add('active'); renderRiskDashboard(); }
+  else if (view === 'riskdash') { rdV.classList.add('active'); renderRiskDashboard(); if (typeof ensureFxRates === 'function') ensureFxRates(); }
   else if (view === 'settings') { setV.classList.add('active'); renderSettingsPage(); }
   else if (view === 'about') { $('aboutView').classList.add('active'); }
   else { $('chartView').classList.remove('hidden'); }
@@ -3368,7 +3577,158 @@ function setModeBadge(id, mode) { const el=$(id); if(!el) return; el.textContent
 
 var _instTypeCache={};function getInstrumentType(symbol) { if(_instTypeCache[symbol])return _instTypeCache[symbol]; if(!symbol) return 'forex'; const s=symbol.toUpperCase().replace(/[:/]/g,''); const cb=['BTC','ETH','SOL','XRP','BNB','DOGE','ADA','AVAX','MATIC','LINK','DOT','LTC','TRX','SHIB','ATOM','NEAR','APT','ARB','OP','INJ','PEPE','FIL','RNDR','FTM','ALGO','SAND','AXS','THETA','GALA','CHZ','ENJ','WAVES','ZEC','DASH','XMR','XTZ','HBAR','VET','EOS','FLOW','CRV','AAVE','SUSHI','COMP','SNX','DYDX','GMX','LDO','RPL','FXS','IMX','SUI','SEI','TIA','ORDI','ICP','PEPE','MANA']; if(s.endsWith('.D')) return 'dominance'; if(s.endsWith('USDT.P')||s.endsWith('USDT')) return 'crypto'; if(cb.some(b=>s.startsWith(b))) return 'crypto'; if(['XAUUSD','XAGUSD','XPTUSD','XPDUSD'].includes(s)) return 'metal'; if(['US30','NAS100','SPX500','US500','GER40','UK100','JP225','FRA40','AUS200','HK50','NASDAQ','SP500','DXY'].includes(s)) return 'index'; var _r='forex';_instTypeCache[symbol]=_r;return _r;}
 function getContractSize(symbol) { const t=getInstrumentType(symbol); const s=symbol?symbol.toUpperCase().replace(/[:/]/g,''):''; switch(t){case 'crypto':return null;case 'metal':return s==='XAGUSD'?5000:100;case 'index':return 1;case 'forex':return 100000;default:return 1;} }
-function calculatePnl(symbol, direction, entry, exit, size) { entry=num(entry); exit=num(exit); size=num(size); if(entry===0||exit===0||size===0) return 0; size=Math.abs(size); const t=getInstrumentType(symbol); const ds=direction==='long'?1:-1; const s=symbol?symbol.toUpperCase().replace(/[:/]/g,''):''; if(t==='crypto'){if(entry===0)return 0; return ((exit-entry)/entry)*size*ds;} const cs=getContractSize(symbol); if(t==='forex'&&s.endsWith('JPY')){if(exit===0)return 0; return (exit-entry)*size*cs/exit*ds;} return (exit-entry)*size*cs*ds; }
+
+// =============================================================================
+// FX CONVERSION — quote currency → account currency
+// Bug fix (B-FX): the old calculatePnl divided by the cross rate (e.g. AUD/JPY
+// price) to "convert to USD", which was wrong for every non-USD-quote pair.
+// The correct methodology is:
+//   1. Profit is created in the QUOTE currency: (exit - entry) * size * contractSize * directionSign
+//   2. If quote == account currency, you're done. Otherwise convert.
+// Conversion uses fxRates (USD/JPY, USD/CAD, USD/CHF, EUR/USD, GBP/USD, AUD/USD,
+// NZD/USD) fetched from TwelveData via /api/fx-rates. User can also override
+// any rate manually in Settings → FX Rates & Currency.
+// =============================================================================
+
+// In-memory FX state. Refreshed by loadFxRates() in Settings; falls back to
+// empty object (no conversion) if rates are missing — in which case the raw
+// quote-currency profit is returned (better than wrong conversion).
+let _fxRates = {};        // e.g. { 'USD/JPY': 150.0, 'EUR/USD': 1.08, ... }
+let _fxFetchedAt = 0;
+let _fxErrors = {};
+
+// Get the quote currency (right side) of a symbol.
+//   EUR/USD → USD      AUD/JPY → JPY       USD/CAD → CAD
+//   XAU/USD → USD      BTC/USDT → USD      US30 → USD (indices are USD-denominated)
+function getQuoteCurrency(symbol) {
+  if (!symbol) return 'USD';
+  const s = symbol.toUpperCase().replace(/[:/]/g, '');
+  // Crypto: BTCUSDT → USD, BTCUSD → USD, ETHBTC → BTC
+  if (s.endsWith('USDT') || s.endsWith('USD')) return 'USD';
+  if (s.endsWith('BTC')) return 'BTC';
+  if (s.endsWith('ETH')) return 'ETH';
+  // Forex 6-char pairs: XXXYYY → YYY
+  if (s.length === 6 && /^[A-Z]{6}$/.test(s)) return s.slice(3);
+  // Metals: XAUUSD, XAGUSD → USD
+  if (/^(XAU|XAG|XPT|XPD)USD$/.test(s)) return 'USD';
+  // Indices: US30, NAS100, SPX500, GER40, UK100, JP225 → USD (account-denominated)
+  return 'USD';
+}
+
+// Convert an amount from one currency to the account currency.
+//   amount   — the value in `fromCurrency`
+//   fromCurrency — e.g. 'JPY', 'CAD', 'USD'
+// Returns the converted amount. If from == account, returns amount unchanged.
+// If no rate is available, returns the original amount and sets a flag the
+// caller can check via fxConversionWarning().
+let _fxLastWarning = '';
+function fxConversionWarning() { const w = _fxLastWarning; _fxLastWarning = ''; return w; }
+function getAccountCurrency() { return (getSetting('account_currency', 'USD') || 'USD').toUpperCase().slice(0, 3); }
+
+function convertToAccountCurrency(amount, fromCurrency) {
+  _fxLastWarning = '';
+  const from = (fromCurrency || 'USD').toUpperCase().slice(0, 3);
+  const acct = getAccountCurrency();
+  if (from === acct) return amount;
+  if (amount === 0) return 0;
+
+  // We need the rate "from → acct". Our fxRates map contains:
+  //   USD/JPY, USD/CAD, USD/CHF  (i.e. USD base, foreign quote)  → 1 USD = X foreign
+  //   EUR/USD, GBP/USD, AUD/USD, NZD/USD                          → 1 foreign = X USD
+  // Strategy: convert `from` → USD first, then USD → `acct`.
+  const toUsd = (cur) => {
+    if (cur === 'USD') return 1;
+    // Foreign-per-USD pairs: USD/JPY=150 means 1 USD = 150 JPY, so 1 JPY = 1/150 USD
+    if (_fxRates['USD/' + cur] !== undefined) return 1 / _fxRates['USD/' + cur];
+    // USD-per-foreign pairs: EUR/USD=1.08 means 1 EUR = 1.08 USD
+    if (_fxRates[cur + '/USD'] !== undefined) return _fxRates[cur + '/USD'];
+    return null;
+  };
+  const fromUsd = (usd, cur) => {
+    if (cur === 'USD') return usd;
+    if (_fxRates['USD/' + cur] !== undefined) return usd * _fxRates['USD/' + cur];
+    if (_fxRates[cur + '/USD'] !== undefined) return usd / _fxRates[cur + '/USD'];
+    return null;
+  };
+
+  const usdAmount = toUsd(from);
+  if (usdAmount === null) {
+    _fxLastWarning = 'No FX rate for ' + from + '→' + acct + '. Showing profit in ' + from + ' (unconverted).';
+    return amount; // unconverted — better than wrong
+  }
+  const finalAmount = fromUsd(usdAmount * amount, acct);
+  if (finalAmount === null) {
+    _fxLastWarning = 'No FX rate for USD→' + acct + '. Showing profit in USD.';
+    return usdAmount * amount;
+  }
+  return finalAmount;
+}
+
+// The new, correct P&L function.
+//   Step 1: profit in QUOTE currency = (exit - entry) * size * contractSize * directionSign
+//   Step 2: convert quote → account currency
+function calculatePnl(symbol, direction, entry, exit, size) {
+  entry = num(entry); exit = num(exit); size = num(size);
+  if (entry === 0 || exit === 0 || size === 0) return 0;
+  size = Math.abs(size);
+  const t = getInstrumentType(symbol);
+  const ds = direction === 'long' ? 1 : -1;
+
+  // Crypto: size = USDT position value. P&L = % move * size (already USD)
+  if (t === 'crypto') {
+    if (entry === 0) return 0;
+    const profitUsd = ((exit - entry) / entry) * size * ds;
+    return convertToAccountCurrency(profitUsd, 'USD');
+  }
+
+  // Everything else: profit is in the QUOTE currency
+  const cs = getContractSize(symbol);
+  const quoteCurrency = getQuoteCurrency(symbol);
+  const profitInQuote = (exit - entry) * size * cs * ds;
+  return convertToAccountCurrency(profitInQuote, quoteCurrency);
+}
+
+// Helper for the trade form — returns both the converted P&L and a human-readable
+// breakdown string so the user can see exactly what conversion was applied.
+function calculatePnlWithBreakdown(symbol, direction, entry, exit, size) {
+  entry = num(entry); exit = num(exit); size = num(size);
+  if (entry === 0 || exit === 0 || size === 0) return { pnl: 0, breakdown: '' };
+  size = Math.abs(size);
+  const t = getInstrumentType(symbol);
+  const ds = direction === 'long' ? 1 : -1;
+  const acct = getAccountCurrency();
+  const cs = getContractSize(symbol);
+  const quote = getQuoteCurrency(symbol);
+
+  let profitQuote, profitLabel;
+  if (t === 'crypto') {
+    profitQuote = ((exit - entry) / entry) * size * ds;
+    profitLabel = '$' + profitQuote.toFixed(2);
+  } else {
+    profitQuote = (exit - entry) * size * cs * ds;
+    const ccys = { USD: '$', JPY: '¥', EUR: '€', GBP: '£', CAD: 'C$', CHF: 'CHF', AUD: 'A$', NZD: 'NZ$' };
+    const sign = ccys[quote] || quote + ' ';
+    profitLabel = sign + profitQuote.toFixed(2);
+  }
+
+  if (quote === acct && t !== 'crypto') return { pnl: profitQuote, breakdown: '' };
+  if (t === 'crypto' && acct === 'USD') return { pnl: profitQuote, breakdown: '' };
+
+  // Build a breakdown string showing the conversion
+  const converted = convertToAccountCurrency(profitQuote, t === 'crypto' ? 'USD' : quote);
+  const warning = fxConversionWarning();
+  if (warning) return { pnl: converted, breakdown: warning };
+
+  // Try to show the actual rate used
+  let rateStr = '';
+  if (quote !== 'USD' && _fxRates['USD/' + quote] !== undefined) {
+    rateStr = ' ÷ USD/' + quote + ' ' + _fxRates['USD/' + quote].toFixed(4);
+  } else if (quote !== 'USD' && _fxRates[quote + '/USD'] !== undefined) {
+    rateStr = ' × ' + quote + '/USD ' + _fxRates[quote + '/USD'].toFixed(4);
+  }
+  const acctSym = { USD: '$', JPY: '¥', EUR: '€', GBP: '£', CAD: 'C$', CHF: 'CHF', AUD: 'A$', NZD: 'NZ$' }[acct] || acct + ' ';
+  return { pnl: converted, breakdown: profitLabel + rateStr + ' = ' + acctSym + converted.toFixed(2) };
+}
 function calculateRisk(symbol, direction, entry, sl, size) { entry=num(entry); sl=num(sl); size=num(size); if(entry===0||sl===0||size===0) return 0; return Math.abs(calculatePnl(symbol,direction,entry,sl,size)); }
 function getSizeUnit(symbol) { const t=getInstrumentType(symbol); return t==='crypto'?'USDT':t==='dominance'?'%':'Lots'; }
 function getInstrumentLabel(symbol) { return {crypto:'Crypto',metal:'Metal',index:'Index',forex:'Forex',dominance:'Dominance'}[getInstrumentType(symbol)]||'Forex'; }
@@ -3377,12 +3737,23 @@ function updateSizeLabel(symbol) { const l=$('t_size_label'),h=$('sizeHint'),b=$
 function updateCalc() {
   const symbol=$('t_symbol').value.trim(); const entry=num($('t_entry').value),exit=num($('t_exit').value),sl=num($('t_sl').value),tp=num($('t_tp').value),size=num($('t_size').value);
   updateSizeLabel(symbol);
+  // Auto-fetch FX rates if user typed a non-USD-quote pair and we have no rate for it
+  if (symbol && typeof ensureFxRates === 'function') {
+    const q = getQuoteCurrency(symbol);
+    if (q !== 'USD' && q !== getAccountCurrency()) {
+      const hasRate = _fxRates['USD/'+q] !== undefined || _fxRates[q+'/USD'] !== undefined;
+      if (!hasRate) ensureFxRates(q);
+    }
+  }
   if(!dirManualOverride){const d=autoDetectDirection(entry,exit,sl,tp); if(d){tradeDirection=d; $$('#dirToggle .dir-btn').forEach(b=>b.classList.toggle('active',b.dataset.dir===d));}}
   if(!statusManualOverride){const st=autoDetectStatus(symbol,tradeDirection,entry,exit,sl,tp,size); tradeStatus=st; $$('#statusSeg .status-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===st));}
-  const pe=$('calcPnl'),re=$('calcR');
-  if(!entry||!exit||!size){pe.textContent='—';pe.className='calc-val';re.textContent='—';re.className='calc-val';return;}
-  const pnl=calculatePnl(symbol,tradeDirection,entry,exit,size);
-  pe.textContent=(pnl>=0?'+':'')+'$'+pnl.toFixed(2); pe.className='calc-val '+(pnl>=0?'pos':'neg');
+  const pe=$('calcPnl'),re=$('calcR'),bd=$('calcPnlBreakdown');
+  if(!entry||!exit||!size){pe.textContent='—';pe.className='calc-val';re.textContent='—';re.className='calc-val';if(bd)bd.textContent='';return;}
+  const {pnl, breakdown}=calculatePnlWithBreakdown(symbol,tradeDirection,entry,exit,size);
+  const acct = getAccountCurrency();
+  const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
+  pe.textContent=(pnl>=0?'+':'')+acctSym+pnl.toFixed(2); pe.className='calc-val '+(pnl>=0?'pos':'neg');
+  if(bd){bd.textContent=breakdown||'';bd.style.display=breakdown?'block':'none';}
   if(sl){const risk=calculateRisk(symbol,tradeDirection,entry,sl,size); if(risk>0){const r=pnl/risk; re.textContent=(r>=0?'+':'')+r.toFixed(2)+'R'; re.className='calc-val '+(r>=0?'pos':'neg');} else {re.textContent='—';re.className='calc-val';}} else {re.textContent='—';re.className='calc-val';}
 }
 
@@ -4625,6 +4996,26 @@ function removeFromWatchlist(sym) {
   saveWatchlist(list); API.req('/api/watchlist/'+encodeURIComponent(sym),{method:'DELETE'}).catch(()=>{}); loadChart(currentChartSymbol);
   renderWatchlist();
 }
+// B-WL-REORDER: move a watchlist item up or down by one position, persist to backend
+function moveWatchlistItem(sym, direction) {
+  const list = getWatchlist();
+  const idx = list.indexOf(sym);
+  if (idx < 0) return;
+  const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+  if (newIdx < 0 || newIdx >= list.length) return;
+  // Swap
+  [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+  saveWatchlist(list);
+  // Persist new order to backend (D1 sort_order)
+  API.req('/api/watchlist/reorder', { method: 'POST', body: JSON.stringify({ symbols: list }) }).catch(()=>{});
+  loadChart(currentChartSymbol);
+  renderWatchlist();
+}
+// Persist the current order to backend (called after drag-drop reorder)
+function persistWatchlistOrder() {
+  const list = getWatchlist();
+  API.req('/api/watchlist/reorder', { method: 'POST', body: JSON.stringify({ symbols: list }) }).catch(()=>{});
+}
 function toggleTVWatchlist() {
   showTVWatchlist = !showTVWatchlist;
   try { saveSetting('tv_wl_visible', showTVWatchlist ? 'true' : 'false'); } catch(e) {}
@@ -4671,9 +5062,13 @@ function renderWatchlistPage() {
   c.innerHTML = list.map((sym, i) => {
     const full = getFullSymbol(sym);
     const active = currentChartSymbol === full ? 'active' : '';
+    const upDisabled = i === 0;
+    const downDisabled = i === list.length - 1;
     return '<div class="wl-item ' + active + '" draggable="true" data-wl-idx="' + i + '" onclick="loadChart(\'' + escapeAttr(full) + '\');switchView(\'chart\');">' +
       '<span class="wl-drag" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg></span>' +
       '<span class="wl-symbol">' + escapeHtml(sym) + '</span>' +
+      '<button class="wl-move" style="background:none;border:none;color:'+(upDisabled?'var(--text-4)':'var(--text-3)')+';cursor:'+(upDisabled?'default':'pointer')+';padding:2px 4px;display:inline-flex;align-items:center;" '+(upDisabled?'disabled':'')+' onclick="event.stopPropagation();' + (upDisabled ? '' : 'moveWatchlistItem(\'' + escapeAttr(sym) + '\',\'up\')') + '" title="Move up"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>' +
+      '<button class="wl-move" style="background:none;border:none;color:'+(downDisabled?'var(--text-4)':'var(--text-3)')+';cursor:'+(downDisabled?'default':'pointer')+';padding:2px 4px;display:inline-flex;align-items:center;" '+(downDisabled?'disabled':'')+' onclick="event.stopPropagation();' + (downDisabled ? '' : 'moveWatchlistItem(\'' + escapeAttr(sym) + '\',\'down\')') + '" title="Move down"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>' +
       '<button class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist(\'' + escapeAttr(sym) + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>' +
     '</div>';
   }).join('');
@@ -4708,6 +5103,8 @@ function bindWatchlistDragDrop() {
       const [moved] = list.splice(_dragWlIdx, 1);
       list.splice(dropIdx, 0, moved);
       saveWatchlist(list);
+      // B-WL-REORDER: persist new order to backend so it survives reload
+      persistWatchlistOrder();
       loadChart(currentChartSymbol);
       renderWatchlist();
       _dragWlIdx = null;
@@ -4737,6 +5134,7 @@ function setThemeSetting(theme) {
 }
 function renderSettingsPage() {
   loadFeeSettingsToUI();
+  loadFxSettingsToUI();
   // Theme buttons
   const themeBtnLight = $('themeLightBtn'); const themeBtnDark = $('themeDarkBtn');
   if(themeBtnLight) themeBtnLight.classList.toggle('active', currentTheme === 'light');
@@ -4793,6 +5191,257 @@ function loadFeeSettingsToUI() {
   if($('set_fee_crypto_taker')) $('set_fee_crypto_taker').value = f.cryptoTaker || '';
   if($('set_fee_forex')) $('set_fee_forex').value = f.forex || '';
   if($('set_fee_default')) $('set_fee_default').value = f.defaultOrder || 'taker';
+}
+
+// =============================================================================
+// FX RATES — settings UI + management
+// =============================================================================
+const FX_DEFAULT_SYMBOLS = ['USD/JPY', 'USD/CAD', 'USD/CHF', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD'];
+
+function getFxOverrides() {
+  var v = getSetting('fx_overrides', '{}');
+  try { return typeof v === 'string' ? JSON.parse(v) : (v || {}); }
+  catch(_) { return {}; }
+}
+function saveFxOverrides(obj) { saveSetting('fx_overrides', JSON.stringify(obj || {})); }
+
+// Merge TwelveData rates with user overrides — overrides win
+function getEffectiveFxRates() {
+  const overrides = getFxOverrides();
+  return Object.assign({}, _fxRates, overrides);
+}
+
+// Load FX settings panel: populate account currency, API key, and rate table
+async function loadFxSettingsToUI() {
+  // Account currency
+  const cur = getSetting('account_currency', 'USD') || 'USD';
+  if($('set_account_currency')) $('set_account_currency').value = cur;
+
+  // API key — masked (only show whether set)
+  const apiKey = getSetting('twelvedata_apikey', '') || '';
+  if($('set_twelvedata_apikey')) $('set_twelvedata_apikey').value = apiKey;
+
+  // Load cached rates from localStorage (instant) then optionally fetch fresh
+  try {
+    const cached = LS.get('tv_fx_rates_' + currentAccountId, null);
+    if (cached && cached.rates) {
+      _fxRates = cached.rates;
+      _fxFetchedAt = cached.fetchedAt || 0;
+      _fxErrors = cached.errors || {};
+    }
+  } catch(_) {}
+
+  renderFxRatesTable();
+  updateFxStatusDisplay();
+}
+
+function updateFxStatusDisplay() {
+  const lf = $('fxLastFetched'), src = $('fxSource');
+  if (lf) lf.textContent = _fxFetchedAt ? 'Last fetched: ' + new Date(_fxFetchedAt).toLocaleString() : 'Never fetched';
+  if (src) src.textContent = _fxRates && Object.keys(_fxRates).length > 0 ? 'Source: TwelveData' : 'Source: — (no rates loaded)';
+}
+
+// Render the editable rate table. Shows the 7 default pairs, with input fields
+// pre-filled from effective rates (TwelveData + overrides).
+function renderFxRatesTable() {
+  const container = $('fxRatesTable');
+  if (!container) return;
+  const effective = getEffectiveFxRates();
+  const overrides = getFxOverrides();
+
+  const cells = FX_DEFAULT_SYMBOLS.map(sym => {
+    const val = effective[sym];
+    const isOverride = overrides[sym] !== undefined;
+    const err = _fxErrors && _fxErrors[sym];
+    const valStr = (val !== undefined && val !== null && Number.isFinite(val)) ? val.toFixed(5) : '';
+    const borderClr = isOverride ? 'var(--accent)' : 'var(--border)';
+    const title = isOverride ? 'Manually overridden — click Save Settings to persist' : (err ? 'Error: ' + err : 'Fetched from TwelveData');
+    return '<div style="display:flex;flex-direction:column;gap:2px;">' +
+      '<label style="font-size:11px;color:var(--text-2);font-family:var(--mono);">'+sym+(isOverride?' <span style="color:var(--accent);">*</span>':'')+'</label>' +
+      '<input type="number" step="0.00001" class="modal-input fx-rate-input" data-symbol="'+sym+'" value="'+valStr+'" placeholder="—" style="width:100%;font-family:var(--mono);font-size:12px;border-color:'+borderClr+';" title="'+escapeAttr(title)+'">' +
+      (err ? '<span style="font-size:9px;color:var(--danger);">'+escapeHtml(err).slice(0,40)+'</span>' : '') +
+    '</div>';
+  });
+  container.innerHTML = cells.join('');
+}
+
+// Save: account currency + API key + any manually edited rates
+async function saveFxSettings() {
+  const cur = $('set_account_currency') ? $('set_account_currency').value : 'USD';
+  const apiKey = $('set_twelvedata_apikey') ? $('set_twelvedata_apikey').value.trim() : '';
+
+  // Save via existing settings API (works in both local and backend mode)
+  await API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key: 'account_currency', value: cur }) });
+  if (apiKey) {
+    await API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key: 'twelvedata_apikey', value: apiKey }) });
+  }
+
+  // Collect any manually edited rates and save as overrides
+  const inputs = document.querySelectorAll('.fx-rate-input');
+  const overrides = {};
+  let hasOverride = false;
+  inputs.forEach(inp => {
+    const sym = inp.getAttribute('data-symbol');
+    const v = parseFloat(inp.value);
+    if (Number.isFinite(v) && v > 0) {
+      // Compare with fetched rate to detect overrides
+      const fetched = _fxRates[sym];
+      if (fetched === undefined || Math.abs(fetched - v) > 1e-8) {
+        overrides[sym] = v;
+        hasOverride = true;
+      }
+    }
+  });
+  if (hasOverride) {
+    saveFxOverrides(overrides);
+  } else {
+    saveFxOverrides({});
+  }
+
+  // Refresh in-memory rates with new overrides
+  _fxRates = getEffectiveFxRates();
+
+  showToast('FX settings saved');
+  renderFxRatesTable();
+  updateFxStatusDisplay();
+
+  // If user entered an API key and no rates loaded yet, fetch automatically
+  if (apiKey && Object.keys(_fxRates).length === 0) {
+    setTimeout(() => refreshFxRates(false), 300);
+  }
+}
+
+// Fetch fresh rates from TwelveData via /api/fx-rates
+async function refreshFxRates(force) {
+  const status = $('fxStatus');
+  const btn = $('fxRefreshBtn');
+  if (status) status.textContent = 'Fetching...';
+  if (btn) btn.disabled = true;
+  try {
+    const url = '/api/fx-rates' + (force ? '?force=1' : '');
+    const r = await API.req(url);
+    if (r && r.error && !r.rates) {
+      if (status) status.textContent = r.error;
+      showToast(r.error);
+      return;
+    }
+    if (r && r.rates) {
+      // Keep user overrides on top of freshly fetched rates
+      _fxRates = Object.assign({}, r.rates, getFxOverrides());
+      _fxFetchedAt = r.fetchedAt || Date.now();
+      _fxErrors = r.errors || {};
+      if (status) {
+        const n = Object.keys(r.rates).length;
+        const errs = Object.keys(_fxErrors).length;
+        status.textContent = n + ' rates fetched' + (errs ? ' · ' + errs + ' error(s)' : '') + (r.cached ? ' (from cache)' : '');
+      }
+      renderFxRatesTable();
+      updateFxStatusDisplay();
+      updateCalc(); // refresh trade form P&L if open
+      showToast('FX rates updated');
+    } else {
+      if (status) status.textContent = 'No rates returned';
+    }
+  } catch (e) {
+    if (status) status.textContent = 'Error: ' + e.message;
+    showToast('Failed to fetch FX rates: ' + e.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// =============================================================================
+// AUTO-FETCH — silently ensure FX rates are available before P&L / risk calc.
+// Called on app load, on view switches (journal, risk calc, dashboard), and
+// when the user types a non-USD-quote symbol in the trade form.
+//
+// Behavior:
+//   - If rates were fetched <1h ago AND cover the requested quote currency → no-op
+//   - If rates are missing or stale → fetch silently (no toast, no UI blocking)
+//   - If API key not set → no-op (user will see "No FX rates" warning in calc)
+//   - Multiple concurrent calls coalesce via _fxFetching flag
+// =============================================================================
+let _fxFetching = false;
+let _fxLastEnsure = 0;
+const FX_ENSURE_COOLDOWN_MS = 30 * 1000; // don't re-check more than once per 30s
+
+async function ensureFxRates(requiredQuoteCurrency) {
+  // Cooldown: don't spam the API if user is typing fast
+  if (Date.now() - _fxLastEnsure < FX_ENSURE_COOLDOWN_MS) {
+    // Even during cooldown, if we have no rates at all and the required quote
+    // isn't covered, we still need to try — but only if not already fetching
+    if (_fxFetching) return;
+    if (_fxRates && Object.keys(_fxRates).length > 0) {
+      if (!requiredQuoteCurrency || requiredQuoteCurrency === 'USD' || requiredQuoteCurrency === getAccountCurrency()) return;
+      const hasRate = _fxRates['USD/'+requiredQuoteCurrency] !== undefined || _fxRates[requiredQuoteCurrency+'/USD'] !== undefined;
+      if (hasRate) return;
+    }
+  }
+  _fxLastEnsure = Date.now();
+
+  // No API key → can't fetch (user will see warning in UI)
+  const apiKey = getSetting('twelvedata_apikey', '') || '';
+  if (!apiKey) return;
+
+  if (_fxFetching) return;
+  _fxFetching = true;
+
+  try {
+    const url = '/api/fx-rates'; // server/local handler returns cache if <1h old
+    const r = await API.req(url);
+    if (r && r.rates && Object.keys(r.rates).length > 0) {
+      _fxRates = Object.assign({}, r.rates, getFxOverrides());
+      _fxFetchedAt = r.fetchedAt || Date.now();
+      _fxErrors = r.errors || {};
+      // Update Settings panel if open
+      if ($('fxRatesTable')) { renderFxRatesTable(); updateFxStatusDisplay(); }
+      // Refresh any open P&L display
+      if (typeof updateCalc === 'function') {
+        try { updateCalc(); } catch(_) {}
+      }
+      // Refresh risk calc if open
+      if ($('rcResult') && typeof calcRisk === 'function') {
+        try { calcRisk(); } catch(_) {}
+      }
+    }
+  } catch (_) {
+    // Silent failure — user will see "No FX rates" warning in the UI
+  } finally {
+    _fxFetching = false;
+  }
+}
+
+// Walk every closed trade, recompute its P&L using current FX rates, save.
+// (Removed from Settings UI — P&L is now computed at trade-log time using
+//  calculatePnl() in saveTrade(). The function is kept here in case other
+//  code paths need to force a recompute in the future.)
+async function recalculateAllPnl() {
+  const trades = getTrades();
+  if (!trades || trades.length === 0) { showToast('No trades to recalculate'); return; }
+  let updated = 0;
+  for (let i = 0; i < trades.length; i++) {
+    const t = trades[i];
+    if (!t.entry || !t.exit) continue;
+    const dir = autoDetectDirection(t.entry, t.exit, t.sl, t.tp) || t.direction || 'long';
+    const newPnl = calculatePnl(t.symbol, dir, t.entry, t.exit, t.size);
+    const risk = calculateRisk(t.symbol, dir, t.entry, t.sl, t.size);
+    const newR = risk > 0 ? newPnl / risk : 0;
+    if (Math.abs((t.pnl || 0) - newPnl) > 0.005 || Math.abs((t.rMultiple || 0) - newR) > 0.005) {
+      trades[i].pnl = newPnl;
+      trades[i].rMultiple = newR;
+      updated++;
+    }
+  }
+  saveTrades(trades);
+  try {
+    for (const t of trades) {
+      if (t.id) await API.req('/api/trades/' + t.id, { method: 'PUT', body: JSON.stringify(t) }).catch(() => {});
+    }
+  } catch(_) {}
+  showToast('Recalculated P&L for ' + updated + ' trade(s)');
+  if (typeof renderTrades === 'function') renderTrades();
+  if (typeof updateJournalStats === 'function') updateJournalStats();
+  if (typeof renderEquityCurve === 'function') renderEquityCurve();
 }
 function calcFees(symbol, positionSize, entry, exit, instType) {
   var fees = getFeeSettings();
@@ -5211,29 +5860,35 @@ function calcRisk() {
   const balance = num($('rc_balance').value);
   const riskPct = num($('rc_risk_pct').value);
   const r = $('rcResult');
+  // Auto-fetch FX rates if user typed a non-USD-quote pair and we have no rate
+  if (sym && typeof ensureFxRates === 'function') {
+    const q = getQuoteCurrency(sym);
+    if (q !== 'USD' && q !== getAccountCurrency()) {
+      const hasRate = _fxRates['USD/'+q] !== undefined || _fxRates[q+'/USD'] !== undefined;
+      if (!hasRate) ensureFxRates(q);
+    }
+  }
   if(!entry || !sl || !balance || !riskPct) { r.innerHTML = '<div class="rc-result-row"><span class="rc-result-lbl">Enter trade details to calculate</span></div>'; return; }
   const riskUsd = balance * riskPct / 100;
   const slDist = Math.abs(entry - sl);
   if(slDist === 0) { r.innerHTML = '<div class="rc-result-row"><span class="rc-result-lbl">SL cannot equal entry</span></div>'; return; }
   const instType = getInstrumentType(sym);
-  let positionSize, pipValue, sizeUnit, riskPerLot;
+  const acct = getAccountCurrency();
+  const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
+  let positionSize, sizeUnit, riskPerLot;
   if(instType === 'crypto') {
     // Crypto: position_size_usd = risk_usd / (sl_distance_percent / 100)
     const slPct = slDist / entry * 100;
     positionSize = slPct > 0 ? riskUsd / (slPct/100) : 0;
     sizeUnit = 'USDT';
-    pipValue = 1;
     riskPerLot = slDist;
   } else {
-    const cs = getContractSize(sym);
-    const s = sym.replace(/[:/]/g,'');
-    if(instType === 'forex' && s.endsWith('JPY')) {
-      pipValue = 0.01; riskPerLot = slDist * cs / entry;
-    } else if(instType === 'forex') {
-      pipValue = 0.0001; riskPerLot = slDist * cs;
-    } else {
-      pipValue = 0.01; riskPerLot = slDist * cs;
-    }
+    // B-FX-RC: use the corrected calculateRisk() which properly converts
+    // quote-currency risk → account currency. This fixes JPY pairs (was using
+    // the pair's own price as USD/JPY) AND fixes USD/CAD, USD/CHF (were not
+    // converting at all).
+    // Risk per 1 lot, in account currency:
+    riskPerLot = calculateRisk(sym, dir, entry, sl, 1);
     positionSize = riskPerLot > 0 ? riskUsd / riskPerLot : 0;
     sizeUnit = 'Lots';
   }
@@ -5247,22 +5902,37 @@ function calcRisk() {
   var netRisk = riskUsd + fees;
   var feeHtml = '';
   if(fees > 0) {
-    feeHtml = '<div class="rc-result-row"><span class="rc-result-lbl">Trading Fees</span><span class="rc-result-val neg">$'+fees.toFixed(2)+'</span></div>'+
-      '<div class="rc-result-row"><span class="rc-result-lbl">Net Risk (with fees)</span><span class="rc-result-val neg">$'+netRisk.toFixed(2)+'</span></div>';
+    feeHtml = '<div class="rc-result-row"><span class="rc-result-lbl">Trading Fees</span><span class="rc-result-val neg">'+acctSym+fees.toFixed(2)+'</span></div>'+
+      '<div class="rc-result-row"><span class="rc-result-lbl">Net Risk (with fees)</span><span class="rc-result-val neg">'+acctSym+netRisk.toFixed(2)+'</span></div>';
   }
   if(tp) {
-    var tpPnl = Math.abs(tp - entry) * positionSize * (instType==='crypto' ? 1 : getContractSize(sym));
-    if(instType === 'forex' && sym.replace(/[:/]/g,'').endsWith('JPY')) tpPnl = Math.abs(tp - entry) * positionSize * getContractSize(sym) / entry;
+    // B-FX-RC: TP P&L also uses the corrected calculatePnl() (handles all quote currencies)
+    var tpPnl = Math.abs(calculatePnl(sym, dir, entry, tp, positionSize));
     var netPnl = tpPnl - fees;
-    feeHtml += '<div class="rc-result-row"><span class="rc-result-lbl">Gross P&L at TP</span><span class="rc-result-val pos">$'+tpPnl.toFixed(2)+'</span></div>'+
-      '<div class="rc-result-row"><span class="rc-result-lbl">Net P&L (after fees)</span><span class="rc-result-val pos">$'+netPnl.toFixed(2)+'</span></div>';
+    feeHtml += '<div class="rc-result-row"><span class="rc-result-lbl">Gross P&L at TP</span><span class="rc-result-val pos">'+acctSym+tpPnl.toFixed(2)+'</span></div>'+
+      '<div class="rc-result-row"><span class="rc-result-lbl">Net P&L (after fees)</span><span class="rc-result-val pos">'+acctSym+netPnl.toFixed(2)+'</span></div>';
   }
-  r.innerHTML = '<div class="rc-result-row"><span class="rc-result-lbl">Risk Amount</span><span class="rc-result-val neg">$'+riskUsd.toFixed(2)+'</span></div>'+
+  // Conversion breakdown for non-USD-quote pairs (so user sees what rate was used)
+  var convHtml = '';
+  if (instType !== 'crypto') {
+    var quote = getQuoteCurrency(sym);
+    if (quote !== acct) {
+      var rate = _fxRates['USD/'+quote] !== undefined ? _fxRates['USD/'+quote]
+              : _fxRates[quote+'/USD'] !== undefined ? 1/_fxRates[quote+'/USD']
+              : null;
+      if (rate !== null) {
+        convHtml = '<div class="rc-result-row" style="font-size:11px;color:var(--text-3);"><span class="rc-result-lbl">FX conversion</span><span class="rc-result-val" style="font-family:var(--mono);font-size:10px;">1 '+acct+'/'+quote+' = '+rate.toFixed(4)+'</span></div>';
+      } else if (_fxRates && Object.keys(_fxRates).length === 0) {
+        convHtml = '<div class="rc-result-row" style="font-size:11px;color:var(--warning,#f59e0b);"><span class="rc-result-lbl">⚠ No FX rates</span><span class="rc-result-val" style="font-size:10px;">Open Settings → FX Rates to fetch</span></div>';
+      }
+    }
+  }
+  r.innerHTML = '<div class="rc-result-row"><span class="rc-result-lbl">Risk Amount</span><span class="rc-result-val neg">'+acctSym+riskUsd.toFixed(2)+'</span></div>'+
     '<div class="rc-result-row"><span class="rc-result-lbl">SL Distance</span><span class="rc-result-val">'+slDist.toFixed(5)+'</span></div>'+
     (instType==='crypto' ? '<div class="rc-result-row"><span class="rc-result-lbl">SL %</span><span class="rc-result-val">'+(slDist/entry*100).toFixed(2)+'%</span></div>' : '')+
     '<div class="rc-result-row"><span class="rc-result-lbl">Position Size</span><span class="rc-result-val accent rc-result-big">'+positionSize.toFixed(instType==='crypto'?2:4)+' '+sizeUnit+'</span></div>'+
     (instType==='crypto' ? '<div class="rc-result-row"><span class="rc-result-lbl">Coins/Units</span><span class="rc-result-val">'+(positionSize/entry).toFixed(6)+'</span></div>' : '')+
-    rrHtml + feeHtml;
+    rrHtml + feeHtml + convHtml;
 }
 function setRiskPreset(pct) {
   if($('rc_risk_pct')) { $('rc_risk_pct').value = pct; calcRisk(); }
@@ -5310,6 +5980,68 @@ function calcCryptoRisk() {
   }
   if(!risk && !posSize) html += '<div class="rc-result-row"><span class="rc-result-lbl">Enter risk amount or position size</span></div>';
   r.innerHTML = html;
+}
+
+// ============ PIP VALUE CALCULATOR ============
+// Shows 1-pip value per lot for every pair composed of these 7 currencies.
+// Pip value = pip_size × contract_size × lots (in quote currency),
+//             then converted to account currency via FX rates.
+const PIP_VALUE_CURRENCIES = ['USD', 'JPY', 'EUR', 'GBP', 'AUD', 'NZD', 'CHF', 'CAD'];
+
+function buildAllForexPairs() {
+  const pairs = [];
+  for (const base of PIP_VALUE_CURRENCIES) {
+    for (const quote of PIP_VALUE_CURRENCIES) {
+      if (base === quote) continue;
+      pairs.push(base + '/' + quote);
+    }
+  }
+  return pairs;
+}
+
+function renderPipValueTable() {
+  const container = $('pipValueTable');
+  if (!container) return;
+  const lots = Math.max(0.01, num($('pvc_lots') ? $('pvc_lots').value : 1));
+  const acct = getAccountCurrency();
+  const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
+  const cs = 100000; // 1 lot = 100,000 units for forex
+  const status = $('pvcStatus');
+  const hasRates = _fxRates && Object.keys(_fxRates).length > 0;
+  if (status) {
+    if (!hasRates) status.textContent = '⚠ No FX rates — open Settings → FX Rates to fetch';
+    else if (_fxFetchedAt) status.textContent = 'Rates from ' + new Date(_fxFetchedAt).toLocaleTimeString();
+    else status.textContent = '';
+  }
+
+  const pairs = buildAllForexPairs();
+  const cells = pairs.map(pair => {
+    const [base, quote] = pair.split('/');
+    const pipSize = quote === 'JPY' ? 0.01 : 0.0001;
+    // Pip value in quote currency = pipSize × cs × lots
+    const pipValueInQuote = pipSize * cs * lots;
+    // Convert to account currency
+    let pipValueInAcct, conversionNote;
+    if (quote === acct) {
+      pipValueInAcct = pipValueInQuote;
+      conversionNote = '';
+    } else {
+      pipValueInAcct = convertToAccountCurrency(pipValueInQuote, quote);
+      const w = fxConversionWarning();
+      conversionNote = w ? ' ⚠' : '';
+    }
+    const isApprox = !hasRates && quote !== acct && quote !== 'USD';
+    const valStr = isApprox ? '—' : acctSym + pipValueInAcct.toFixed(2);
+    const quoteSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[quote] || quote+' ';
+    const cls = pipValueInAcct >= 0 ? 'pos' : 'neg';
+    const title = '1 pip = ' + pipSize + ' ' + quote + '\nPer lot: ' + quoteSym + pipValueInQuote.toFixed(2) + ' ' + quote + (quote !== acct && !isApprox ? '\nConverted to ' + acct : '');
+    return '<div style="display:flex;flex-direction:column;padding:7px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);" title="'+escapeAttr(title)+'">' +
+      '<span style="font-size:11px;color:var(--text-2);font-family:var(--mono);font-weight:600;">'+pair+'</span>' +
+      '<span style="font-size:13px;font-family:var(--mono);color:var(--text);'+(isApprox?'opacity:.4;':'')+'">'+valStr+conversionNote+'</span>' +
+      '<span style="font-size:9px;color:var(--text-3);">'+quoteSym+pipValueInQuote.toFixed(2)+' '+quote+'/pip</span>' +
+    '</div>';
+  });
+  container.innerHTML = cells.join('');
 }
 
 // ============ PARTIAL PROFIT TRACKER ============

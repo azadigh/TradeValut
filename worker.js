@@ -1,7 +1,13 @@
 /**
- * TradeVault — Single-File Cloudflare Worker (v4 — bug-fixed)
+ * TradeVault — Single-File Cloudflare Worker (v5.0)
  *
- * Bug fixes vs. previous version:
+ * v5.0 — P&L accuracy overhaul, FX integration, watchlist reorder, settings persistence
+ *   v5  : FX rates integration via TwelveData (server-side key, KV-cached 1h)
+ *   v5  : /api/fx-rates endpoint with parallel fetch + KV cache
+ *   v5  : watchlist sort_order column + /api/watchlist/reorder endpoint
+ *   v5  : backup/restore now preserves watchlist order
+ *
+ * v4 bug fixes (preserved from previous release):
  *   B3  : CORS restricted via env.ALLOWED_ORIGIN (fallback to echo-Origin)
  *   B4  : schema init guarded by module-level flag (per-isolate)
  *   B5  : schema splitter replaced with proper statement tokenizer
@@ -72,7 +78,7 @@ CREATE TABLE IF NOT EXISTS custom_fields (
 );
 CREATE TABLE IF NOT EXISTS watchlist (
   id INTEGER PRIMARY KEY AUTOINCREMENT, account_id INTEGER NOT NULL DEFAULT 1,
-  symbol TEXT NOT NULL, UNIQUE(account_id, symbol)
+  symbol TEXT NOT NULL, sort_order INTEGER DEFAULT 0, UNIQUE(account_id, symbol)
 );
 CREATE TABLE IF NOT EXISTS review_notes (
   id INTEGER PRIMARY KEY AUTOINCREMENT, account_id INTEGER NOT NULL DEFAULT 1,
@@ -105,6 +111,9 @@ const OPTIONAL_MIGRATIONS = [
   "ALTER TABLE trades ADD COLUMN tp1_hit INTEGER DEFAULT 0",
   "ALTER TABLE trades ADD COLUMN tp2_hit INTEGER DEFAULT 0",
   "ALTER TABLE trades ADD COLUMN tp3_hit INTEGER DEFAULT 0",
+  // B-WL-REORDER: explicit sort_order so users can reorder watchlist items
+  // and have the order persist across reloads, devices, and account switches.
+  "ALTER TABLE watchlist ADD COLUMN sort_order INTEGER DEFAULT 0",
 ];
 
 // Module-level schema-init guard (per-isolate). Re-running on every cold start
@@ -291,6 +300,7 @@ async function handleApi(request, env, url, path, method) {
   // Watchlist
   if (path === '/api/watchlist' && method === 'GET') return await getWatchlist(env, accountId);
   if (path === '/api/watchlist' && method === 'POST') return await addToWatchlist(request, env, accountId);
+  if (path === '/api/watchlist/reorder' && method === 'POST') return await reorderWatchlist(request, env, accountId);
   const wlMatch = path.match(/^\/api\/watchlist\/(.+)$/);
   if (wlMatch && method === 'DELETE') return await removeFromWatchlist(env, accountId, decodeURIComponent(wlMatch[1]));
 
@@ -315,6 +325,9 @@ async function handleApi(request, env, url, path, method) {
   // User settings
   if (path === '/api/settings' && method === 'GET') return await getUserSettingsAPI(env, accountId);
   if (path === '/api/settings' && method === 'POST') return await saveUserSettingAPI(request, env, accountId);
+
+  // FX rates (TwelveData, cached 1h in KV) — server-side so the API key never reaches the browser
+  if (path === '/api/fx-rates' && method === 'GET') return await getFxRatesAPI(env, accountId, url);
 
   return json({ error: 'Not found: ' + path }, 404);
 }
@@ -699,7 +712,7 @@ async function removeCustomField(env, accountId, name) {
 // WATCHLIST
 // =========================================================================
 async function getWatchlist(env, accountId) {
-  const result = await env.DB.prepare('SELECT symbol FROM watchlist WHERE account_id = ? ORDER BY id').bind(accountId).all();
+  const result = await env.DB.prepare('SELECT symbol FROM watchlist WHERE account_id = ? ORDER BY sort_order, id').bind(accountId).all();
   return json(result.results.map(r => r.symbol));
 }
 async function addToWatchlist(request, env, accountId) {
@@ -708,12 +721,28 @@ async function addToWatchlist(request, env, accountId) {
   // B32: allow ':' and '.' so 'OANDA:XAUUSD' survives.
   const sym = String(symbol).toUpperCase().replace(/[^A-Z0-9.:]/g, '').slice(0, 30);
   if (!sym) return json({ error: 'Invalid symbol' }, 400);
-  await env.DB.prepare('INSERT OR IGNORE INTO watchlist (account_id, symbol) VALUES (?, ?)').bind(accountId, sym).run();
+  // B-WL-REORDER: assign next available sort_order so new symbols appear at end
+  const maxRow = await env.DB.prepare('SELECT MAX(sort_order) as m FROM watchlist WHERE account_id = ?').bind(accountId).first();
+  const nextOrder = (maxRow && typeof maxRow.m === 'number' ? maxRow.m : -1) + 1;
+  await env.DB.prepare('INSERT OR IGNORE INTO watchlist (account_id, symbol, sort_order) VALUES (?, ?, ?)').bind(accountId, sym, nextOrder).run();
   return json({ success: true, symbol: sym });
 }
 async function removeFromWatchlist(env, accountId, symbol) {
   await env.DB.prepare('DELETE FROM watchlist WHERE account_id = ? AND symbol = ?').bind(accountId, String(symbol).toUpperCase()).run();
   return json({ success: true });
+}
+// B-WL-REORDER: persist new watchlist order. Body: { symbols: ["EURUSD", "GBPUSD", ...] }
+// Sets sort_order = index for each symbol. Symbols not in the list keep their order.
+async function reorderWatchlist(request, env, accountId) {
+  const { symbols } = await request.json();
+  if (!Array.isArray(symbols)) return json({ error: 'symbols array required' }, 400);
+  // Update each symbol's sort_order in a single D1 batch
+  const stmts = symbols.map((sym, i) =>
+    env.DB.prepare('UPDATE watchlist SET sort_order = ? WHERE account_id = ? AND symbol = ?')
+      .bind(i, accountId, String(sym).toUpperCase())
+  );
+  if (stmts.length > 0) await env.DB.batch(stmts);
+  return json({ success: true, count: stmts.length });
 }
 
 // =========================================================================
@@ -804,6 +833,80 @@ async function saveUserSettingAPI(request, env, accountId) {
 }
 
 // =========================================================================
+// FX RATES (TwelveData) — server-side fetch + KV cache (1h TTL).
+// The API key is read from user_settings (key = "twelvedata_apikey") so it
+// never travels to the browser. Cached in KV under "fx_rates:{accountId}".
+//
+// ?symbols=USD/JPY,USD/CAD,... — optional comma-separated list. Defaults to
+// the 7 majors needed for quote->USD conversion.
+// ?force=1 — bypass KV cache and force a fresh fetch.
+// =========================================================================
+const DEFAULT_FX_SYMBOLS = ['USD/JPY', 'USD/CAD', 'USD/CHF', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD'];
+
+async function getFxRatesAPI(env, accountId, url) {
+  const symbolsParam = url.searchParams.get('symbols');
+  const symbols = symbolsParam
+    ? symbolsParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+    : DEFAULT_FX_SYMBOLS;
+  const force = url.searchParams.get('force') === '1';
+
+  // 1. Try KV cache first (unless ?force=1)
+  const cacheKey = 'fx_rates:' + accountId;
+  if (!force && env.SESSIONS) {
+    try {
+      const cached = await env.SESSIONS.get(cacheKey, 'json');
+      if (cached && cached.fetchedAt && (Date.now() - cached.fetchedAt < 60 * 60 * 1000)) {
+        // Refresh TTL on read so active users keep their cache warm
+        await env.SESSIONS.put(cacheKey, JSON.stringify(cached), { expirationTtl: 3600 }).catch(() => {});
+        return json({ rates: cached.rates, fetchedAt: cached.fetchedAt, source: cached.source || 'twelvedata', cached: true });
+      }
+    } catch (_) { /* cache miss / corrupt — fall through to fetch */ }
+  }
+
+  // 2. Read the API key from user_settings (D1)
+  const row = await env.DB.prepare('SELECT value FROM user_settings WHERE account_id = ? AND key = ?').bind(accountId, 'twelvedata_apikey').first();
+  const apiKey = row && row.value ? String(row.value).trim() : '';
+  if (!apiKey) {
+    return json({ error: 'TwelveData API key not set. Open Settings → FX Rates & Currency to add one.', rates: {}, fetchedAt: 0, source: 'none' }, 200);
+  }
+
+  // 3. Fetch each symbol in parallel from TwelveData
+  //    Endpoint: https://api.twelvedata.com/price?symbol=USD/JPY&apikey=KEY
+  //    Response: { "price": "150.23", "currency": "USD", ... }  OR  { "status": "error", "message": "..." }
+  const results = await Promise.all(symbols.map(async sym => {
+    try {
+      const r = await fetch('https://api.twelvedata.com/price?symbol=' + encodeURIComponent(sym) + '&apikey=' + encodeURIComponent(apiKey), {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!r.ok) return { symbol: sym, error: 'HTTP ' + r.status };
+      const j = await r.json();
+      if (j && j.status === 'error') return { symbol: sym, error: j.message || 'API error' };
+      const price = parseFloat(j && j.price);
+      if (!Number.isFinite(price)) return { symbol: sym, error: 'No price in response' };
+      return { symbol: sym, price };
+    } catch (e) {
+      return { symbol: sym, error: e.message };
+    }
+  }));
+
+  const rates = {};
+  const errors = {};
+  results.forEach(r => {
+    if (r.price !== undefined) rates[r.symbol] = r.price;
+    else errors[r.symbol] = r.error;
+  });
+
+  const payload = { rates, errors, fetchedAt: Date.now(), source: 'twelvedata', cached: false };
+
+  // 4. Cache in KV for 1h (only if at least one rate came back)
+  if (env.SESSIONS && Object.keys(rates).length > 0) {
+    await env.SESSIONS.put(cacheKey, JSON.stringify(payload), { expirationTtl: 3600 }).catch(() => {});
+  }
+
+  return json(payload);
+}
+
+// =========================================================================
 // BACKUP
 // =========================================================================
 async function backupAll(env) {
@@ -814,7 +917,7 @@ async function backupAll(env) {
     data.strategies[acc.id] = (await env.DB.prepare('SELECT * FROM strategies WHERE account_id = ?').bind(acc.id).all()).results;
     data.setups[acc.id] = (await env.DB.prepare('SELECT * FROM setups WHERE account_id = ?').bind(acc.id).all()).results;
     data.custom_fields[acc.id] = (await env.DB.prepare('SELECT name FROM custom_fields WHERE account_id = ?').bind(acc.id).all()).results.map(r => r.name);
-    data.watchlist[acc.id] = (await env.DB.prepare('SELECT symbol FROM watchlist WHERE account_id = ? ORDER BY id').bind(acc.id).all()).results.map(r => r.symbol);
+    data.watchlist[acc.id] = (await env.DB.prepare('SELECT symbol FROM watchlist WHERE account_id = ? ORDER BY sort_order, id').bind(acc.id).all()).results.map(r => r.symbol);
     data.review_notes[acc.id] = (await env.DB.prepare('SELECT label, notes FROM review_notes WHERE account_id = ?').bind(acc.id).all()).results;
     data.prop_firms[acc.id] = (await env.DB.prepare('SELECT * FROM prop_firms WHERE account_id = ?').bind(acc.id).all()).results.map(parsePropFirm);
     data.user_settings[acc.id] = {};
@@ -896,11 +999,12 @@ async function restoreAllBackend(request, env) {
           .bind(acc.id, String(name).slice(0, 50)).run();
       }
 
-      // Restore watchlist
+      // Restore watchlist — preserve order via sort_order
       const wl = (d.watchlist && d.watchlist[acc.id]) || [];
+      let wlOrder = 0;
       for (const sym of wl) {
-        await env.DB.prepare('INSERT OR IGNORE INTO watchlist (account_id, symbol) VALUES (?, ?)')
-          .bind(acc.id, String(sym).toUpperCase()).run();
+        await env.DB.prepare('INSERT OR IGNORE INTO watchlist (account_id, symbol, sort_order) VALUES (?, ?, ?)')
+          .bind(acc.id, String(sym).toUpperCase(), wlOrder++).run();
       }
 
       // Restore review notes (object: {label: notes})
