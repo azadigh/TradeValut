@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TradeVault Local — Trading Journal (Browser Storage)</title>
-<meta name="description" content="TradeVault Local — standalone trading journal that saves all data in your browser's localStorage. No backend, no signup, no network required.">
+<title>TradeVault — Trading Journal & Analytics</title>
+<meta name="description" content="TradeVault is a modern trading journal with P&L tracking, strategy analytics, equity curve, calendar heatmap, and TradingView chart integration. Log trades, analyze performance, and improve your edge.">
 <meta name="keywords" content="trading journal, trade tracker, P&L calculator, forex journal, crypto trading log, trading analytics, equity curve, drawdown analysis, trading strategy, risk management">
 <meta name="author" content="TradeVault">
 <meta name="robots" content="index, follow">
@@ -1685,38 +1685,20 @@ svg[stroke-width] { stroke-width: inherit; }
 .about-footer { text-align: center; padding: 12px 0 0; border-top: 1px solid var(--border); margin-top: 12px; }
 .about-footer p { font-size: 12px; color: var(--text-3); margin: 0; }
 
-/* Changelog */
+/* Changelog (v5.0) */
 .about-changelog { display: flex; flex-direction: column; gap: 14px; }
-.changelog-entry {
-  padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: var(--r-md); position: relative;
-}
-.changelog-version {
-  font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--mono);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
-}
+.changelog-entry { padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); position: relative; }
+.changelog-version { font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--mono); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .changelog-date { font-size: 11px; font-weight: 400; color: var(--text-3); font-family: var(--font-sans); }
-.changelog-tag {
-  display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px;
-  border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;
-}
+.changelog-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px; }
 .changelog-tag.major { background: rgba(16,185,129,0.15); color: #10b981; }
 .changelog-tag.minor { background: rgba(59,130,246,0.15); color: #3b82f6; }
 .changelog-tag.patch { background: rgba(148,163,184,0.15); color: #94a3b8; }
 .changelog-list { list-style: none; padding: 0; margin: 6px 0 0; }
-.changelog-list li {
-  font-size: 12px; line-height: 1.55; color: var(--text-2); padding: 4px 0 4px 14px;
-  position: relative; border-bottom: 1px solid rgba(148,163,184,0.08);
-}
+.changelog-list li { font-size: 12px; line-height: 1.55; color: var(--text-2); padding: 4px 0 4px 14px; position: relative; border-bottom: 1px solid rgba(148,163,184,0.08); }
 .changelog-list li:last-child { border-bottom: none; }
-.changelog-list li::before {
-  content: ''; position: absolute; left: 2px; top: 12px;
-  width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
-}
-.changelog-list code {
-  font-family: var(--mono); font-size: 11px; background: var(--input);
-  padding: 1px 5px; border-radius: 3px; color: var(--accent-h);
-}
+.changelog-list li::before { content: ''; position: absolute; left: 2px; top: 12px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.changelog-list code { font-family: var(--mono); font-size: 11px; background: var(--input); padding: 1px 5px; border-radius: 3px; color: var(--accent-h); }
 .changelog-list strong { color: var(--text); font-weight: 600; }
 
 @media (max-width: 600px) {
@@ -1726,8 +1708,6 @@ svg[stroke-width] { stroke-width: inherit; }
 </style>
 </head>
 <body>
-<!-- LOCAL MODE BADGE -->
-<div style="position:fixed;bottom:12px;right:12px;z-index:9999;background:#1e293b;color:#94a3b8;font-size:11px;padding:4px 10px;border-radius:999px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;">LOCAL · browser storage</div>
 
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
@@ -2067,6 +2047,11 @@ svg[stroke-width] { stroke-width: inherit; }
         <button class="tbtn" onclick="loadEconomicCalendar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Load Calendar</button>
       </div>
       <div class="glass" style="padding: 16px 20px;">
+        <!-- Countdown to next high-impact event -->
+        <div id="ecCountdownBar" style="display:none;padding:10px 14px;margin-bottom:12px;background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04));border:1px solid rgba(239,68,68,0.3);border-radius:var(--r-sm);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="ecCountdownText" style="font-size:13px;color:var(--text);font-weight:500;flex:1;">—</span>
+        </div>
         <div class="ec-filter-bar" id="ecFilterBar">
           <button class="chip active" data-ec-filter="all" onclick="setEcFilter('all')">All</button>
           <button class="chip" data-ec-filter="high" onclick="setEcFilter('high')">High Impact</button>
@@ -2074,7 +2059,21 @@ svg[stroke-width] { stroke-width: inherit; }
           <button class="chip" data-ec-filter="low" onclick="setEcFilter('low')">Low</button>
           <input type="text" id="ecSearch" placeholder="Search events..." style="flex:1;min-width:160px;height:32px;background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 10px;color:var(--text);font-size:13px;" oninput="clearTimeout(window._ecSearchTimer); window._ecSearchTimer=setTimeout(function(){renderEconomicCalendar();},200);">
         </div>
-        <div class="ec-tz-bar" id="ecTzBar" style="display:none;"><span class="ec-tz-label" id="ecTzLabel">Times shown in: EST</span><select class="ec-tz-select" id="ecTzSelect" onchange="changeEcTimezone(this.value)"><option value="est">EST (UTC-5)</option><option value="local">My Local Time</option><option value="utc">UTC</option></select></div>
+        <!-- Currency filter chips -->
+        <div class="ec-currency-bar" id="ecCurrencyBar" style="display:none;flex-wrap:wrap;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+          <span style="font-size:11px;color:var(--text-3);margin-right:4px;align-self:center;">Currencies:</span>
+          <button class="chip ec-ccy active" data-ec-ccy="all" onclick="setEcCurrencyFilter('all')" style="font-size:11px;padding:3px 9px;">All</button>
+          <button class="chip ec-ccy" data-ec-ccy="USD" onclick="toggleEcCurrencyFilter('USD')" style="font-size:11px;padding:3px 9px;">🇺🇸 USD</button>
+          <button class="chip ec-ccy" data-ec-ccy="EUR" onclick="toggleEcCurrencyFilter('EUR')" style="font-size:11px;padding:3px 9px;">🇪🇺 EUR</button>
+          <button class="chip ec-ccy" data-ec-ccy="GBP" onclick="toggleEcCurrencyFilter('GBP')" style="font-size:11px;padding:3px 9px;">🇬🇧 GBP</button>
+          <button class="chip ec-ccy" data-ec-ccy="JPY" onclick="toggleEcCurrencyFilter('JPY')" style="font-size:11px;padding:3px 9px;">🇯🇵 JPY</button>
+          <button class="chip ec-ccy" data-ec-ccy="AUD" onclick="toggleEcCurrencyFilter('AUD')" style="font-size:11px;padding:3px 9px;">🇦🇺 AUD</button>
+          <button class="chip ec-ccy" data-ec-ccy="NZD" onclick="toggleEcCurrencyFilter('NZD')" style="font-size:11px;padding:3px 9px;">🇳🇿 NZD</button>
+          <button class="chip ec-ccy" data-ec-ccy="CAD" onclick="toggleEcCurrencyFilter('CAD')" style="font-size:11px;padding:3px 9px;">🇨🇦 CAD</button>
+          <button class="chip ec-ccy" data-ec-ccy="CHF" onclick="toggleEcCurrencyFilter('CHF')" style="font-size:11px;padding:3px 9px;">🇨🇭 CHF</button>
+          <button class="chip ec-ccy" data-ec-ccy="CNY" onclick="toggleEcCurrencyFilter('CNY')" style="font-size:11px;padding:3px 9px;">🇨🇳 CNY</button>
+        </div>
+        <div class="ec-tz-bar" id="ecTzBar" style="display:none;"><span class="ec-tz-label" id="ecTzLabel">Times shown in: EST</span><select class="ec-tz-select" id="ecTzSelect" onchange="changeEcTimezone(this.value)"><option value="est">Source: EST (UTC-5)</option><option value="utc">Source: UTC</option><option value="local">My Display Timezone</option></select></div>
         <div id="ecContainer"><div class="ec-loading">Loading economic calendar...</div></div>
       </div>
     </div>
@@ -2241,13 +2240,12 @@ svg[stroke-width] { stroke-width: inherit; }
 
       <!-- FX Rates & Account Currency -->
       <div class="glass settings-section">
-        <div class="settings-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>FX Rates &amp; Account Currency</div>
+        <div class="settings-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>FX Rates, Currency &amp; Timezone</div>
         <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;line-height:1.5;">
           P&amp;L is calculated in the <strong>quote currency</strong> of each pair, then converted to your <strong>account currency</strong> using the rates below.
           Rates are fetched from TwelveData and cached for 1 hour. You can override any rate manually — your override wins.
         </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
           <div>
             <label style="font-size:12px;color:var(--text-2);">Account Currency</label>
             <select class="modal-input" id="set_account_currency" style="width:100%;">
@@ -2262,22 +2260,42 @@ svg[stroke-width] { stroke-width: inherit; }
             </select>
           </div>
           <div>
-            <label style="font-size:12px;color:var(--text-2);">TwelveData API Key <span style="font-weight:400;color:var(--text-3);font-size:9px;">(stored securely server-side)</span></label>
+            <label style="font-size:12px;color:var(--text-2);">Display Timezone</label>
+            <select class="modal-input" id="set_display_timezone" style="width:100%;">
+              <option value="Asia/Tehran">IRST — Iran (UTC+3:30)</option>
+              <option value="America/New_York">EST/EDT — New York</option>
+              <option value="America/Chicago">CST/CDT — Chicago</option>
+              <option value="America/Denver">MST/MDT — Denver</option>
+              <option value="America/Los_Angeles">PST/PDT — Los Angeles</option>
+              <option value="America/Toronto">EST/EDT — Toronto</option>
+              <option value="America/Vancouver">PST/PDT — Vancouver</option>
+              <option value="Europe/London">GMT/BST — London</option>
+              <option value="Europe/Berlin">CET/CEST — Berlin</option>
+              <option value="Europe/Paris">CET/CEST — Paris</option>
+              <option value="Europe/Moscow">MSK — Moscow</option>
+              <option value="Asia/Dubai">GST — Dubai</option>
+              <option value="Asia/Kolkata">IST — India</option>
+              <option value="Asia/Singapore">SGT — Singapore</option>
+              <option value="Asia/Tokyo">JST — Tokyo</option>
+              <option value="Australia/Sydney">AEDT/AEST — Sydney</option>
+              <option value="Pacific/Auckland">NZDT/NZST — Auckland</option>
+              <option value="UTC">UTC — Coordinated Universal Time</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--text-2);">TwelveData API Key <span style="font-weight:400;color:var(--text-3);font-size:9px;">(stored server-side)</span></label>
             <input type="password" class="modal-input" id="set_twelvedata_apikey" placeholder="0515e26c..." style="width:100%;" autocomplete="off">
           </div>
         </div>
-
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
           <button class="save-btn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="saveFxSettings()">Save Settings</button>
           <button class="tbtn primary" style="width:auto;padding:7px 16px;font-size:13px;" onclick="refreshFxRates(false)" id="fxRefreshBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:4px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Fetch Rates</button>
           <button class="tbtn" style="width:auto;padding:7px 16px;font-size:13px;" onclick="refreshFxRates(true)">Force Refresh</button>
           <span id="fxStatus" style="font-size:11px;color:var(--text-3);"></span>
         </div>
-
         <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">
           <span id="fxLastFetched">Never fetched</span> · <span id="fxSource">—</span>
         </div>
-
         <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-2);">FX Rates (editable)</div>
         <div id="fxRatesTable" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;"></div>
       </div>
@@ -2328,7 +2346,7 @@ svg[stroke-width] { stroke-width: inherit; }
         </div>
         <h1 class="about-title">TradeVault</h1>
         <p class="about-tagline">Your trading edge, quantified.</p>
-        <div class="about-version">v5.0 · FX-accurate P&amp;L · Pip Value Calculator · Watchlist reorder</div>
+        <div class="about-version">v5.1 · FX-accurate P&amp;L · Frozen rates · Timezone-aware · Calendar filters</div>
       </div>
 
       <!-- Two columns: Connect + Donate -->
@@ -2352,9 +2370,9 @@ svg[stroke-width] { stroke-width: inherit; }
               <div class="about-social-info"><div class="about-social-name">Telegram</div><div class="about-social-handle">@azadi_tg</div></div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="about-social-arrow"><path d="m9 18 6-6-6-6"/></svg>
             </a>
-            <a href="https://instagram.com/azad_igp" target="_blank" rel="noopener" class="about-social-card about-social-instagram">
+            <a href="https://instagram.com/azadi_igp" target="_blank" rel="noopener" class="about-social-card about-social-instagram">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="about-social-icon"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              <div class="about-social-info"><div class="about-social-name">Instagram</div><div class="about-social-handle">@azad_igp</div></div>
+              <div class="about-social-info"><div class="about-social-name">Instagram</div><div class="about-social-handle">@azadi_igp</div></div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="about-social-arrow"><path d="m9 18 6-6-6-6"/></svg>
             </a>
           </div>
@@ -2396,9 +2414,23 @@ svg[stroke-width] { stroke-width: inherit; }
           Changelog
         </h2>
         <div class="about-changelog">
+          <div class="changelog-entry">
+            <div class="changelog-version">v5.1 <span class="changelog-date">— Jul 14, 2026</span></div>
+            <div class="changelog-tag major">Major</div>
+            <ul class="changelog-list">
+              <li><strong>Frozen FX rates</strong> — P&amp;L is now frozen at trade-log time using the live FX rate. Historical trades never drift when rates change. New <code>fx_rate_used</code> column in D1 stores the rate. One-time fix automatically corrects old trades on first v5.1 load.</li>
+              <li><strong>Display Timezone setting</strong> — Choose from 18 timezones (IRST, EST, UTC, JST, etc.). All trade entry, session detection, heatmap, and time display use this timezone consistently. No more browser-local vs. Iran-time mismatch.</li>
+              <li><strong>Calendar auto-detect CSV parser</strong> — Calendar now reads the CSV header row and maps columns by name. Works with any CSV format (Forex Factory, Investing.com, custom exports). No more shifted fields.</li>
+              <li><strong>Calendar currency filter</strong> — Multi-select chips for USD, EUR, GBP, JPY, AUD, NZD, CAD, CHF, CNY. Filter events by the currencies you trade.</li>
+              <li><strong>Calendar countdown</strong> — Red bar at top shows the next high-impact event with live countdown ("in 2h 14m"). Auto-updates every 30-60 seconds. Prefers high-impact events within 24h.</li>
+              <li><strong>Calendar stale cache detection</strong> — Automatically detects and discards old broken cache data from pre-v5.0 parser. Forces fresh fetch when cache is invalid.</li>
+              <li><strong>Instagram fix</strong> — Corrected Instagram handle to <code>@azadi_igp</code> in the About page.</li>
+              <li><strong>125-test stress test passed</strong> — Comprehensive tests covering FX P&amp;L math, frozen rates, timezone helpers, calendar parser, currency filter, watchlist reorder, D1 persistence, and localStorage persistence.</li>
+            </ul>
+          </div>
 
           <div class="changelog-entry">
-            <div class="changelog-version">v5.0 <span class="changelog-date">— Jul 14, 2026</span></div>
+            <div class="changelog-version">v5.0 <span class="changelog-date">— Jul 13, 2026</span></div>
             <div class="changelog-tag major">Major</div>
             <ul class="changelog-list">
               <li><strong>FX-accurate P&amp;L engine</strong> — Rewrote <code>calculatePnl()</code> using the correct two-step methodology: profit is computed in the <em>quote currency</em> first, then converted to your account currency. Fixes the bug where AUD/JPY, EUR/JPY, USD/CAD, USD/CHF and every other non-USD-quote pair was mis-valued by 20–30%.</li>
@@ -2406,15 +2438,13 @@ svg[stroke-width] { stroke-width: inherit; }
               <li><strong>Auto-fetch FX rates</strong> — Rates now load silently in the background when you open the Journal, Risk Calculator, or Risk Dashboard, and whenever you type a non-USD-quote symbol. No more manual refresh.</li>
               <li><strong>Pip Value Calculator</strong> — New section on the Risk Calculator page showing 1-pip value per lot for all 56 forex pairs composed of USD, JPY, EUR, GBP, AUD, NZD, CHF, CAD. Editable lot size, live conversion to account currency.</li>
               <li><strong>Risk Calculator fixed</strong> — Same P&amp;L bug was producing wrong position sizes and wrong TP P&amp;L on JPY/CAD/CHF pairs. Now routes through the corrected <code>calculatePnl()</code> and shows the FX conversion rate it used.</li>
-              <li><strong>Settings persistence to D1</strong> — <code>saveSetting()</code> now fire-and-forgets a POST to the backend. Theme, session times, fee settings, FX overrides, account currency, and your TwelveData API key all survive across devices and browser cache clears.</li>
+              <li><strong>Settings persistence</strong> — Theme, session times, fee settings, FX overrides, account currency, and your TwelveData API key all persist server-side and survive across devices and browser cache clears.</li>
               <li><strong>Watchlist reorder</strong> — New <code>sort_order</code> column + <code>/api/watchlist/reorder</code> endpoint. Drag-drop or use the new ↑/↓ arrow buttons — your order persists to D1 and survives reloads.</li>
               <li><strong>Conversion breakdown</strong> — The trade form now shows the exact math used, e.g. <code>¥-4365.00 ÷ USD/JPY 150.0000 = $-29.10</code> — no more black-box P&amp;L.</li>
               <li><strong>Account currency selector</strong> — Choose from USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. All P&amp;L, risk, and pip-value outputs respect the selection.</li>
               <li><strong>Manual FX overrides</strong> — Edit any of the 7 rates in Settings → FX Rates &amp; Currency. Your override wins, even after a fresh fetch. Useful for locking in the rate your broker used at trade time.</li>
-              <li><strong>Removed "Recalculate All Trades" button</strong> — No longer needed: P&amp;L is computed correctly at trade-log time inside <code>saveTrade()</code>.</li>
             </ul>
           </div>
-
           <div class="changelog-entry">
             <div class="changelog-version">v4.8 <span class="changelog-date">— previous release</span></div>
             <div class="changelog-tag patch">Patch</div>
@@ -2426,7 +2456,6 @@ svg[stroke-width] { stroke-width: inherit; }
               <li>Calendar CSV parser strips UTF-8 BOM.</li>
             </ul>
           </div>
-
         </div>
       </div>
 
@@ -2596,21 +2625,6 @@ svg[stroke-width] { stroke-width: inherit; }
 </div>
 
 <script>
-// ===== LOCAL STORAGE DATA ADAPTER =====
-// All data lives in browser localStorage. No backend, no auth, no network.
-// Keys:
-//   tv_accounts               = [{id, name, created, trade_count, pnl}, ...]
-//   tv_current_account        = <id>
-//   tv_trades_<id>            = [trade, ...]
-//   tv_setups_<id>            = [setup, ...]
-//   tv_strategies_<id>        = [strategy, ...]
-//   tv_custom_fields_<id>     = [name, ...]
-//   tv_watchlist_<id>         = [symbol, ...]
-//   tv_review_notes_<id>      = {label: notes, ...}
-//   tv_propfirms_<id>         = [propfirm, ...]
-//   tv_settings_<id>          = {key: value, ...}
-//   dashboard_theme           = 'light' | 'dark'
-
 const LS = {
   get(key, def) {
     try { const v = localStorage.getItem(key); return v === null ? def : JSON.parse(v); }
@@ -2677,6 +2691,76 @@ async function loadAccountData(accId) {
     acc.pnl = _tc.reduce((s, t) => s + (Number(t.pnl) || 0), 0);
     LS.set('tv_accounts', _ac);
   }
+  // v5.0: ONE-TIME fix for trades logged with the old buggy formula.
+  // Gated by v5_pnl_fix_done setting — runs ONCE, then never again.
+  runOneTimePnlFix();
+}
+
+// v5.0: One-time fix — recompute P&L for trades that have no fx_rate_used
+// (i.e. logged before v5.0 with the old buggy formula). After fixing, each
+// trade gets fx_rate_used frozen so subsequent loads never recompute.
+// Gated by the 'v5_pnl_fix_done' setting — runs ONCE per account, then skips.
+async function runOneTimePnlFix() {
+  if (!_tc || _tc.length === 0) return;
+  if (getSetting('v5_pnl_fix_done', 'false') === 'true') return;
+  const needsFix = _tc.filter(t => t.entry && t.exit && (!t.fxRateUsed || t.fxRateUsed === 0));
+  if (needsFix.length === 0) {
+    saveSetting('v5_pnl_fix_done', 'true');
+    return;
+  }
+  if (Object.keys(_fxRates).length === 0) {
+    try { await ensureFxRates(); } catch(_) {}
+  }
+  let fixedCount = 0;
+  for (const t of needsFix) {
+    const dir = (typeof autoDetectDirection === 'function')
+      ? (autoDetectDirection(t.entry, t.exit, t.sl, t.tp) || t.direction || 'long')
+      : (t.direction || 'long');
+    const quote = getQuoteCurrency(t.symbol);
+    let frozenRate = 0;
+    if (quote === 'USD' || quote === getAccountCurrency()) {
+      frozenRate = 1;
+    } else if (_fxRates['USD/' + quote] !== undefined) {
+      frozenRate = _fxRates['USD/' + quote];
+    } else if (_fxRates[quote + '/USD'] !== undefined) {
+      frozenRate = 1 / _fxRates[quote + '/USD'];
+    }
+    const oldPnl = t.pnl;
+    t.fxRateUsed = frozenRate;
+    t.pnl = calculatePnlWithFrozenRate(t.symbol, dir, t.entry, t.exit, t.size, frozenRate);
+    const risk = calculateRiskWithFrozenRate(t.symbol, dir, t.entry, t.sl, t.size, frozenRate);
+    t.rMultiple = risk > 0 ? t.pnl / risk : 0;
+    if (t.id && Math.abs(oldPnl - t.pnl) > 0.005) {
+      try { await API.req('/api/trades/' + t.id, { method: 'PUT', body: JSON.stringify(t) }).catch(()=>{}); } catch(_) {}
+      fixedCount++;
+    }
+  }
+  saveSetting('v5_pnl_fix_done', 'true');
+  if (fixedCount > 0 && typeof showToast === 'function') {
+    showToast('v5.0: Fixed P&L for ' + fixedCount + ' trade(s) — frozen rates saved');
+  }
+}
+
+// Calculate P&L using a FROZEN FX rate (not live).
+function calculatePnlWithFrozenRate(symbol, direction, entry, exit, size, frozenRate) {
+  entry = num(entry); exit = num(exit); size = num(size);
+  if (entry === 0 || exit === 0 || size === 0) return 0;
+  size = Math.abs(size);
+  const t = getInstrumentType(symbol);
+  const ds = direction === 'long' ? 1 : -1;
+  if (t === 'crypto') {
+    if (entry === 0) return 0;
+    return ((exit - entry) / entry) * size * ds;
+  }
+  const cs = getContractSize(symbol);
+  const quote = getQuoteCurrency(symbol);
+  const profitInQuote = (exit - entry) * size * cs * ds;
+  if (quote === 'USD' || quote === getAccountCurrency()) return profitInQuote;
+  if (!frozenRate || frozenRate === 0) return profitInQuote;
+  return profitInQuote / frozenRate;
+}
+function calculateRiskWithFrozenRate(symbol, direction, entry, sl, size, frozenRate) {
+  return Math.abs(calculatePnlWithFrozenRate(symbol, direction, entry, sl, size, frozenRate));
 }
 
 async function saveSetting(key, value) {
@@ -3188,350 +3272,6 @@ function showAccountPicker(accounts) {
   $('accountPickerModal').classList.add('active');
 }
 
-async function pickAccount(id) {
-  $('accountPickerModal').classList.remove('active');
-  currentAccountId = id;
-  API.setAccountId(parseInt(id, 10) || 0);
-  localStorage.setItem('current_account_id', String(id));
-  // Load the selected account's data
-  await loadData();
-  proceedAfterAccountLoad();
-  showToast('Account loaded');
-}
-async function handleLogin(event) {
-  event.preventDefault();
-  const pw = $('loginPassword').value;
-  const errEl = $('loginError'); errEl.classList.remove('show');
-  if (!pw) { showLoginError('Password required'); return; }
-  const btn = $('loginSubmitBtn'); btn.textContent = 'Please wait...'; btn.disabled = true;
-  try {
-    // B81/B82: Don't call loadData() here — hideLoginScreen() will do it.
-    // B82: Don't let API.login() save accountId to localStorage — we want the
-    // account picker to show if there are multiple accounts.
-    const d = await API.req('/api/auth/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
-    API.setToken(d.token);
-    API.accountId = d.accountId;  // set in-memory only, DON'T save to localStorage yet
-    // B66: clear the password field on success so it doesn't linger if the user logs out later.
-    $('loginPassword').value = '';
-    btn.textContent = 'Login'; btn.disabled = false;
-    hideLoginScreen(); showToast('Welcome back!');
-  } catch (err) {
-    btn.textContent = 'Login'; btn.disabled = false;
-    showLoginError(err.message || 'Login failed');
-  }
-}
-function showLoginError(msg) { const e = $('loginError'); e.textContent = msg; e.classList.add('show'); }
-function togglePasswordVisibility() {
-  const pw = $('loginPassword'), eye = $('pwEye');
-  if (pw.type === 'password') { pw.type = 'text'; eye.style.opacity = '1'; } else { pw.type = 'password'; eye.style.opacity = '.5'; }
-}
-function showLoggedInUser() {}
-function toggleLoginMode(mode) {}
-async function logout() {
-  // LOCAL MODE: no real logout. Reload the page instead.
-  if (!confirm('Reload the app? (Your data is saved in browser storage.)')) return;
-  location.reload();
-}
-
-function bindEvents() {
-  const tagSel = $('tagSelector');
-  if (tagSel) tagSel.addEventListener('click', e => { const b = e.target.closest('.tag-btn'); if(!b) return; $$('#tagSelector .tag-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); currentTag = b.dataset.tag; });
-  document.addEventListener('keydown', e => {
-    if($('tradeLightbox').classList.contains('active')) {
-      if(e.key==='Escape') closeTradeLightbox();
-      else if(e.key==='ArrowLeft') { e.preventDefault(); navTradeImage(-1); }
-      else if(e.key==='ArrowRight') { e.preventDefault(); navTradeImage(1); }
-      return;
-    }
-    if($('lightbox').classList.contains('active')) {
-      if(e.key==='Escape') closeLightbox();
-      else if(e.key==='ArrowLeft') { e.preventDefault(); navLightbox(-1); }
-      else if(e.key==='ArrowRight') { e.preventDefault(); navLightbox(1); }
-      return;
-    }
-    if(e.key==='Escape') { closeDayModal(); closeAccountModal(); }
-  });
-  const restoreFile = $('restoreFile');
-  if (restoreFile) restoreFile.addEventListener('change', restoreAll);
-  // Opportunity search + filter
-  const oppSearch = $('oppSearch');
-  var _oppSearchTimer; if (oppSearch) oppSearch.addEventListener('input', e => { clearTimeout(_oppSearchTimer); _oppSearchTimer = setTimeout(function() { searchQuery = e.target.value.toLowerCase(); renderOpportunities(); }, 200); });
-  // Session clock — live update every second
-  updateSessionClock();
-  setInterval(updateSessionClock, 1000);
-}
-
-// ============ SESSION CLOCK (IRST + EST) ============
-function updateSessionClock() {
-  const now = new Date();
-  // IRST = UTC+3:30 (Asia/Tehran)
-  const irstStr = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Tehran', hour12: false });
-  // EST = America/New_York (auto-handles EDT/EST)
-  const estStr = now.toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
-  // Use custom session times from localStorage
-  const sessionTimes = getSessionSettings();
-  const irstParts = irstStr.split(':');
-  const nowMins = parseInt(irstParts[0],10)*60 + parseInt(irstParts[1],10);
-  let session = 'newyork', sessionLabel = 'New York';
-  let nextSession = null, nextMins = Infinity;
-  Object.entries(sessionTimes).forEach(([key, s]) => {
-    const [sh, sm] = s.start.split(':').map(Number);
-    const [eh, em] = s.end.split(':').map(Number);
-    const startMins = sh*60+sm, endMins = eh*60+em;
-    if(nowMins >= startMins && nowMins < endMins) { session = key; sessionLabel = s.label; }
-    // Find next session start
-    if(startMins > nowMins && startMins < nextMins) { nextMins = startMins; nextSession = s.label; }
-  });
-  // Wrap around: if no next session today, next is tomorrow's first session
-  if(!nextSession) {
-    const first = Object.values(sessionTimes)[0];
-    const [fsh, fsm] = first.start.split(':').map(Number);
-    nextMins = fsh*60+fsm + 24*60; nextSession = first.label;
-  }
-  const diffMins = nextMins - nowMins;
-  const cdEl = $('scCountdown');
-  if(cdEl) {
-    if(diffMins > 0 && diffMins < 600) {
-      const h = Math.floor(diffMins/60), m = diffMins%60;
-      cdEl.textContent = nextSession + ' in ' + (h>0?h+'h ':'') + m + 'm';
-      cdEl.style.display = 'inline-block';
-    } else { cdEl.style.display = 'none'; }
-  }
-  ['asia','london','newyork'].forEach(function(s) {
-    const el = $('sess-' + s);
-    if (el) {
-      el.className = 'sc-sess ' + s + (s === session ? ' active' : '');
-    }
-  });
-  const irstEl = $('scIRST'); if (irstEl) irstEl.textContent = irstStr;
-  const estEl = $('scEST'); if (estEl) estEl.textContent = estStr;
-}
-function togglePanel() {}
-function openPanel() {}
-function closePanel() {}
-
-let showTVWatchlist = (function(){ try { var v = getSetting('tv_wl_visible', 'true'); return v !== 'false'; } catch(e) { return true; } })();
-
-function loadChart(symbol) {
-  if (!symbol) symbol = defaultSymbol;
-  currentChartSymbol = symbol;
-  try { saveSetting('last_chart_symbol', symbol); } catch(e) {}
-  const c = $('tv_chart_container'); if (!c) return;
-  c.innerHTML = '';
-  const w = document.createElement('div'); w.className = 'tradingview-widget-container'; w.style.height = w.style.width = '100%';
-  const d = document.createElement('div'); d.className = 'tradingview-widget-container__widget'; d.style.height = d.style.width = '100%';
-  const s = document.createElement('script'); s.type = 'text/javascript'; s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js?v=' + Date.now(); s.async = true;
-  // Build watchlist from our watchlist + current symbol — ALWAYS pass the full list
-  // B67: guard against null _wlc (loadData not yet complete) — fall back to [symbol].
-  const wlList = getWatchlist() || [];
-  let wlSyms = wlList.map(sym => getFullSymbol(sym));
-  if (!wlSyms.includes(symbol)) wlSyms.unshift(symbol);
-  // De-duplicate while preserving order
-  wlSyms = wlSyms.filter((v, i, a) => a.indexOf(v) === i);
-  // B68: defense-in-depth — sanitize the symbol before passing to TradingView widget JSON.
-  // Symbols are sanitized on input, but if a malicious value somehow slips through, this
-  // prevents script injection in the widget config.
-  const safeSymbol = String(symbol).replace(/[^A-Za-z0-9.:/_-]/g, '').slice(0, 50) || defaultSymbol;
-  s.text = JSON.stringify({ allow_symbol_change:true, calendar:false, details:false, hide_side_toolbar:!showTVWatchlist, hide_top_toolbar:false, hide_legend:false, hide_volume:false, hotlist:false, interval:'15', locale:'en', save_image:true, style:'1', symbol:safeSymbol, theme:currentTheme, timezone:'Asia/Tehran', backgroundColor: currentTheme==='dark'?'#0A0A0B':'#FFFFFF', gridColor: currentTheme==='dark'?'rgba(255,255,255,0.04)':'rgba(15,15,20,0.05)', watchlist: wlSyms, withdateranges:false, compareSymbols:[], studies:['STD;RSI'], autosize:true });
-  w.appendChild(d); w.appendChild(s); c.appendChild(w); renderWatchlist();
-  // Update TV sidebar toggle button color to reflect current state
-  const tvToggle = $('tvWlToggle'); if (tvToggle) tvToggle.style.color = showTVWatchlist ? 'var(--accent-h)' : 'var(--text-3)';
-}
-
-function saveOpportunity(event) {
-  event.preventDefault();
-  const symbol = $('input_symbol').value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
-  if(!symbol) return;
-  const opp = { symbol, note:str($('input_note').value,1000), picUrl:normalizeImageUrl(str($('input_pic').value,800000)), tag:currentTag, timestamp:Date.now(), date:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) };
-  // B53: POST first, then add to _sc with the real DB id (was: temp Date.now() id).
-  API.req('/api/setups', { method:'POST', body: JSON.stringify(opp) })
-    .then(r => {
-      opp.id = r.id;
-      const opps = getOpportunities();
-      opps.unshift(opp);
-      saveOpportunities(opps);
-      $('input_symbol').value=''; $('input_note').value=''; $('input_pic').value='';
-      renderOpportunities(); updateStats(); updateBackupInfo();
-    })
-    .catch(e => showToast('Save failed: ' + e.message));
-}
-function saveEdit(id) {
-  const opps = getOpportunities(); const idx = opps.findIndex(o => o.id===id); if(idx===-1) return;
-  const symbol = $('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
-  if(!symbol) return;
-  const updated = { ...opps[idx], symbol, note:str($('edit_note_'+id).value,1000), picUrl:normalizeImageUrl(str($('edit_pic_'+id).value,800000)) };
-  opps[idx] = updated;
-  saveOpportunities(opps);
-  // B52: was missing PUT — edits never reached the backend.
-  API.req('/api/setups/'+id, { method:'PUT', body: JSON.stringify({ symbol: updated.symbol, note: updated.note, picUrl: updated.picUrl, tag: updated.tag }) })
-    .catch(e => showToast('Sync failed: ' + e.message));
-  editingId = null; renderOpportunities(); updateStats(); updateBackupInfo();
-}
-
-let _oppSlideshowItems = [];
-
-function renderOpportunities() {
-  const c = $('oppListContainer'); let opps = getOpportunities();
-  if(activeFilter!=='all') opps = opps.filter(o => o.tag===activeFilter);
-  if(searchQuery) opps = opps.filter(o => o.symbol.toLowerCase().includes(searchQuery) || (o.note&&o.note.toLowerCase().includes(searchQuery)));
-  const total = getOpportunities().length;
-  if($('setupCount')) $('setupCount').textContent = opps.length+'/'+total;
-  if($('oppCountBadge')) $('oppCountBadge').textContent = total + (total===1?' opportunity':' opportunities');
-  // Build slideshow items from opps that have images
-  _oppSlideshowItems = opps.filter(o => o.picUrl).map(o => ({ url: normalizeImageUrl(o.picUrl), note: o.note||'', symbol: o.symbol||'', tag: o.tag||'', date: o.date||'' }));
-  if(opps.length===0) { c.innerHTML = '<div class="empty-state glass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><div class="e-title">No opportunities yet</div><div class="e-sub">Add your first opportunity using the form on the left.</div></div>'; return; }
-  c.innerHTML = opps.map(opp => editingId===opp.id ? renderEditForm(opp) : renderItem(opp)).join('');
-}
-
-function renderItem(opp) {
-  const tag = opp.tag || 'long';
-  const picUrl = normalizeImageUrl(opp.picUrl || '');
-  const slideshowIdx = picUrl ? _oppSlideshowItems.findIndex(s => s.url === picUrl && s.symbol === opp.symbol) : -1;
-  const openCall = slideshowIdx >= 0 ? 'openOppLightbox('+slideshowIdx+')' : (picUrl ? 'openLightbox(\''+escapeAttr(picUrl)+'\')' : '');
-  const thumbHtml = picUrl ? '<div class="opp-thumb" onclick="'+openCall+'" title="Click to enlarge"><img src="'+escapeHtml(picUrl)+'" alt="Chart" referrerpolicy="no-referrer" loading="lazy"><div class="opp-thumb-overlay"><span><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15 3h6v6\'/><path d=\'M9 21H3v-6\'/><path d=\'M21 3l-7 7\'/><path d=\'M3 21l7-7\'/></svg>Click to enlarge</span></div></div>' : '';
-  const viewBtn = picUrl ? '<button class="icon-btn" onclick="'+openCall+'" title="View image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></button>' : '';
-  return '<div class="opp-item" data-id="'+opp.id+'"><div class="opp-top"><span class="opp-symbol" onclick="loadChart(\''+escapeAttr(getFullSymbol(opp.symbol))+'\');switchView(\'chart\')">'+escapeHtml(opp.symbol)+'</span><span class="badge '+tag+'">'+tag+'</span><span class="opp-date">'+(opp.date||'')+'</span></div>'+(opp.note?'<div class="opp-note">'+escapeHtml(opp.note)+'</div>':'')+thumbHtml+renderOppRating(opp)+'<div class="opp-actions">'+viewBtn+'<button class="icon-btn" onclick="startEdit('+opp.id+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="icon-btn danger" onclick="deleteOpportunity('+opp.id+')" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div></div>';
-}
-
-function renderEditForm(opp) {
-  return '<div class="opp-item" data-id="'+opp.id+'" style="background:var(--surface-2);border-color:var(--border-accent);"><div style="display:flex;flex-direction:column;gap:5px;"><input type="text" id="edit_symbol_'+opp.id+'" value="'+escapeAttr(opp.symbol)+'" placeholder="SYMBOL" style="font-family:var(--font-mono);font-weight:600;background:var(--input);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:12px;"><input type="text" id="edit_note_'+opp.id+'" value="'+escapeAttr(opp.note||'')+'" placeholder="Note..." style="background:var(--input);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:12px;"><input type="url" id="edit_pic_'+opp.id+'" value="'+escapeAttr(opp.picUrl||'')+'" placeholder="Image URL..." style="background:var(--input);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:12px;"><div style="display:flex;gap:5px;"><button onclick="cancelEdit()" style="flex:1;padding:5px;border:1px solid var(--border);background:var(--input);color:var(--text-2);border-radius:5px;font-size:11px;cursor:pointer;">Cancel</button><button onclick="saveEdit('+opp.id+')" style="flex:1;padding:5px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;">Save</button></div></div></div>';
-}
-
-function startEdit(id) { editingId = id; renderOpportunities(); }
-function cancelEdit() { editingId = null; renderOpportunities(); }
-// B52 saveEdit() moved up next to saveOpportunity (single definition now).
-function deleteOpportunity(id) { let opps = getOpportunities().filter(o => o.id!==id); saveOpportunities(opps); /* B57 */ API.req('/api/setups/'+id,{method:'DELETE'}).catch(e=>{showToast('Delete failed — reloading: '+e.message);loadData().then(()=>{renderOpportunities();updateBackupInfo();});}); renderOpportunities(); updateBackupInfo(); }
-
-function setOppFilter(filter) {
-  activeFilter = filter;
-  document.querySelectorAll('[data-opp-filter]').forEach(b => b.classList.toggle('active', b.dataset.oppFilter === filter));
-  renderOpportunities();
-}
-
-function renderQuickChips() { /* removed — quick chips no longer displayed on chart view */ }
-
-function updateStats() {
-  const opps = getOpportunities(); const total = opps.length; const now = new Date();
-  const today = opps.filter(o => { const d = new Date(o.timestamp||0); return d.getDate()===now.getDate() && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); }).length;
-  const counts = {}; opps.forEach(o => { counts[o.symbol] = (counts[o.symbol]||0)+1; });
-  let topSym='—', topCount=0; for(const [s,c] of Object.entries(counts)) { if(c>topCount){topSym=s;topCount=c;} }
-  const topDisplay = topSym.length>8 ? topSym.slice(0,7)+'…' : topSym;
-  if($('statTotal'))$('statTotal').textContent=total; if($('statToday'))$('statToday').textContent=today; if($('statTop'))$('statTop').textContent=topDisplay;
-}
-
-function getFullSymbol(sym) {
-  if(!sym) return defaultSymbol;
-  sym = sym.toUpperCase();
-  if (sym.includes(':')) return sym; // Already has exchange prefix
-  if (sym.endsWith('.P')) return 'BINANCE:' + sym; // Perpetual → BINANCE:BTCUSDT.P
-  if (sym.endsWith('.D')) return 'INDEX:' + sym; // Dominance → INDEX:BTC.D
-  if (sym === 'DXY') return 'TVC:DXY';
-  if (sym === 'EURX') return 'TVC:EURX';
-  if (sym === 'JPYX') return 'TVC:JPYX';
-  return 'OANDA:' + sym;
-}
-function escapeHtml(s) { if(s==null||s===undefined) return ''; return String(s).replace(/[&<>"'`\n\r]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','\n':' ','\r':''}[c])); }
-function escapeAttr(s) { if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\\/g,'\\\\'); }
-
-// Convert TradingView snapshot page URLs to direct image URLs
-// https://www.tradingview.com/x/CODE/ → https://s3.tradingview.com/snapshots/{first_char}/CODE.png
-function normalizeImageUrl(url) {
-  if (!url || typeof url !== 'string') return url;
-  url = url.trim();
-  // Already a direct S3 image URL — return as-is
-  if (url.includes('s3.tradingview.com/snapshots/')) return url;
-  // TradingView snapshot page URL → direct image URL
-  var tvMatch = url.match(/^https?:\/\/(?:www\.)?tradingview\.com\/x\/([A-Za-z0-9]+)\/?/);
-  if (tvMatch) {
-    var code = tvMatch[1];
-    var firstChar = code.charAt(0).toLowerCase();
-    return 'https://s3.tradingview.com/snapshots/' + firstChar + '/' + code + '.png';
-  }
-  return url;
-}
-
-let lightboxItems = [];
-let lightboxIndex = 0;
-
-function openLightbox(url) {
-  // Single image mode (trade screenshots)
-  lightboxItems = [{ url: url, note: '', symbol: '', tag: '', date: '' }];
-  lightboxIndex = 0;
-  renderLightbox();
-  $('lightbox').classList.add('active');
-}
-
-function openOppLightbox(idx) {
-  if (!_oppSlideshowItems || _oppSlideshowItems.length === 0) { showToast('No images to view'); return; }
-  lightboxItems = _oppSlideshowItems;
-  lightboxIndex = Math.max(0, Math.min(idx, lightboxItems.length - 1));
-  renderLightbox();
-  $('lightbox').classList.add('active');
-}
-
-function renderLightbox() {
-  const item = lightboxItems[lightboxIndex];
-  if (!item) return;
-  const img = $('lightbox-img');
-  // Show loading state
-  img.style.opacity = '0';
-  img.onload = function() { img.style.opacity = '1'; };
-  img.onerror = function() {
-    img.onerror = null;
-    img.style.opacity = '1';
-    img.alt = 'Failed to load image';
-    showToast('Image failed to load — check URL');
-  };
-  // Set referrerpolicy to bypass hotlink protection
-  img.referrerPolicy = 'no-referrer';
-  img.src = normalizeImageUrl(item.url);
-  // Note text below image
-  const noteEl = $('lbNote');
-  if (noteEl) {
-    noteEl.textContent = item.note || '';
-    noteEl.style.display = item.note ? 'block' : 'none';
-  }
-  // Meta info (symbol, tag, date)
-  const metaEl = $('lbMeta');
-  if (metaEl) {
-    let html = '';
-    if (item.symbol) html += '<span>'+escapeHtml(item.symbol)+'</span>';
-    if (item.tag) {
-      const tagColors = { long: '#3DD68C', short: '#E5484D', watch: '#F5A623' };
-      const tc = tagColors[item.tag] || '#A1A1AA';
-      html += '<span class="lb-tag" style="background:'+tc+'22;color:'+tc+'">'+escapeHtml(item.tag)+'</span>';
-    }
-    if (item.date) html += '<span style="opacity:.6">'+escapeHtml(item.date)+'</span>';
-    metaEl.innerHTML = html;
-    metaEl.style.display = html ? 'flex' : 'none';
-  }
-  // Counter
-  const counterEl = $('lbCounter');
-  if (counterEl) {
-    counterEl.textContent = (lightboxIndex + 1) + ' / ' + lightboxItems.length;
-    counterEl.style.display = lightboxItems.length > 1 ? 'block' : 'none';
-  }
-  // Arrows
-  const prevBtn = document.querySelector('.lb-prev');
-  const nextBtn = document.querySelector('.lb-next');
-  if (prevBtn) prevBtn.style.display = lightboxItems.length > 1 ? 'flex' : 'none';
-  if (nextBtn) nextBtn.style.display = lightboxItems.length > 1 ? 'flex' : 'none';
-}
-
-function navLightbox(dir) {
-  if (lightboxItems.length <= 1) return;
-  lightboxIndex = (lightboxIndex + dir + lightboxItems.length) % lightboxItems.length;
-  renderLightbox();
-}
-
-function closeLightbox() {
-  $('lightbox').classList.remove('active');
-  const img = $('lightbox-img');
-  if (img) { img.onerror = null; setTimeout(() => { if (!$('lightbox').classList.contains('active')) img.removeAttribute('src'); }, 300); }
-  lightboxItems = [];
-  lightboxIndex = 0;
-}
-
 function switchView(view) {
   $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   $('chartView').classList.add('hidden');
@@ -3555,8 +3295,23 @@ function switchView(view) {
       try {
         var cachedStr = getSetting('ec_data_cache', null);
         var cached = cachedStr ? JSON.parse(cachedStr) : [];
-        if(cached.length > 0) { _ecData = cached; renderEconomicCalendar(); }
-        else showEconomicCalendarPrompt();
+        // v5.0: detect old broken cache (pre-v5 parser shifted fields — date had title, etc.)
+        // If the first event's date field doesn't look like a date, the cache is from the old
+        // broken parser and must be discarded. Also check for cache version marker.
+        var cacheStale = true;
+        if (cached.length > 0) {
+          var firstDate = (cached[0].date || '').trim();
+          // Valid date patterns: "Jul 12", "07-12-2026", "2026-07-12", "Jul 12, 2026"
+          var looksLikeDate = /^([A-Za-z]{3}\s+\d)/.test(firstDate) || /^\d{1,4}[-/]\d{1,2}/.test(firstDate);
+          cacheStale = !looksLikeDate;
+        }
+        if(cached.length > 0 && !cacheStale) {
+          _ecData = cached; renderEconomicCalendar();
+        } else {
+          // Cache is empty or stale (old broken format) — clear it and auto-fetch fresh
+          try { saveSetting('ec_data_cache', '[]'); } catch(_) {}
+          loadEconomicCalendar();
+        }
       } catch(e) { showEconomicCalendarPrompt(); }
     } else renderEconomicCalendar();
   }
@@ -3579,68 +3334,177 @@ var _instTypeCache={};function getInstrumentType(symbol) { if(_instTypeCache[sym
 function getContractSize(symbol) { const t=getInstrumentType(symbol); const s=symbol?symbol.toUpperCase().replace(/[:/]/g,''):''; switch(t){case 'crypto':return null;case 'metal':return s==='XAGUSD'?5000:100;case 'index':return 1;case 'forex':return 100000;default:return 1;} }
 
 // =============================================================================
-// FX CONVERSION — quote currency → account currency
-// Bug fix (B-FX): the old calculatePnl divided by the cross rate (e.g. AUD/JPY
-// price) to "convert to USD", which was wrong for every non-USD-quote pair.
-// The correct methodology is:
-//   1. Profit is created in the QUOTE currency: (exit - entry) * size * contractSize * directionSign
-//   2. If quote == account currency, you're done. Otherwise convert.
-// Conversion uses fxRates (USD/JPY, USD/CAD, USD/CHF, EUR/USD, GBP/USD, AUD/USD,
-// NZD/USD) fetched from TwelveData via /api/fx-rates. User can also override
-// any rate manually in Settings → FX Rates & Currency.
+// FX CONVERSION — quote currency → account currency (v5.0)
+// Bug fix: old calculatePnl divided by the cross rate (e.g. AUD/JPY price) to
+// "convert to USD", which was wrong for every non-USD-quote pair. The correct
+// methodology: profit is created in the QUOTE currency first, then converted
+// to account currency using live FX rates from TwelveData.
 // =============================================================================
-
-// In-memory FX state. Refreshed by loadFxRates() in Settings; falls back to
-// empty object (no conversion) if rates are missing — in which case the raw
-// quote-currency profit is returned (better than wrong conversion).
-let _fxRates = {};        // e.g. { 'USD/JPY': 150.0, 'EUR/USD': 1.08, ... }
+let _fxRates = {};
 let _fxFetchedAt = 0;
 let _fxErrors = {};
+let _fxFetching = false;
+let _fxLastEnsure = 0;
+let _fxLastWarning = '';
+const FX_ENSURE_COOLDOWN_MS = 30 * 1000;
+const FX_DEFAULT_SYMBOLS = ['USD/JPY', 'USD/CAD', 'USD/CHF', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD'];
 
-// Get the quote currency (right side) of a symbol.
-//   EUR/USD → USD      AUD/JPY → JPY       USD/CAD → CAD
-//   XAU/USD → USD      BTC/USDT → USD      US30 → USD (indices are USD-denominated)
 function getQuoteCurrency(symbol) {
   if (!symbol) return 'USD';
   const s = symbol.toUpperCase().replace(/[:/]/g, '');
-  // Crypto: BTCUSDT → USD, BTCUSD → USD, ETHBTC → BTC
   if (s.endsWith('USDT') || s.endsWith('USD')) return 'USD';
   if (s.endsWith('BTC')) return 'BTC';
   if (s.endsWith('ETH')) return 'ETH';
-  // Forex 6-char pairs: XXXYYY → YYY
   if (s.length === 6 && /^[A-Z]{6}$/.test(s)) return s.slice(3);
-  // Metals: XAUUSD, XAGUSD → USD
   if (/^(XAU|XAG|XPT|XPD)USD$/.test(s)) return 'USD';
-  // Indices: US30, NAS100, SPX500, GER40, UK100, JP225 → USD (account-denominated)
   return 'USD';
 }
-
-// Convert an amount from one currency to the account currency.
-//   amount   — the value in `fromCurrency`
-//   fromCurrency — e.g. 'JPY', 'CAD', 'USD'
-// Returns the converted amount. If from == account, returns amount unchanged.
-// If no rate is available, returns the original amount and sets a flag the
-// caller can check via fxConversionWarning().
-let _fxLastWarning = '';
 function fxConversionWarning() { const w = _fxLastWarning; _fxLastWarning = ''; return w; }
 function getAccountCurrency() { return (getSetting('account_currency', 'USD') || 'USD').toUpperCase().slice(0, 3); }
 
+// =============================================================================
+// DISPLAY TIMEZONE (v5.0) — all trade entry, session detection, heatmap, and
+// time display use this timezone instead of the browser's local timezone.
+// Default: Asia/Tehran (IRST, UTC+3:30) — the app's original audience.
+// Stored in user_settings as 'display_timezone'.
+// =============================================================================
+const DISPLAY_TIMEZONES = [
+  { id: 'Asia/Tehran',       label: 'IRST — Iran (UTC+3:30)' },
+  { id: 'America/New_York',  label: 'EST/EDT — New York (UTC-5/-4)' },
+  { id: 'America/Chicago',   label: 'CST/CDT — Chicago (UTC-6/-5)' },
+  { id: 'America/Denver',    label: 'MST/MDT — Denver (UTC-7/-6)' },
+  { id: 'America/Los_Angeles', label: 'PST/PDT — Los Angeles (UTC-8/-7)' },
+  { id: 'America/Toronto',   label: 'EST/EDT — Toronto (UTC-5/-4)' },
+  { id: 'America/Vancouver', label: 'PST/PDT — Vancouver (UTC-8/-7)' },
+  { id: 'Europe/London',     label: 'GMT/BST — London (UTC+0/+1)' },
+  { id: 'Europe/Berlin',     label: 'CET/CEST — Berlin (UTC+1/+2)' },
+  { id: 'Europe/Paris',      label: 'CET/CEST — Paris (UTC+1/+2)' },
+  { id: 'Europe/Moscow',     label: 'MSK — Moscow (UTC+3)' },
+  { id: 'Asia/Dubai',        label: 'GST — Dubai (UTC+4)' },
+  { id: 'Asia/Kolkata',      label: 'IST — India (UTC+5:30)' },
+  { id: 'Asia/Singapore',    label: 'SGT — Singapore (UTC+8)' },
+  { id: 'Asia/Tokyo',        label: 'JST — Tokyo (UTC+9)' },
+  { id: 'Australia/Sydney',  label: 'AEDT/AEST — Sydney (UTC+11/+10)' },
+  { id: 'Pacific/Auckland',  label: 'NZDT/NZST — Auckland (UTC+13/+12)' },
+  { id: 'UTC',               label: 'UTC — Coordinated Universal Time' },
+];
+
+function getDisplayTimezone() {
+  return getSetting('display_timezone', 'Asia/Tehran') || 'Asia/Tehran';
+}
+
+// Get the offset (in minutes) of `date` in the given IANA timezone.
+// Positive = timezone is ahead of UTC (e.g., Tehran = +210 min).
+function getTimezoneOffsetMinutes(date, timezone) {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  });
+  const parts = dtf.formatToParts(date);
+  const obj = {};
+  parts.forEach(p => { if (p.type !== 'literal') obj[p.type] = p.value; });
+  // Handle hour '24' from Intl (some environments return 24 instead of 0)
+  if (obj.hour === '24') obj.hour = '00';
+  const asUTC = Date.UTC(parseInt(obj.year,10), parseInt(obj.month,10)-1, parseInt(obj.day,10),
+                         parseInt(obj.hour,10), parseInt(obj.minute,10), parseInt(obj.second,10));
+  // Offset = (wall-clock-as-UTC) - (actual UTC)
+  return Math.round((asUTC - date.getTime()) / 60000);
+}
+
+// Parse a user-entered "YYYY-MM-DD HH:MM" as wall-clock time in `timezone`,
+// returning a UTC millisecond timestamp.
+// Iterates 2-3 times to converge on the correct offset (handles DST edges).
+function parseInTimezone(dateStr, timeStr, timezone) {
+  if (!dateStr || !timeStr) return Date.now();
+  // Build a "wall-clock as UTC" guess
+  const wallUtc = Date.parse(dateStr + 'T' + timeStr + ':00Z');
+  if (!Number.isFinite(wallUtc)) return Date.now();
+  // Iterate to find the correct offset at that wall-clock time
+  let ts = wallUtc;
+  for (let i = 0; i < 4; i++) {
+    const offsetMin = getTimezoneOffsetMinutes(new Date(ts), timezone);
+    const newTs = wallUtc - offsetMin * 60000;
+    if (Math.abs(newTs - ts) < 1000) { ts = newTs; break; }
+    ts = newTs;
+  }
+  return ts;
+}
+
+// Format a UTC timestamp as "HH:MM" in the given timezone (24h, no seconds).
+function formatTimeInTimezone(ts, timezone) {
+  try {
+    return new Date(ts).toLocaleTimeString('en-GB', {
+      timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch (_) {
+    return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+}
+
+// Format a UTC timestamp as "Mon DD" (e.g., "Jul 14") in the given timezone.
+function formatDateInTimezone(ts, timezone) {
+  try {
+    return new Date(ts).toLocaleDateString('en-US', {
+      timeZone: timezone, month: 'short', day: 'numeric'
+    });
+  } catch (_) {
+    return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+}
+
+// Get the day-of-week index (0=Sun ... 6=Sat) of `ts` in the given timezone.
+function getDayInTimezone(ts, timezone) {
+  try {
+    const dtf = new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'short' });
+    const dayName = dtf.format(new Date(ts));
+    return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(dayName);
+  } catch (_) {
+    return new Date(ts).getDay();
+  }
+}
+
+// Get the hour (0-23) of `ts` in the given timezone.
+function getHourInTimezone(ts, timezone) {
+  try {
+    const dtf = new Intl.DateTimeFormat('en-GB', { timeZone: timezone, hour: '2-digit', hour12: false });
+    let h = parseInt(dtf.format(new Date(ts)), 10);
+    if (h === 24) h = 0;
+    return h;
+  } catch (_) {
+    return new Date(ts).getHours();
+  }
+}
+
+// Get {year, month (1-12), day, hour, minute} of `ts` in the given timezone.
+function getPartsInTimezone(ts, timezone) {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  const parts = dtf.formatToParts(new Date(ts));
+  const obj = {};
+  parts.forEach(p => { if (p.type !== 'literal') obj[p.type] = p.value; });
+  if (obj.hour === '24') obj.hour = '00';
+  return {
+    year: parseInt(obj.year, 10),
+    month: parseInt(obj.month, 10),
+    day: parseInt(obj.day, 10),
+    hour: parseInt(obj.hour, 10),
+    minute: parseInt(obj.minute, 10)
+  };
+}
 function convertToAccountCurrency(amount, fromCurrency) {
   _fxLastWarning = '';
   const from = (fromCurrency || 'USD').toUpperCase().slice(0, 3);
   const acct = getAccountCurrency();
   if (from === acct) return amount;
   if (amount === 0) return 0;
-
-  // We need the rate "from → acct". Our fxRates map contains:
-  //   USD/JPY, USD/CAD, USD/CHF  (i.e. USD base, foreign quote)  → 1 USD = X foreign
-  //   EUR/USD, GBP/USD, AUD/USD, NZD/USD                          → 1 foreign = X USD
-  // Strategy: convert `from` → USD first, then USD → `acct`.
   const toUsd = (cur) => {
     if (cur === 'USD') return 1;
-    // Foreign-per-USD pairs: USD/JPY=150 means 1 USD = 150 JPY, so 1 JPY = 1/150 USD
     if (_fxRates['USD/' + cur] !== undefined) return 1 / _fxRates['USD/' + cur];
-    // USD-per-foreign pairs: EUR/USD=1.08 means 1 EUR = 1.08 USD
     if (_fxRates[cur + '/USD'] !== undefined) return _fxRates[cur + '/USD'];
     return null;
   };
@@ -3650,11 +3514,10 @@ function convertToAccountCurrency(amount, fromCurrency) {
     if (_fxRates[cur + '/USD'] !== undefined) return usd / _fxRates[cur + '/USD'];
     return null;
   };
-
   const usdAmount = toUsd(from);
   if (usdAmount === null) {
     _fxLastWarning = 'No FX rate for ' + from + '→' + acct + '. Showing profit in ' + from + ' (unconverted).';
-    return amount; // unconverted — better than wrong
+    return amount;
   }
   const finalAmount = fromUsd(usdAmount * amount, acct);
   if (finalAmount === null) {
@@ -3663,33 +3526,22 @@ function convertToAccountCurrency(amount, fromCurrency) {
   }
   return finalAmount;
 }
-
-// The new, correct P&L function.
-//   Step 1: profit in QUOTE currency = (exit - entry) * size * contractSize * directionSign
-//   Step 2: convert quote → account currency
 function calculatePnl(symbol, direction, entry, exit, size) {
   entry = num(entry); exit = num(exit); size = num(size);
   if (entry === 0 || exit === 0 || size === 0) return 0;
   size = Math.abs(size);
   const t = getInstrumentType(symbol);
   const ds = direction === 'long' ? 1 : -1;
-
-  // Crypto: size = USDT position value. P&L = % move * size (already USD)
   if (t === 'crypto') {
     if (entry === 0) return 0;
     const profitUsd = ((exit - entry) / entry) * size * ds;
     return convertToAccountCurrency(profitUsd, 'USD');
   }
-
-  // Everything else: profit is in the QUOTE currency
   const cs = getContractSize(symbol);
   const quoteCurrency = getQuoteCurrency(symbol);
   const profitInQuote = (exit - entry) * size * cs * ds;
   return convertToAccountCurrency(profitInQuote, quoteCurrency);
 }
-
-// Helper for the trade form — returns both the converted P&L and a human-readable
-// breakdown string so the user can see exactly what conversion was applied.
 function calculatePnlWithBreakdown(symbol, direction, entry, exit, size) {
   entry = num(entry); exit = num(exit); size = num(size);
   if (entry === 0 || exit === 0 || size === 0) return { pnl: 0, breakdown: '' };
@@ -3699,7 +3551,6 @@ function calculatePnlWithBreakdown(symbol, direction, entry, exit, size) {
   const acct = getAccountCurrency();
   const cs = getContractSize(symbol);
   const quote = getQuoteCurrency(symbol);
-
   let profitQuote, profitLabel;
   if (t === 'crypto') {
     profitQuote = ((exit - entry) / entry) * size * ds;
@@ -3710,16 +3561,11 @@ function calculatePnlWithBreakdown(symbol, direction, entry, exit, size) {
     const sign = ccys[quote] || quote + ' ';
     profitLabel = sign + profitQuote.toFixed(2);
   }
-
   if (quote === acct && t !== 'crypto') return { pnl: profitQuote, breakdown: '' };
   if (t === 'crypto' && acct === 'USD') return { pnl: profitQuote, breakdown: '' };
-
-  // Build a breakdown string showing the conversion
   const converted = convertToAccountCurrency(profitQuote, t === 'crypto' ? 'USD' : quote);
   const warning = fxConversionWarning();
   if (warning) return { pnl: converted, breakdown: warning };
-
-  // Try to show the actual rate used
   let rateStr = '';
   if (quote !== 'USD' && _fxRates['USD/' + quote] !== undefined) {
     rateStr = ' ÷ USD/' + quote + ' ' + _fxRates['USD/' + quote].toFixed(4);
@@ -3729,6 +3575,36 @@ function calculatePnlWithBreakdown(symbol, direction, entry, exit, size) {
   const acctSym = { USD: '$', JPY: '¥', EUR: '€', GBP: '£', CAD: 'C$', CHF: 'CHF', AUD: 'A$', NZD: 'NZ$' }[acct] || acct + ' ';
   return { pnl: converted, breakdown: profitLabel + rateStr + ' = ' + acctSym + converted.toFixed(2) };
 }
+async function ensureFxRates(requiredQuoteCurrency) {
+  if (Date.now() - _fxLastEnsure < FX_ENSURE_COOLDOWN_MS) {
+    if (_fxFetching) return;
+    if (_fxRates && Object.keys(_fxRates).length > 0) {
+      if (!requiredQuoteCurrency || requiredQuoteCurrency === 'USD' || requiredQuoteCurrency === getAccountCurrency()) return;
+      const hasRate = _fxRates['USD/'+requiredQuoteCurrency] !== undefined || _fxRates[requiredQuoteCurrency+'/USD'] !== undefined;
+      if (hasRate) return;
+    }
+  }
+  _fxLastEnsure = Date.now();
+  const apiKey = getSetting('twelvedata_apikey', '') || '';
+  if (!apiKey) return;
+  if (_fxFetching) return;
+  _fxFetching = true;
+  try {
+    const r = await API.req('/api/fx-rates');
+    if (r && r.rates && Object.keys(r.rates).length > 0) {
+      const overrides = (function(){ try { return JSON.parse(getSetting('fx_overrides', '{}') || '{}'); } catch(_) { return {}; } })();
+      _fxRates = Object.assign({}, r.rates, overrides);
+      _fxFetchedAt = r.fetchedAt || Date.now();
+      _fxErrors = r.errors || {};
+      if ($('fxRatesTable')) { renderFxRatesTable(); updateFxStatusDisplay(); }
+      if (typeof updateCalc === 'function') { try { updateCalc(); } catch(_) {} }
+      if ($('rcResult') && typeof calcRisk === 'function') { try { calcRisk(); } catch(_) {} }
+      if ($('pipValueTable') && typeof renderPipValueTable === 'function') { try { renderPipValueTable(); } catch(_) {} }
+      // v5.0: Do NOT recompute existing trade P&L — they use frozen rates.
+      // FX rate changes only affect NEW trades logged from this point forward.
+    }
+  } catch (_) {} finally { _fxFetching = false; }
+}
 function calculateRisk(symbol, direction, entry, sl, size) { entry=num(entry); sl=num(sl); size=num(size); if(entry===0||sl===0||size===0) return 0; return Math.abs(calculatePnl(symbol,direction,entry,sl,size)); }
 function getSizeUnit(symbol) { const t=getInstrumentType(symbol); return t==='crypto'?'USDT':t==='dominance'?'%':'Lots'; }
 function getInstrumentLabel(symbol) { return {crypto:'Crypto',metal:'Metal',index:'Index',forex:'Forex',dominance:'Dominance'}[getInstrumentType(symbol)]||'Forex'; }
@@ -3737,14 +3613,7 @@ function updateSizeLabel(symbol) { const l=$('t_size_label'),h=$('sizeHint'),b=$
 function updateCalc() {
   const symbol=$('t_symbol').value.trim(); const entry=num($('t_entry').value),exit=num($('t_exit').value),sl=num($('t_sl').value),tp=num($('t_tp').value),size=num($('t_size').value);
   updateSizeLabel(symbol);
-  // Auto-fetch FX rates if user typed a non-USD-quote pair and we have no rate for it
-  if (symbol && typeof ensureFxRates === 'function') {
-    const q = getQuoteCurrency(symbol);
-    if (q !== 'USD' && q !== getAccountCurrency()) {
-      const hasRate = _fxRates['USD/'+q] !== undefined || _fxRates[q+'/USD'] !== undefined;
-      if (!hasRate) ensureFxRates(q);
-    }
-  }
+  if(symbol && typeof ensureFxRates === 'function'){const q=getQuoteCurrency(symbol); if(q!=='USD'&&q!==getAccountCurrency()){const hasRate=_fxRates['USD/'+q]!==undefined||_fxRates[q+'/USD']!==undefined; if(!hasRate) ensureFxRates(q);}}
   if(!dirManualOverride){const d=autoDetectDirection(entry,exit,sl,tp); if(d){tradeDirection=d; $$('#dirToggle .dir-btn').forEach(b=>b.classList.toggle('active',b.dataset.dir===d));}}
   if(!statusManualOverride){const st=autoDetectStatus(symbol,tradeDirection,entry,exit,sl,tp,size); tradeStatus=st; $$('#statusSeg .status-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===st));}
   const pe=$('calcPnl'),re=$('calcR'),bd=$('calcPnlBreakdown');
@@ -3852,37 +3721,68 @@ function collectEditImages(tradeId) {
   return JSON.stringify(imgs);
 }
 
-function saveTrade(event) {
+async function saveTrade(event) {
   event.preventDefault();
   const symbol=$('t_symbol').value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20);
   if(!symbol){showToast('Symbol required');return;}
   const entry=num($('t_entry').value),exit=num($('t_exit').value),sl=num($('t_sl').value),tp=num($('t_tp').value),size=Math.abs(num($('t_size').value));
-  const pnl=calculatePnl(symbol,tradeDirection,entry,exit,size); const risk=calculateRisk(symbol,tradeDirection,entry,sl,size); const rMult=risk>0?pnl/risk:0;
+  const btn=event.target.querySelector('button[type="submit"]'); if(btn){btn.disabled=true;btn.textContent='Saving…';}
+
+  // v5.0: fetch LIVE FX rate for this trade's quote currency before computing P&L.
+  // This freezes the rate at trade-log time so historical P&L never drifts.
+  let frozenRate = 0;
+  const quote = getQuoteCurrency(symbol);
+  if (quote !== 'USD' && quote !== getAccountCurrency()) {
+    try {
+      // Force refresh to get the freshest rate for this specific pair
+      const rateSymbol = 'USD/' + quote;
+      const r = await API.req('/api/fx-rates?symbols=' + encodeURIComponent(rateSymbol) + '&force=1').catch(()=>null);
+      if (r && r.rates && r.rates[rateSymbol]) {
+        frozenRate = r.rates[rateSymbol];
+        _fxRates[rateSymbol] = frozenRate; // update cache
+      } else if (_fxRates[rateSymbol] !== undefined) {
+        // Fallback to cached rate if live fetch failed
+        frozenRate = _fxRates[rateSymbol];
+      } else if (_fxRates[quote + '/USD'] !== undefined) {
+        frozenRate = 1 / _fxRates[quote + '/USD'];
+      }
+    } catch(_) {
+      // Use cached rate as fallback
+      if (_fxRates['USD/' + quote] !== undefined) frozenRate = _fxRates['USD/' + quote];
+      else if (_fxRates[quote + '/USD'] !== undefined) frozenRate = 1 / _fxRates[quote + '/USD'];
+    }
+  } else {
+    frozenRate = 1; // no conversion needed
+  }
+
+  // Compute P&L using the frozen rate
+  const pnl = calculatePnlWithFrozenRate(symbol, tradeDirection, entry, exit, size, frozenRate);
+  const risk = calculateRiskWithFrozenRate(symbol, tradeDirection, entry, sl, size, frozenRate);
+  const rMult = risk > 0 ? pnl / risk : 0;
+
   // B71: use user-entered date/time/session, fall back to now if empty.
+  // v5.0: parse the user-entered time in the DISPLAY TIMEZONE (not browser-local).
+  const tz = getDisplayTimezone();
   const userDate = $('t_date') ? $('t_date').value : '';
   const userTime = $('t_time') ? $('t_time').value : '';
   const userSession = $('t_session') ? $('t_session').value : '';
   let tradeDate, tradeTime, tradeTimestamp, tradeSession;
   if (userDate && userTime) {
-    // Combine date + time into a local Date object
-    const d = new Date(userDate + 'T' + userTime);
-    if (!isNaN(d.getTime())) {
-      tradeTimestamp = d.getTime();
-      tradeDate = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-      tradeTime = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
-    } else {
+    // Parse the wall-clock time in the display timezone → UTC timestamp
+    tradeTimestamp = parseInTimezone(userDate, userTime, tz);
+    if (!Number.isFinite(tradeTimestamp)) {
       // Fallback to now if parsing failed
       const now = new Date();
       tradeTimestamp = now.getTime();
-      tradeDate = now.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-      tradeTime = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
     }
+    tradeDate = formatDateInTimezone(tradeTimestamp, tz);
+    tradeTime = formatTimeInTimezone(tradeTimestamp, tz);
   } else {
     // User left date/time empty → use current time
     const now = new Date();
     tradeTimestamp = now.getTime();
-    tradeDate = now.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-    tradeTime = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false });
+    tradeDate = formatDateInTimezone(tradeTimestamp, tz);
+    tradeTime = formatTimeInTimezone(tradeTimestamp, tz);
   }
   // Session: use user's selection if they picked one; otherwise auto-detect from the trade time
   if (userSession) {
@@ -3892,8 +3792,7 @@ function saveTrade(event) {
   }
   // B72: collect images as JSON array, store in entryPic. exitPic is now unused.
   const imagesJson = collectImages();
-  const trade={symbol,direction:tradeDirection,setup:str($('t_setup').value,100),entry,exit,sl,tp,size,pnl,rMultiple:rMult,status:tradeStatus,mae:num($('t_mae').value),mfe:num($('t_mfe').value),tp1:num($('t_tp1').value),tp2:num($('t_tp2').value),tp3:num($('t_tp3').value),tp1Hit:$('t_tp1Hit').checked,tp2Hit:$('t_tp2Hit').checked,tp3Hit:$('t_tp3Hit').checked,mtf4h:str($('t_mtf4h').value),notes:str($('t_notes').value),lessons:str($('t_lessons').value),emotion:str($('t_emotion').value,50),entryPic:imagesJson,rating:Math.max(0,Math.min(5,currentRating)),tags:[...currentTags].slice(0,20),custom:collectCustomFields(),propfirmId:($('t_propfirm')?$('t_propfirm').value:''),session:tradeSession,timestamp:tradeTimestamp,date:tradeDate,time:tradeTime};
-  const btn=event.target.querySelector('button[type="submit"]'); if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  const trade={symbol,direction:tradeDirection,setup:str($('t_setup').value,100),entry,exit,sl,tp,size,pnl,rMultiple:rMult,status:tradeStatus,mae:num($('t_mae').value),mfe:num($('t_mfe').value),tp1:num($('t_tp1').value),tp2:num($('t_tp2').value),tp3:num($('t_tp3').value),tp1Hit:$('t_tp1Hit').checked,tp2Hit:$('t_tp2Hit').checked,tp3Hit:$('t_tp3Hit').checked,mtf4h:str($('t_mtf4h').value),notes:str($('t_notes').value),lessons:str($('t_lessons').value),emotion:str($('t_emotion').value,50),entryPic:imagesJson,rating:Math.max(0,Math.min(5,currentRating)),tags:[...currentTags].slice(0,20),custom:collectCustomFields(),propfirmId:($('t_propfirm')?$('t_propfirm').value:''),session:tradeSession,timestamp:tradeTimestamp,date:tradeDate,time:tradeTime,fxRateUsed:frozenRate};
   API.req('/api/trades',{method:'POST',body:JSON.stringify(trade)})
     .then(r=>{
       trade.id=r.id;
@@ -3914,18 +3813,14 @@ function saveTrade(event) {
 // Called on form load and after each save so the next trade defaults to "now".
 function fillTradeTimeDefaults() {
   const now = new Date();
-  // Date input needs YYYY-MM-DD
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const dateStr = yyyy + '-' + mm + '-' + dd;
-  // Time input needs HH:MM (24h)
-  const hh = String(now.getHours()).padStart(2, '0');
-  const min = String(now.getMinutes()).padStart(2, '0');
-  const timeStr = hh + ':' + min;
+  const tz = getDisplayTimezone();
+  // Use display timezone for the date/time inputs (v5.0)
+  const parts = getPartsInTimezone(now.getTime(), tz);
+  const dateStr = parts.year + '-' + String(parts.month).padStart(2,'0') + '-' + String(parts.day).padStart(2,'0');
+  const timeStr = String(parts.hour).padStart(2,'0') + ':' + String(parts.minute).padStart(2,'0');
   if ($('t_date')) $('t_date').value = dateStr;
   if ($('t_time')) $('t_time').value = timeStr;
-  // Session: auto-detect from current time, but leave it selectable
+  // Session: auto-detect from current time in display timezone
   if ($('t_session')) $('t_session').value = detectSession(now);
 }
 
@@ -4066,94 +3961,111 @@ function renderEquityCurve() {
   } catch(e) { console.error('Equity curve error:', e); }
 }
 
-function initTheme() { currentTheme=getSetting('dashboard_theme','dark')||'dark'; applyTheme(currentTheme); }
+function initTheme() {
+  // v5.0: read-only — do NOT call applyTheme() here (which would write the
+  // default back to D1 before loadData() has a chance to fetch the real value).
+  // Just read from cache/localStorage and apply the attribute.
+  currentTheme = getSetting('dashboard_theme', null);
+  if (!currentTheme) currentTheme = localStorage.getItem('dashboard_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+}
 function applyTheme(theme) { currentTheme=theme; document.documentElement.setAttribute('data-theme',theme); saveSetting('dashboard_theme',theme); }
 function toggleTheme() { applyTheme(currentTheme==='dark'?'light':'dark'); loadChart(currentChartSymbol); showToast('Switched to '+currentTheme+' theme'); }
 function bindThemeToggle() {}
 
 function bindBackupRestore() {}
-function backupAll() {
-  // LOCAL MODE: dump every tv_* key + dashboard_theme + tv_accounts + tv_current_account
-  const backup = { version: 3, type: 'trading-dashboard-local-backup', created: new Date().toISOString(), theme: localStorage.getItem('dashboard_theme') || 'light', data: {} };
-  const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k.startsWith('tv_') || k === 'dashboard_theme') keys.push(k);
+// B58: cloud backupAll() now calls GET /api/backup (was: read localStorage, which only had dashboard_theme).
+// The old code produced an essentially empty backup file in cloud mode.
+async function backupAll() {
+  try {
+    showToast('Creating backup…');
+    const r = await API.req('/api/backup');
+    r.theme = localStorage.getItem('dashboard_theme') || 'light';
+    downloadFile(JSON.stringify(r, null, 2), 'tradevault-cloud-backup-' + new Date().toISOString().slice(0, 10) + '.json', 'application/json');
+    const accountCount = (r.data && r.data.accounts) ? r.data.accounts.length : 0;
+    let tradeCount = 0;
+    if (r.data && r.data.trades) Object.values(r.data.trades).forEach(t => tradeCount += t.length);
+    showToast('Backup created: ' + accountCount + ' accounts · ' + tradeCount + ' trades');
+  } catch (e) {
+    showToast('Backup failed: ' + e.message);
   }
-  keys.forEach(k => { backup.data[k] = localStorage.getItem(k); });
-  backup.keyCount = keys.length;
-  downloadFile(JSON.stringify(backup, null, 2), 'tradevault-local-backup-' + new Date().toISOString().slice(0, 10) + '.json', 'application/json');
-  showToast('Backup created: ' + keys.length + ' items');
 }
-function restoreAll(event) {
+// B59: cloud restoreAll() now POSTs the backup to /api/restore (was: wrote to localStorage, which nothing reads).
+// B62: accepts both cloud-format (data.accounts + data.trades[accId]) and local-format (tv_* keys) backups.
+async function restoreAll(event) {
   const file = event.target.files[0]; if (!file) return;
   if (file.size > 50 * 1024 * 1024) { showToast('Backup too large (max 50MB)'); event.target.value = ''; return; }
   if (!confirm('This will REPLACE all current data with the backup. Continue?')) { event.target.value = ''; return; }
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async (e) => {
     try {
       const backup = JSON.parse(e.target.result);
-      if (!backup || !backup.data) throw new Error('Not a valid backup file');
+      if (!backup) throw new Error('Not a valid backup file');
 
-      // B62: detect format — local (tv_* keys) or cloud (data.accounts array)
-      const isCloudFormat = Array.isArray(backup.data.accounts);
-      const isLocalFormat = !isCloudFormat && Object.keys(backup.data).some(k => k.startsWith('tv_'));
+      // Detect format: cloud backup has data.accounts (array), local backup has data with tv_* keys
+      const isCloudFormat = backup.data && Array.isArray(backup.data.accounts);
+      const isLocalFormat = backup.data && !Array.isArray(backup.data.accounts) && Object.keys(backup.data).some(k => k.startsWith('tv_'));
 
       if (!isCloudFormat && !isLocalFormat) throw new Error('Unrecognized backup format');
 
-      // Wipe every tv_* key + dashboard_theme before restoring.
-      const toRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k.startsWith('tv_') || k === 'dashboard_theme') toRemove.push(k);
-      }
-      toRemove.forEach(k => localStorage.removeItem(k));
+      showToast('Restoring…');
 
-      let restored = 0;
-
-      if (isLocalFormat) {
-        // Local format: values are JSON strings — write directly.
-        Object.entries(backup.data).forEach(([k, v]) => {
-          if (typeof v === 'string') { localStorage.setItem(k, v); restored++; }
-        });
+      if (isCloudFormat) {
+        // POST the whole backup to the backend
+        const r = await API.req('/api/restore', { method: 'POST', body: JSON.stringify(backup) });
+        if (r.error) throw new Error(r.error);
+        if (backup.theme) localStorage.setItem('dashboard_theme', backup.theme);
+        showToast('Restored ' + (r.accounts_restored || 0) + ' accounts. Reloading…');
       } else {
-        // Cloud format: convert to local tv_* keys.
-        // data.accounts = [{id, name, created}, ...]
-        // data.trades[id] = [trade, ...], etc.
-        const accounts = backup.data.accounts || [];
-        localStorage.setItem('tv_accounts', JSON.stringify(accounts));
-        restored++;
-        for (const acc of accounts) {
-          const id = acc.id;
-          localStorage.setItem('tv_trades_' + id,        JSON.stringify(backup.data.trades[id] || []));
-          localStorage.setItem('tv_strategies_' + id,    JSON.stringify(backup.data.strategies[id] || []));
-          localStorage.setItem('tv_setups_' + id,        JSON.stringify(backup.data.setups[id] || []));
-          localStorage.setItem('tv_custom_fields_' + id, JSON.stringify(backup.data.custom_fields[id] || []));
-          localStorage.setItem('tv_watchlist_' + id,     JSON.stringify(backup.data.watchlist[id] || []));
-          // review_notes comes as array of {label, notes} OR object {label: notes}
-          let rn = backup.data.review_notes[id] || {};
-          if (Array.isArray(rn)) {
-            const obj = {};
-            rn.forEach(r => { obj[r.label] = r.notes; });
-            rn = obj;
-          }
-          localStorage.setItem('tv_review_notes_' + id, JSON.stringify(rn));
-          localStorage.setItem('tv_propfirms_' + id,    JSON.stringify(backup.data.prop_firms[id] || []));
-          localStorage.setItem('tv_settings_' + id,     JSON.stringify(backup.data.user_settings[id] || {}));
-          restored += 8;
-        }
+        // Local format — write tv_* keys to localStorage, then reload
+        // (this path is for cross-edition restore: cloud app restoring a local backup)
+        // Convert local format to cloud format and POST
+        const converted = convertLocalBackupToCloud(backup);
+        const r = await API.req('/api/restore', { method: 'POST', body: JSON.stringify(converted) });
+        if (r.error) throw new Error(r.error);
+        if (backup.theme) localStorage.setItem('dashboard_theme', backup.theme);
+        showToast('Restored from local-format backup. Reloading…');
       }
 
-      if (backup.theme) localStorage.setItem('dashboard_theme', backup.theme);
       // B80: clear saved account preference so the account picker shows after restore
-      try { localStorage.removeItem('tv_current_account'); } catch(_){}
-      showToast('Restored ' + restored + ' items. Reloading...');
-      setTimeout(() => location.reload(), 1200);
+      localStorage.removeItem('current_account_id');
+      setTimeout(() => location.reload(), 1500);
     } catch (err) { showToast('Restore failed: ' + (err.message || 'invalid file')); }
     event.target.value = '';
   };
   reader.onerror = () => { showToast('Failed to read file'); event.target.value = ''; };
   reader.readAsText(file);
+}
+
+// Convert a local-format backup (tv_* keys) to cloud format (structured data per account)
+// so the backend's /api/restore endpoint can process it.
+function convertLocalBackupToCloud(localBackup) {
+  const data = localBackup.data || {};
+  const accounts = [];
+  try { accounts = JSON.parse(data.tv_accounts || '[]'); } catch (_) {}
+  const cloud = {
+    version: 3,
+    type: 'trading-dashboard-cloud-backup',
+    created: localBackup.created || new Date().toISOString(),
+    theme: localBackup.theme || 'light',
+    data: {
+      accounts: accounts,
+      trades: {}, strategies: {}, setups: {}, custom_fields: {},
+      watchlist: {}, review_notes: {}, prop_firms: {}, user_settings: {}
+    }
+  };
+  for (const acc of accounts) {
+    const id = acc.id;
+    try { cloud.data.trades[id]        = JSON.parse(data['tv_trades_' + id] || '[]'); } catch (_) { cloud.data.trades[id] = []; }
+    try { cloud.data.strategies[id]    = JSON.parse(data['tv_strategies_' + id] || '[]'); } catch (_) { cloud.data.strategies[id] = []; }
+    try { cloud.data.setups[id]        = JSON.parse(data['tv_setups_' + id] || '[]'); } catch (_) { cloud.data.setups[id] = []; }
+    try { cloud.data.custom_fields[id] = JSON.parse(data['tv_custom_fields_' + id] || '[]'); } catch (_) { cloud.data.custom_fields[id] = []; }
+    try { cloud.data.watchlist[id]     = JSON.parse(data['tv_watchlist_' + id] || '[]'); } catch (_) { cloud.data.watchlist[id] = []; }
+    try { cloud.data.review_notes[id]  = JSON.parse(data['tv_review_notes_' + id] || '{}'); } catch (_) { cloud.data.review_notes[id] = {}; }
+    try { cloud.data.prop_firms[id]    = JSON.parse(data['tv_propfirms_' + id] || '[]'); } catch (_) { cloud.data.prop_firms[id] = []; }
+    try { cloud.data.user_settings[id] = JSON.parse(data['tv_settings_' + id] || '{}'); } catch (_) { cloud.data.user_settings[id] = {}; }
+  }
+  return cloud;
 }
 function updateBackupInfo() { const info=$('backupInfo'); if(!info) return; info.textContent=(_ac||[]).length+' accounts · '+(_tc||[]).length+' trades · '+(_sc||[]).length+' opportunities'; }
 
@@ -4398,13 +4310,16 @@ function sanitizeTrade(t) { if(!t||typeof t!=='object') return null; const arr=v
 
 function startEditTrade(id) { const _t = getTrades().find(t=>t.id===id); if(_t && isTradeLocked(_t)) { showToast('Trade locked after 48h'); return; } editingTradeId=id; renderTrades(); }
 function cancelEditTrade() { editingTradeId=null; renderTrades(); }
-function saveEditTrade(id) { const trades=getTrades(); const idx=trades.findIndex(t=>t.id===id); if(idx===-1) return; const symbol=$('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20); if(!symbol){showToast('Symbol required');return;} trades[idx].symbol=symbol; trades[idx].setup=str($('edit_setup_'+id).value,100); trades[idx].entry=num($('edit_entry_'+id).value); trades[idx].exit=num($('edit_exit_'+id).value); trades[idx].sl=num($('edit_sl_'+id).value); trades[idx].tp=num($('edit_tp_'+id).value); trades[idx].size=Math.abs(num($('edit_size_'+id).value)); trades[idx].notes=str($('edit_notes_'+id).value); trades[idx].lessons=str($('edit_lessons_'+id).value); trades[idx].emotion=str($('edit_emotion_'+id).value,50); trades[idx].rating=Math.max(0,Math.min(5,parseInt($('edit_rating_'+id).value)||0)); trades[idx].tags=$('edit_tags_'+id).value.split(',').map(s=>s.trim().slice(0,100)).filter(Boolean); trades[idx].propfirmId=$('edit_propfirm_'+id)?$('edit_propfirm_'+id).value:(trades[idx].propfirmId||'');trades[idx].tp1=num($('edit_tp1_'+id)?.value||0);trades[idx].tp2=num($('edit_tp2_'+id)?.value||0);trades[idx].tp3=num($('edit_tp3_'+id)?.value||0);trades[idx].mae=num($('edit_mae_'+id)?.value||0); trades[idx].mfe=num($('edit_mfe_'+id)?.value||0); trades[idx].mtf4h=str($('edit_mtf4h_'+id)?.value); /* B76: collect edited images */ trades[idx].entryPic=collectEditImages(id); if(!trades[idx].session) trades[idx].session=detectSession(new Date(trades[idx].timestamp||Date.now())); /* B56: recalculate pnl + rMultiple after editing entry/exit/sl/size */ var _dir=trades[idx].direction||autoDetectDirection(trades[idx].entry,trades[idx].exit,trades[idx].sl,trades[idx].tp)||'long'; trades[idx].pnl=calculatePnl(trades[idx].symbol,_dir,trades[idx].entry,trades[idx].exit,trades[idx].size); var _risk=calculateRisk(trades[idx].symbol,_dir,trades[idx].entry,trades[idx].sl,trades[idx].size); trades[idx].rMultiple=_risk>0?trades[idx].pnl/_risk:0; saveTrades(trades); API.req('/api/trades/'+id,{method:'PUT',body:JSON.stringify(trades[idx])}).catch(e=>showToast('Sync failed: '+e.message)); editingTradeId=null; renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); showToast('Trade updated'); }
+function saveEditTrade(id) { const trades=getTrades(); const idx=trades.findIndex(t=>t.id===id); if(idx===-1) return; const symbol=$('edit_symbol_'+id).value.trim().toUpperCase().replace(/[^A-Z0-9.]/g,'').slice(0,20); if(!symbol){showToast('Symbol required');return;} trades[idx].symbol=symbol; trades[idx].setup=str($('edit_setup_'+id).value,100); trades[idx].entry=num($('edit_entry_'+id).value); trades[idx].exit=num($('edit_exit_'+id).value); trades[idx].sl=num($('edit_sl_'+id).value); trades[idx].tp=num($('edit_tp_'+id).value); trades[idx].size=Math.abs(num($('edit_size_'+id).value)); trades[idx].notes=str($('edit_notes_'+id).value); trades[idx].lessons=str($('edit_lessons_'+id).value); trades[idx].emotion=str($('edit_emotion_'+id).value,50); trades[idx].rating=Math.max(0,Math.min(5,parseInt($('edit_rating_'+id).value)||0)); trades[idx].tags=$('edit_tags_'+id).value.split(',').map(s=>s.trim().slice(0,100)).filter(Boolean); trades[idx].propfirmId=$('edit_propfirm_'+id)?$('edit_propfirm_'+id).value:(trades[idx].propfirmId||'');trades[idx].tp1=num($('edit_tp1_'+id)?.value||0);trades[idx].tp2=num($('edit_tp2_'+id)?.value||0);trades[idx].tp3=num($('edit_tp3_'+id)?.value||0);trades[idx].mae=num($('edit_mae_'+id)?.value||0); trades[idx].mfe=num($('edit_mfe_'+id)?.value||0); trades[idx].mtf4h=str($('edit_mtf4h_'+id)?.value); /* B76: collect edited images */ trades[idx].entryPic=collectEditImages(id); if(!trades[idx].session) trades[idx].session=detectSession(new Date(trades[idx].timestamp||Date.now())); /* v5.0: recalculate pnl + rMultiple using the FROZEN fx_rate_used (not live) so editing entry/exit/size doesn't silently change the conversion rate */ var _dir=trades[idx].direction||autoDetectDirection(trades[idx].entry,trades[idx].exit,trades[idx].sl,trades[idx].tp)||'long'; var _frozen=trades[idx].fxRateUsed||0; trades[idx].pnl=calculatePnlWithFrozenRate(trades[idx].symbol,_dir,trades[idx].entry,trades[idx].exit,trades[idx].size,_frozen); var _risk=calculateRiskWithFrozenRate(trades[idx].symbol,_dir,trades[idx].entry,trades[idx].sl,trades[idx].size,_frozen); trades[idx].rMultiple=_risk>0?trades[idx].pnl/_risk:0; saveTrades(trades); API.req('/api/trades/'+id,{method:'PUT',body:JSON.stringify(trades[idx])}).catch(e=>showToast('Sync failed: '+e.message)); editingTradeId=null; renderTrades(); updateJournalStats(); renderEquityCurve(); updateBackupInfo(); showToast('Trade updated'); }
 function renderTradeEditForm(t) { const strategies=getStrategies(); const stratOpts='<option value="">None</option>'+strategies.map(s=>'<option value="'+escapeHtml(s.name)+'"'+(s.name===(t.setup||'')?' selected':'')+'>'+escapeHtml(s.name)+'</option>').join(''); var html='<div class="trade-card glass expanded" data-id="'+t.id+'"><div class="tc-edit-form"><div class="ef-row"><div class="ef-field"><label>Symbol</label><input type="text" id="edit_symbol_'+t.id+'" value="'+escapeAttr(t.symbol)+'" class="mono"></div><div class="ef-field"><label>Strategy</label><select id="edit_setup_'+t.id+'">'+stratOpts+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Prop Firm</label><select id="edit_propfirm_'+t.id+'"><option value=\"\">None</option>'+getPropFirms().map(function(p){return '<option value=\"'+p.id+'\"'+(String(p.id)===String(t.propfirmId||'')?' selected':'')+'>'+escapeHtml(p.name)+'</option>';}).join('')+'</select></div></div><div class="ef-row"><div class="ef-field"><label>Entry</label><input type="number" step="any" id="edit_entry_'+t.id+'" value="'+(t.entry||'')+'" class="mono"></div><div class="ef-field"><label>Exit</label><input type="number" step="any" id="edit_exit_'+t.id+'" value="'+(t.exit||'')+'" class="mono"></div><div class="ef-field"><label>SL</label><input type="number" step="any" id="edit_sl_'+t.id+'" value="'+(t.sl||'')+'" class="mono"></div><div class="ef-field"><label>TP</label><input type="number" step="any" id="edit_tp_'+t.id+'" value="'+(t.tp||'')+'" class="mono"></div><div class="ef-field"><label>Size</label><input type="number" step="any" id="edit_size_'+t.id+'" value="'+(t.size||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>Rating (0-5)</label><input type="number" min="0" max="5" id="edit_rating_'+t.id+'" value="'+(t.rating||0)+'"></div><div class="ef-field"><label>Tags (comma-sep)</label><input type="text" id="edit_tags_'+t.id+'" value="'+escapeAttr((t.tags||[]).join(', '))+'"></div><div class="ef-field"><label>Emotion</label><input type="text" id="edit_emotion_'+t.id+'" value="'+escapeAttr(t.emotion||'')+'"></div></div><div class="ef-row"><div class="ef-field"><label>Notes</label><textarea id="edit_notes_'+t.id+'" rows="2">'+escapeHtml(t.notes||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Lessons</label><textarea id="edit_lessons_'+t.id+'" rows="2">'+escapeHtml(t.lessons||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>Analytics</label><textarea id="edit_mtf4h_'+t.id+'" rows="2" placeholder="Market context, structure, confluence...">'+escapeHtml(t.mtf4h||'')+'</textarea></div></div><div class="ef-row"><div class="ef-field"><label>TP1</label><input type="number" step="any" id="edit_tp1_'+t.id+'" value="'+(t.tp1||'')+'" class="mono"></div><div class="ef-field"><label>TP2</label><input type="number" step="any" id="edit_tp2_'+t.id+'" value="'+(t.tp2||'')+'" class="mono"></div><div class="ef-field"><label>TP3</label><input type="number" step="any" id="edit_tp3_'+t.id+'" value="'+(t.tp3||'')+'" class="mono"></div></div><div class="ef-row"><div class="ef-field"><label>MAE</label><input type="number" step="any" id="edit_mae_'+t.id+'" value="'+(t.mae||'')+'" class="mono"></div><div class="ef-field"><label>MFE</label><input type="number" step="any" id="edit_mfe_'+t.id+'" value="'+(t.mfe||'')+'" class="mono"></div></div>'; /* B76: Images section in edit form */ html+='<div class="ef-row"><div class="ef-field"><label>Images <span style="font-weight:400;color:var(--text-3);font-size:9px;">(up to 4, each with a note)</span></label><div id="edit_images_'+t.id+'"></div><button type="button" class="tbtn" id="edit_addImage_'+t.id+'" onclick="addEditImageRow('+t.id+')" style="margin-top:4px;font-size:11px;padding:4px 8px;">+ Add Image</button></div></div>'; html+='<div class="ef-actions"><button class="ef-cancel" onclick="cancelEditTrade()">Cancel</button><button class="ef-save" onclick="saveEditTrade('+t.id+')">Save Changes</button></div></div></div>'; /* Populate image rows after DOM insertion */ setTimeout(function(){ var imgs=parseImages(t.entryPic); var c=$('edit_images_'+t.id); if(c){c.innerHTML='';} imgs.forEach(function(img){ addEditImageRow(t.id, img.url, img.note); }); updateEditAddImageBtn(t.id); },0); return html; }
-function duplicateTrade(id) { const t=getTrades().find(tr=>tr.id===id); if(!t) return; $('t_symbol').value=t.symbol||''; populateStrategyDropdown(t.setup); $('t_entry').value=t.entry||''; $('t_exit').value=t.exit||''; $('t_sl').value=t.sl||''; $('t_tp').value=t.tp||''; $('t_size').value=t.size||''; $('t_notes').value=t.notes||''; $('t_lessons').value=t.lessons||''; $('t_emotion').value=t.emotion||''; if($('t_mae'))$('t_mae').value=t.mae||''; if($('t_mfe'))$('t_mfe').value=t.mfe||''; if($('t_mtf4h'))$('t_mtf4h').value=t.mtf4h||''; /* B71: populate date/time/session */ if(t.timestamp){var td=new Date(t.timestamp);if(!isNaN(td.getTime())){$('t_date').value=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');$('t_time').value=String(td.getHours()).padStart(2,'0')+':'+String(td.getMinutes()).padStart(2,'0');}} if(t.session&&$('t_session'))$('t_session').value=t.session; /* B72: populate image rows */ clearImageRows(); var imgs=parseImages(t.entryPic); imgs.forEach(function(img){ addImageRow(img.url, img.note); }); currentRating=t.rating||0; currentTags=[...(t.tags||[])]; updateStarDisplay(); renderTagChips(); dirManualOverride=false; statusManualOverride=false; setModeBadge('dirMode','auto'); setModeBadge('statusMode','auto'); ['t_entry','t_exit','t_sl','t_tp','t_size','t_symbol'].forEach(id2=>$(id2).dispatchEvent(new Event('input'))); document.querySelector('.form-wrap').scrollIntoView({behavior:'smooth',block:'start'}); showToast('Trade duplicated — edit and save'); }
+function duplicateTrade(id) { const t=getTrades().find(tr=>tr.id===id); if(!t) return; $('t_symbol').value=t.symbol||''; populateStrategyDropdown(t.setup); $('t_entry').value=t.entry||''; $('t_exit').value=t.exit||''; $('t_sl').value=t.sl||''; $('t_tp').value=t.tp||''; $('t_size').value=t.size||''; $('t_notes').value=t.notes||''; $('t_lessons').value=t.lessons||''; $('t_emotion').value=t.emotion||''; if($('t_mae'))$('t_mae').value=t.mae||''; if($('t_mfe'))$('t_mfe').value=t.mfe||''; if($('t_mtf4h'))$('t_mtf4h').value=t.mtf4h||''; /* B71: populate date/time/session in display timezone (v5.0) */ if(t.timestamp){var tz=getDisplayTimezone();var parts=getPartsInTimezone(t.timestamp,tz);$('t_date').value=parts.year+'-'+String(parts.month).padStart(2,'0')+'-'+String(parts.day).padStart(2,'0');$('t_time').value=String(parts.hour).padStart(2,'0')+':'+String(parts.minute).padStart(2,'0');} if(t.session&&$('t_session'))$('t_session').value=t.session; /* B72: populate image rows */ clearImageRows(); var imgs=parseImages(t.entryPic); imgs.forEach(function(img){ addImageRow(img.url, img.note); }); currentRating=t.rating||0; currentTags=[...(t.tags||[])]; updateStarDisplay(); renderTagChips(); dirManualOverride=false; statusManualOverride=false; setModeBadge('dirMode','auto'); setModeBadge('statusMode','auto'); ['t_entry','t_exit','t_sl','t_tp','t_size','t_symbol'].forEach(id2=>$(id2).dispatchEvent(new Event('input'))); document.querySelector('.form-wrap').scrollIntoView({behavior:'smooth',block:'start'}); showToast('Trade duplicated — edit and save'); }
 
 function detectSession(date) {
   if(!(date instanceof Date)||isNaN(date.getTime())) return 'london';
-  var mins = date.getHours() * 60 + date.getMinutes();
+  // v5.0: use display timezone for session detection (was: browser-local getHours())
+  var tz = (typeof getDisplayTimezone === 'function') ? getDisplayTimezone() : 'Asia/Tehran';
+  var parts = getPartsInTimezone(date.getTime(), tz);
+  var mins = parts.hour * 60 + parts.minute;
   var sessions = getSessionSettings();
   var keys = Object.keys(sessions);
   for (var i = 0; i < keys.length; i++) {
@@ -4491,7 +4406,7 @@ function closeDayModal() { $('dayModal').classList.remove('active'); }
 
 function renderSymbolBreakdown() { const trades=getTrades(); const tb=$('symbolTableBody'); if(!tb) return; const map={}; trades.forEach(t=>{if(!map[t.symbol])map[t.symbol]={trades:0,wins:0,losses:0,pnl:0,rSum:0,best:-Infinity,worst:Infinity}; const s=map[t.symbol]; const dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long'; const pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size); const risk=calculateRisk(t.symbol,dir,t.entry,t.sl,t.size); const rMult=risk>0?pnl/risk:0; const status=(t.entry&&t.exit)?autoDetectStatus(t.symbol,dir,t.entry,t.exit,t.sl,t.tp,t.size):'open'; s.trades++; s.pnl+=pnl; s.rSum+=rMult; if(pnl>s.best)s.best=pnl; if(pnl<s.worst)s.worst=pnl; if(status==='win')s.wins++; if(status==='loss')s.losses++;}); const syms=Object.entries(map).sort((a,b)=>b[1].pnl-a[1].pnl); if(syms.length===0){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:20px;">No trades yet</td></tr>';return;} tb.innerHTML=syms.map(([sym,s])=>{const closed=s.wins+s.losses; const wr=closed>0?(s.wins/closed*100).toFixed(1)+'%':'—'; const avgR=s.trades>0?(s.rSum/s.trades).toFixed(2):'—'; const cls=s.pnl>0?'pos':s.pnl<0?'neg':''; return '<tr><td>'+escapeHtml(sym)+'</td><td>'+s.trades+'</td><td>'+wr+'</td><td class="'+cls+'">'+(s.pnl>=0?'+':'')+'$'+s.pnl.toFixed(2)+'</td><td>'+(parseFloat(avgR)>=0?'+':'')+avgR+'R</td><td class="pos">'+(s.best>-Infinity?'+$'+s.best.toFixed(2):'—')+'</td><td class="neg">'+(s.worst<Infinity?'-$'+Math.abs(s.worst).toFixed(2):'—')+'</td></tr>';}).join(''); }
 
-function renderTimeAnalysis() { const trades=getTrades(); const dc=$('dowChart'),hc=$('hourChart'); if(!dc||!hc) return; const dow=Array(7).fill(0).map(()=>({pnl:0,count:0})); const hr=Array(24).fill(0).map(()=>({pnl:0,count:0})); trades.forEach(function(t){if(!t||!t.timestamp)return;var d=new Date(t.timestamp);if(isNaN(d.getTime()))return;var dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long';var pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size);if(!isNaN(pnl)){dow[d.getDay()].pnl+=pnl;dow[d.getDay()].count++;hr[d.getHours()].pnl+=pnl;hr[d.getHours()].count++;}}); const dn=['S','M','T','W','T','F','S']; const maxD=Math.max(...dow.map(d=>Math.abs(d.pnl)),1); const maxH=Math.max(...hr.map(d=>Math.abs(d.pnl)),1); dc.innerHTML=dow.map((d,i)=>{const h=Math.abs(d.pnl)/maxD*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=dn[i]+': '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:h)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+dn[i]+'</div></div>';}).join(''); const active=[]; for(let i=0;i<24;i++) if(hr[i].count>0) active.push(i); const show=active.length>=8?active:Array.from({length:24},(_,i)=>i); hc.innerHTML=show.map(h=>{const d=hr[h]; const height=Math.abs(d.pnl)/maxH*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=h+':00 - '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:height)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+(h%6===0?h+'h':'')+'</div></div>';}).join(''); }
+function renderTimeAnalysis() { const trades=getTrades(); const dc=$('dowChart'),hc=$('hourChart'); if(!dc||!hc) return; const tz=getDisplayTimezone(); const dow=Array(7).fill(0).map(()=>({pnl:0,count:0})); const hr=Array(24).fill(0).map(()=>({pnl:0,count:0})); trades.forEach(function(t){if(!t||!t.timestamp)return;var ts=t.timestamp;if(!Number.isFinite(ts))return;var dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long';var pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size);if(!isNaN(pnl)){var dayIdx=getDayInTimezone(ts,tz);var hourIdx=getHourInTimezone(ts,tz);dow[dayIdx].pnl+=pnl;dow[dayIdx].count++;hr[hourIdx].pnl+=pnl;hr[hourIdx].count++;}}); const dn=['S','M','T','W','T','F','S']; const maxD=Math.max(...dow.map(d=>Math.abs(d.pnl)),1); const maxH=Math.max(...hr.map(d=>Math.abs(d.pnl)),1); dc.innerHTML=dow.map((d,i)=>{const h=Math.abs(d.pnl)/maxD*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=dn[i]+': '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:h)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+dn[i]+'</div></div>';}).join(''); const active=[]; for(let i=0;i<24;i++) if(hr[i].count>0) active.push(i); const show=active.length>=8?active:Array.from({length:24},(_,i)=>i); hc.innerHTML=show.map(h=>{const d=hr[h]; const height=Math.abs(d.pnl)/maxH*100; const cls=d.pnl>0?'win':d.pnl<0?'loss':''; const tip=h+':00 - '+d.count+' trades, '+(d.pnl>=0?'+':'')+'$'+d.pnl.toFixed(2); return '<div class="bar-item"><div class="bar '+cls+'" style="height:'+(d.pnl===0?2:height)+'%"><div class="bar-tooltip">'+tip+'</div></div><div class="bar-label">'+(h%6===0?h+'h':'')+'</div></div>';}).join(''); }
 
 function renderReviews() { const trades=getTrades().slice().sort((a,b)=>b.timestamp-a.timestamp); const c=$('reviewGrid'); if(!c) return; if(trades.length===0){c.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-3);font-size:12px;padding:40px;">Log trades to see weekly and monthly reviews</div>';return;} const now=new Date(); const ws=new Date(now); ws.setDate(now.getDate()-now.getDay()); ws.setHours(0,0,0,0); const ms=new Date(now.getFullYear(),now.getMonth(),1); const wt=trades.filter(t=>t.timestamp>=ws.getTime()); const mt=trades.filter(t=>t.timestamp>=ms.getTime()); c.innerHTML=renderReviewCard('This Week',wt)+renderReviewCard('This Month',mt); }
 function renderReviewCard(label,trades) { if(trades.length===0) return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">No trades yet</div><div class="review-summary">Start logging trades to see your auto-summary here.</div></div>'; let netPnl=0,wins=0,losses=0,rSum=0; let dm={},sm={}; trades.forEach(t=>{const dir=autoDetectDirection(t.entry,t.exit,t.sl,t.tp)||t.direction||'long'; const pnl=calculatePnl(t.symbol,dir,t.entry,t.exit,t.size); const risk=calculateRisk(t.symbol,dir,t.entry,t.sl,t.size); const rMult=risk>0?pnl/risk:0; const status=(t.entry&&t.exit)?autoDetectStatus(t.symbol,dir,t.entry,t.exit,t.sl,t.tp,t.size):'open'; netPnl+=pnl; rSum+=rMult; if(status==='win')wins++; if(status==='loss')losses++; const dk=new Date(t.timestamp).toLocaleDateString('en-US',{weekday:'short'}); dm[dk]=(dm[dk]||0)+pnl; sm[t.symbol]=(sm[t.symbol]||0)+pnl;}); const closed=wins+losses; const wr=closed>0?(wins/closed*100).toFixed(1):'0.0'; const avgR=trades.length>0?(rSum/trades.length).toFixed(2):'0.00'; let bD='—',bP=0,wD='—',wP=0; for(const[day,pnl] of Object.entries(dm)){if(pnl>bP){bP=pnl;bD=day;} if(pnl<wP){wP=pnl;wD=day;}} let tS='—',tP=0; for(const[s,p] of Object.entries(sm)){if(Math.abs(p)>Math.abs(tP)){tP=p;tS=s;}} const period=new Date(trades[trades.length-1].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' - '+new Date(trades[0].timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}); const cls=netPnl>=0?'pos':'neg'; let sum='<strong>'+trades.length+' trades</strong> · '+wr+'% win rate · '+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(2)+' net P&L. '; if(bP>0)sum+='Best day: <strong>'+bD+'</strong> (+'+bP.toFixed(0)+'). '; if(wP<0)sum+='Worst day: <strong>'+wD+'</strong> ('+wP.toFixed(0)+'). '; sum+='Top symbol: <strong>'+tS+'</strong>. Avg R: '+(parseFloat(avgR)>=0?'+':'')+avgR+'R.'; const notes=(_reviewNotesCache||{})[label]||''; return '<div class="review-card"><h4>'+label+'</h4><div class="review-period">'+period+'</div><div class="review-stats"><div class="review-stat"><div class="rs-val '+cls+'">'+(netPnl>=0?'+':'')+'$'+netPnl.toFixed(0)+'</div><div class="rs-lbl">Net P&L</div></div><div class="review-stat"><div class="rs-val">'+wr+'%</div><div class="rs-lbl">Win Rate</div></div><div class="review-stat"><div class="rs-val">'+trades.length+'</div><div class="rs-lbl">Trades</div></div><div class="review-stat"><div class="rs-val '+(parseFloat(avgR)>=0?'pos':'neg')+'">'+(parseFloat(avgR)>=0?'+':'')+avgR+'R</div><div class="rs-lbl">Avg R</div></div></div><div class="review-summary">'+sum+'</div><textarea class="review-notes" placeholder="Your reflection for '+label+'..." onblur="saveReviewNotes(\''+label.replace(/\s/g,'_')+'\',this.value)">'+escapeHtml(notes)+'</textarea></div>'; }
@@ -4996,22 +4911,19 @@ function removeFromWatchlist(sym) {
   saveWatchlist(list); API.req('/api/watchlist/'+encodeURIComponent(sym),{method:'DELETE'}).catch(()=>{}); loadChart(currentChartSymbol);
   renderWatchlist();
 }
-// B-WL-REORDER: move a watchlist item up or down by one position, persist to backend
+// v5.0: move a watchlist item up or down by one position, persist to backend
 function moveWatchlistItem(sym, direction) {
   const list = getWatchlist();
   const idx = list.indexOf(sym);
   if (idx < 0) return;
   const newIdx = direction === 'up' ? idx - 1 : idx + 1;
   if (newIdx < 0 || newIdx >= list.length) return;
-  // Swap
   [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
   saveWatchlist(list);
-  // Persist new order to backend (D1 sort_order)
   API.req('/api/watchlist/reorder', { method: 'POST', body: JSON.stringify({ symbols: list }) }).catch(()=>{});
   loadChart(currentChartSymbol);
   renderWatchlist();
 }
-// Persist the current order to backend (called after drag-drop reorder)
 function persistWatchlistOrder() {
   const list = getWatchlist();
   API.req('/api/watchlist/reorder', { method: 'POST', body: JSON.stringify({ symbols: list }) }).catch(()=>{});
@@ -5103,7 +5015,7 @@ function bindWatchlistDragDrop() {
       const [moved] = list.splice(_dragWlIdx, 1);
       list.splice(dropIdx, 0, moved);
       saveWatchlist(list);
-      // B-WL-REORDER: persist new order to backend so it survives reload
+      // v5.0: persist new order to backend so it survives reload
       persistWatchlistOrder();
       loadChart(currentChartSymbol);
       renderWatchlist();
@@ -5134,7 +5046,7 @@ function setThemeSetting(theme) {
 }
 function renderSettingsPage() {
   loadFeeSettingsToUI();
-  loadFxSettingsToUI();
+  if (typeof loadFxSettingsToUI === 'function') loadFxSettingsToUI();
   // Theme buttons
   const themeBtnLight = $('themeLightBtn'); const themeBtnDark = $('themeDarkBtn');
   if(themeBtnLight) themeBtnLight.classList.toggle('active', currentTheme === 'light');
@@ -5194,68 +5106,45 @@ function loadFeeSettingsToUI() {
 }
 
 // =============================================================================
-// FX RATES — settings UI + management
+// FX RATES — settings UI + management (v5.0)
 // =============================================================================
-const FX_DEFAULT_SYMBOLS = ['USD/JPY', 'USD/CAD', 'USD/CHF', 'EUR/USD', 'GBP/USD', 'AUD/USD', 'NZD/USD'];
-
 function getFxOverrides() {
   var v = getSetting('fx_overrides', '{}');
   try { return typeof v === 'string' ? JSON.parse(v) : (v || {}); }
   catch(_) { return {}; }
 }
 function saveFxOverrides(obj) { saveSetting('fx_overrides', JSON.stringify(obj || {})); }
-
-// Merge TwelveData rates with user overrides — overrides win
 function getEffectiveFxRates() {
   const overrides = getFxOverrides();
   return Object.assign({}, _fxRates, overrides);
 }
-
-// Load FX settings panel: populate account currency, API key, and rate table
 async function loadFxSettingsToUI() {
-  // Account currency
   const cur = getSetting('account_currency', 'USD') || 'USD';
   if($('set_account_currency')) $('set_account_currency').value = cur;
-
-  // API key — masked (only show whether set)
+  const tz = getSetting('display_timezone', 'Asia/Tehran') || 'Asia/Tehran';
+  if($('set_display_timezone')) $('set_display_timezone').value = tz;
   const apiKey = getSetting('twelvedata_apikey', '') || '';
   if($('set_twelvedata_apikey')) $('set_twelvedata_apikey').value = apiKey;
-
-  // Load cached rates from localStorage (instant) then optionally fetch fresh
-  try {
-    const cached = LS.get('tv_fx_rates_' + currentAccountId, null);
-    if (cached && cached.rates) {
-      _fxRates = cached.rates;
-      _fxFetchedAt = cached.fetchedAt || 0;
-      _fxErrors = cached.errors || {};
-    }
-  } catch(_) {}
-
   renderFxRatesTable();
   updateFxStatusDisplay();
 }
-
 function updateFxStatusDisplay() {
   const lf = $('fxLastFetched'), src = $('fxSource');
   if (lf) lf.textContent = _fxFetchedAt ? 'Last fetched: ' + new Date(_fxFetchedAt).toLocaleString() : 'Never fetched';
   if (src) src.textContent = _fxRates && Object.keys(_fxRates).length > 0 ? 'Source: TwelveData' : 'Source: — (no rates loaded)';
 }
-
-// Render the editable rate table. Shows the 7 default pairs, with input fields
-// pre-filled from effective rates (TwelveData + overrides).
 function renderFxRatesTable() {
   const container = $('fxRatesTable');
   if (!container) return;
   const effective = getEffectiveFxRates();
   const overrides = getFxOverrides();
-
   const cells = FX_DEFAULT_SYMBOLS.map(sym => {
     const val = effective[sym];
     const isOverride = overrides[sym] !== undefined;
     const err = _fxErrors && _fxErrors[sym];
     const valStr = (val !== undefined && val !== null && Number.isFinite(val)) ? val.toFixed(5) : '';
     const borderClr = isOverride ? 'var(--accent)' : 'var(--border)';
-    const title = isOverride ? 'Manually overridden — click Save Settings to persist' : (err ? 'Error: ' + err : 'Fetched from TwelveData');
+    const title = isOverride ? 'Manually overridden' : (err ? 'Error: ' + err : 'Fetched from TwelveData');
     return '<div style="display:flex;flex-direction:column;gap:2px;">' +
       '<label style="font-size:11px;color:var(--text-2);font-family:var(--mono);">'+sym+(isOverride?' <span style="color:var(--accent);">*</span>':'')+'</label>' +
       '<input type="number" step="0.00001" class="modal-input fx-rate-input" data-symbol="'+sym+'" value="'+valStr+'" placeholder="—" style="width:100%;font-family:var(--mono);font-size:12px;border-color:'+borderClr+';" title="'+escapeAttr(title)+'">' +
@@ -5264,19 +5153,15 @@ function renderFxRatesTable() {
   });
   container.innerHTML = cells.join('');
 }
-
-// Save: account currency + API key + any manually edited rates
 async function saveFxSettings() {
   const cur = $('set_account_currency') ? $('set_account_currency').value : 'USD';
+  const tz = $('set_display_timezone') ? $('set_display_timezone').value : 'Asia/Tehran';
   const apiKey = $('set_twelvedata_apikey') ? $('set_twelvedata_apikey').value.trim() : '';
-
-  // Save via existing settings API (works in both local and backend mode)
   await API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key: 'account_currency', value: cur }) });
+  await API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key: 'display_timezone', value: tz }) });
   if (apiKey) {
     await API.req('/api/settings', { method: 'POST', body: JSON.stringify({ key: 'twelvedata_apikey', value: apiKey }) });
   }
-
-  // Collect any manually edited rates and save as overrides
   const inputs = document.querySelectorAll('.fx-rate-input');
   const overrides = {};
   let hasOverride = false;
@@ -5284,7 +5169,6 @@ async function saveFxSettings() {
     const sym = inp.getAttribute('data-symbol');
     const v = parseFloat(inp.value);
     if (Number.isFinite(v) && v > 0) {
-      // Compare with fetched rate to detect overrides
       const fetched = _fxRates[sym];
       if (fetched === undefined || Math.abs(fetched - v) > 1e-8) {
         overrides[sym] = v;
@@ -5292,26 +5176,15 @@ async function saveFxSettings() {
       }
     }
   });
-  if (hasOverride) {
-    saveFxOverrides(overrides);
-  } else {
-    saveFxOverrides({});
-  }
-
-  // Refresh in-memory rates with new overrides
+  saveFxOverrides(hasOverride ? overrides : {});
   _fxRates = getEffectiveFxRates();
-
   showToast('FX settings saved');
   renderFxRatesTable();
   updateFxStatusDisplay();
-
-  // If user entered an API key and no rates loaded yet, fetch automatically
   if (apiKey && Object.keys(_fxRates).length === 0) {
     setTimeout(() => refreshFxRates(false), 300);
   }
 }
-
-// Fetch fresh rates from TwelveData via /api/fx-rates
 async function refreshFxRates(force) {
   const status = $('fxStatus');
   const btn = $('fxRefreshBtn');
@@ -5326,7 +5199,6 @@ async function refreshFxRates(force) {
       return;
     }
     if (r && r.rates) {
-      // Keep user overrides on top of freshly fetched rates
       _fxRates = Object.assign({}, r.rates, getFxOverrides());
       _fxFetchedAt = r.fetchedAt || Date.now();
       _fxErrors = r.errors || {};
@@ -5337,7 +5209,8 @@ async function refreshFxRates(force) {
       }
       renderFxRatesTable();
       updateFxStatusDisplay();
-      updateCalc(); // refresh trade form P&L if open
+      if (typeof updateCalc === 'function') updateCalc();
+      if (typeof renderPipValueTable === 'function') renderPipValueTable();
       showToast('FX rates updated');
     } else {
       if (status) status.textContent = 'No rates returned';
@@ -5350,98 +5223,57 @@ async function refreshFxRates(force) {
   }
 }
 
-// =============================================================================
-// AUTO-FETCH — silently ensure FX rates are available before P&L / risk calc.
-// Called on app load, on view switches (journal, risk calc, dashboard), and
-// when the user types a non-USD-quote symbol in the trade form.
-//
-// Behavior:
-//   - If rates were fetched <1h ago AND cover the requested quote currency → no-op
-//   - If rates are missing or stale → fetch silently (no toast, no UI blocking)
-//   - If API key not set → no-op (user will see "No FX rates" warning in calc)
-//   - Multiple concurrent calls coalesce via _fxFetching flag
-// =============================================================================
-let _fxFetching = false;
-let _fxLastEnsure = 0;
-const FX_ENSURE_COOLDOWN_MS = 30 * 1000; // don't re-check more than once per 30s
-
-async function ensureFxRates(requiredQuoteCurrency) {
-  // Cooldown: don't spam the API if user is typing fast
-  if (Date.now() - _fxLastEnsure < FX_ENSURE_COOLDOWN_MS) {
-    // Even during cooldown, if we have no rates at all and the required quote
-    // isn't covered, we still need to try — but only if not already fetching
-    if (_fxFetching) return;
-    if (_fxRates && Object.keys(_fxRates).length > 0) {
-      if (!requiredQuoteCurrency || requiredQuoteCurrency === 'USD' || requiredQuoteCurrency === getAccountCurrency()) return;
-      const hasRate = _fxRates['USD/'+requiredQuoteCurrency] !== undefined || _fxRates[requiredQuoteCurrency+'/USD'] !== undefined;
-      if (hasRate) return;
+// ============ PIP VALUE CALCULATOR (v5.0) ============
+const PIP_VALUE_CURRENCIES = ['USD', 'JPY', 'EUR', 'GBP', 'AUD', 'NZD', 'CHF', 'CAD'];
+function buildAllForexPairs() {
+  const pairs = [];
+  for (const base of PIP_VALUE_CURRENCIES) {
+    for (const quote of PIP_VALUE_CURRENCIES) {
+      if (base === quote) continue;
+      pairs.push(base + '/' + quote);
     }
   }
-  _fxLastEnsure = Date.now();
-
-  // No API key → can't fetch (user will see warning in UI)
-  const apiKey = getSetting('twelvedata_apikey', '') || '';
-  if (!apiKey) return;
-
-  if (_fxFetching) return;
-  _fxFetching = true;
-
-  try {
-    const url = '/api/fx-rates'; // server/local handler returns cache if <1h old
-    const r = await API.req(url);
-    if (r && r.rates && Object.keys(r.rates).length > 0) {
-      _fxRates = Object.assign({}, r.rates, getFxOverrides());
-      _fxFetchedAt = r.fetchedAt || Date.now();
-      _fxErrors = r.errors || {};
-      // Update Settings panel if open
-      if ($('fxRatesTable')) { renderFxRatesTable(); updateFxStatusDisplay(); }
-      // Refresh any open P&L display
-      if (typeof updateCalc === 'function') {
-        try { updateCalc(); } catch(_) {}
-      }
-      // Refresh risk calc if open
-      if ($('rcResult') && typeof calcRisk === 'function') {
-        try { calcRisk(); } catch(_) {}
-      }
-    }
-  } catch (_) {
-    // Silent failure — user will see "No FX rates" warning in the UI
-  } finally {
-    _fxFetching = false;
-  }
+  return pairs;
 }
-
-// Walk every closed trade, recompute its P&L using current FX rates, save.
-// (Removed from Settings UI — P&L is now computed at trade-log time using
-//  calculatePnl() in saveTrade(). The function is kept here in case other
-//  code paths need to force a recompute in the future.)
-async function recalculateAllPnl() {
-  const trades = getTrades();
-  if (!trades || trades.length === 0) { showToast('No trades to recalculate'); return; }
-  let updated = 0;
-  for (let i = 0; i < trades.length; i++) {
-    const t = trades[i];
-    if (!t.entry || !t.exit) continue;
-    const dir = autoDetectDirection(t.entry, t.exit, t.sl, t.tp) || t.direction || 'long';
-    const newPnl = calculatePnl(t.symbol, dir, t.entry, t.exit, t.size);
-    const risk = calculateRisk(t.symbol, dir, t.entry, t.sl, t.size);
-    const newR = risk > 0 ? newPnl / risk : 0;
-    if (Math.abs((t.pnl || 0) - newPnl) > 0.005 || Math.abs((t.rMultiple || 0) - newR) > 0.005) {
-      trades[i].pnl = newPnl;
-      trades[i].rMultiple = newR;
-      updated++;
-    }
+function renderPipValueTable() {
+  const container = $('pipValueTable');
+  if (!container) return;
+  const lots = Math.max(0.01, num($('pvc_lots') ? $('pvc_lots').value : 1));
+  const acct = getAccountCurrency();
+  const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
+  const cs = 100000;
+  const status = $('pvcStatus');
+  const hasRates = _fxRates && Object.keys(_fxRates).length > 0;
+  if (status) {
+    if (!hasRates) status.textContent = '⚠ No FX rates — open Settings → FX Rates to fetch';
+    else if (_fxFetchedAt) status.textContent = 'Rates from ' + new Date(_fxFetchedAt).toLocaleTimeString();
+    else status.textContent = '';
   }
-  saveTrades(trades);
-  try {
-    for (const t of trades) {
-      if (t.id) await API.req('/api/trades/' + t.id, { method: 'PUT', body: JSON.stringify(t) }).catch(() => {});
+  const pairs = buildAllForexPairs();
+  const cells = pairs.map(pair => {
+    const [base, quote] = pair.split('/');
+    const pipSize = quote === 'JPY' ? 0.01 : 0.0001;
+    const pipValueInQuote = pipSize * cs * lots;
+    let pipValueInAcct, conversionNote;
+    if (quote === acct) {
+      pipValueInAcct = pipValueInQuote;
+      conversionNote = '';
+    } else {
+      pipValueInAcct = convertToAccountCurrency(pipValueInQuote, quote);
+      const w = fxConversionWarning();
+      conversionNote = w ? ' ⚠' : '';
     }
-  } catch(_) {}
-  showToast('Recalculated P&L for ' + updated + ' trade(s)');
-  if (typeof renderTrades === 'function') renderTrades();
-  if (typeof updateJournalStats === 'function') updateJournalStats();
-  if (typeof renderEquityCurve === 'function') renderEquityCurve();
+    const isApprox = !hasRates && quote !== acct && quote !== 'USD';
+    const valStr = isApprox ? '—' : acctSym + pipValueInAcct.toFixed(2);
+    const quoteSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[quote] || quote+' ';
+    const title = '1 pip = ' + pipSize + ' ' + quote + '\nPer lot: ' + quoteSym + pipValueInQuote.toFixed(2) + ' ' + quote + (quote !== acct && !isApprox ? '\nConverted to ' + acct : '');
+    return '<div style="display:flex;flex-direction:column;padding:7px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);" title="'+escapeAttr(title)+'">' +
+      '<span style="font-size:11px;color:var(--text-2);font-family:var(--mono);font-weight:600;">'+pair+'</span>' +
+      '<span style="font-size:13px;font-family:var(--mono);color:var(--text);'+(isApprox?'opacity:.4;':'')+'">'+valStr+conversionNote+'</span>' +
+      '<span style="font-size:9px;color:var(--text-3);">'+quoteSym+pipValueInQuote.toFixed(2)+' '+quote+'/pip</span>' +
+    '</div>';
+  });
+  container.innerHTML = cells.join('');
 }
 function calcFees(symbol, positionSize, entry, exit, instType) {
   var fees = getFeeSettings();
@@ -5581,6 +5413,148 @@ function showToast(msg) { const t=$('toast'); t.textContent=msg; t.classList.add
 let _ecData = [];
 let _ecFilter = 'all';
 let _ecFallbackActive = false;
+// v5.0: currency filter — array of selected currency codes, or ['all']
+let _ecCurrencyFilter = ['all'];
+let _ecCountdownTimer = null;
+
+// v5.0: Currency filter functions
+function setEcCurrencyFilter(ccy) {
+  // Clicking "All" clears the selection
+  _ecCurrencyFilter = ['all'];
+  updateEcCurrencyChips();
+  renderEconomicCalendar();
+}
+function toggleEcCurrencyFilter(ccy) {
+  // Remove "all" if present, toggle the clicked currency
+  _ecCurrencyFilter = _ecCurrencyFilter.filter(function(c) { return c !== 'all'; });
+  var idx = _ecCurrencyFilter.indexOf(ccy);
+  if (idx >= 0) _ecCurrencyFilter.splice(idx, 1);
+  else _ecCurrencyFilter.push(ccy);
+  // If nothing selected, fall back to "all"
+  if (_ecCurrencyFilter.length === 0) _ecCurrencyFilter = ['all'];
+  updateEcCurrencyChips();
+  renderEconomicCalendar();
+}
+function updateEcCurrencyChips() {
+  document.querySelectorAll('.ec-ccy').forEach(function(btn) {
+    var ccy = btn.getAttribute('data-ec-ccy');
+    var isActive = _ecCurrencyFilter.indexOf(ccy) >= 0;
+    btn.classList.toggle('active', isActive);
+  });
+}
+function ecCurrencyMatches(country) {
+  if (_ecCurrencyFilter.indexOf('all') >= 0) return true;
+  return _ecCurrencyFilter.indexOf(country) >= 0;
+}
+
+// v5.0: Countdown to next high-impact event
+// Finds the next event (any impact, prioritizing high) that hasn't started yet,
+// and displays "Next: [title] ([country]) in Xd Yh Zm" — updates every minute.
+function updateEcCountdown() {
+  var bar = $('ecCountdownBar');
+  var text = $('ecCountdownText');
+  if (!bar || !text) return;
+  if (!_ecData || _ecData.length === 0) { bar.style.display = 'none'; return; }
+
+  var now = Date.now();
+  var dispTz = getDisplayTimezone();
+  var upcoming = [];
+
+  for (var i = 0; i < _ecData.length; i++) {
+    var e = _ecData[i];
+    if (!e.date || !e.time || e.time === 'All Day') continue;
+    // Build the true UTC timestamp for this event (same logic as convertEcTime)
+    var ts = ecEventToUtc(e);
+    if (ts && ts > now) {
+      upcoming.push({ event: e, ts: ts });
+    }
+  }
+
+  if (upcoming.length === 0) {
+    bar.style.display = 'none';
+    return;
+  }
+
+  // Sort by time, then prioritize high impact
+  upcoming.sort(function(a, b) {
+    if (a.ts !== b.ts) return a.ts - b.ts;
+    // If two events at the same time, high impact first
+    var ia = a.event.impact === 'high' ? 0 : a.event.impact === 'medium' ? 1 : 2;
+    var ib = b.event.impact === 'high' ? 0 : b.event.impact === 'medium' ? 1 : 2;
+    return ia - ib;
+  });
+
+  // Find the next HIGH-impact event (if any high-impact exists in next 24h, show that)
+  var next = upcoming[0];
+  var nextHigh = null;
+  for (var j = 0; j < upcoming.length; j++) {
+    if (upcoming[j].event.impact === 'high') { nextHigh = upcoming[j]; break; }
+  }
+  // Prefer high-impact if it's within 24h, otherwise show the next event of any impact
+  if (nextHigh && (nextHigh.ts - now < 24 * 3600000)) {
+    next = nextHigh;
+  }
+
+  var diffMs = next.ts - now;
+  var days = Math.floor(diffMs / 86400000);
+  var hours = Math.floor((diffMs % 86400000) / 3600000);
+  var mins = Math.floor((diffMs % 3600000) / 60000);
+  var timeStr = '';
+  if (days > 0) timeStr += days + 'd ';
+  if (hours > 0 || days > 0) timeStr += hours + 'h ';
+  timeStr += mins + 'm';
+
+  var impactLabel = next.event.impact === 'high' ? '🔴 High-impact' : next.event.impact === 'medium' ? '🟡 Medium' : '🟢 Low';
+  var dispTime = formatTimeInTimezone(next.ts, dispTz);
+  var dispDate = formatDateInTimezone(next.ts, dispTz);
+
+  var isHigh = next.event.impact === 'high';
+  text.innerHTML = '<strong>' + impactLabel + '</strong> &nbsp; ' + escapeHtml(next.event.title) +
+    ' <span style="color:var(--text-3);">(' + escapeHtml(next.event.country) + ')</span>' +
+    ' &nbsp;in <strong style="color:' + (isHigh ? '#ef4444' : 'var(--accent-h)') + ';">' + timeStr + '</strong>' +
+    ' <span style="color:var(--text-3);font-size:11px;">— ' + escapeHtml(dispDate) + ' ' + escapeHtml(dispTime) + '</span>';
+  bar.style.display = 'flex';
+
+  // If within 1 hour, update every 30s; otherwise every 60s
+  clearTimeout(_ecCountdownTimer);
+  var interval = (diffMs < 3600000) ? 30000 : 60000;
+  _ecCountdownTimer = setTimeout(updateEcCountdown, interval);
+}
+
+// Convert an economic calendar event to a true UTC timestamp
+// (uses the same logic as convertEcTime but returns the raw timestamp)
+function ecEventToUtc(e) {
+  try {
+    var month = -1, day = -1, year = new Date().getFullYear();
+    var monthMap = {'jan':0,'feb':1,'mar':2,'apr':3,'may':4,'jun':5,'jul':6,'aug':7,'sep':8,'oct':9,'nov':10,'dec':11};
+    var m1 = (e.date || '').match(/([A-Za-z]{3})\s+(\d+)/);
+    if (m1) {
+      month = monthMap[m1[1].toLowerCase()]; day = parseInt(m1[2]);
+    } else {
+      var m2 = (e.date || '').match(/(\d{1,4})[-/](\d{1,2})[-/](\d{1,4})/);
+      if (m2) {
+        var a = parseInt(m2[1]), b = parseInt(m2[2]), c = parseInt(m2[3]);
+        if (a > 31) { year = a; month = b - 1; day = c; }
+        else { month = a - 1; day = b; if (c > 31) year = c; }
+      }
+    }
+    if (month < 0 || day < 1) return null;
+    var hour = 0, min = 0;
+    var tm = (e.time || '').match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+    if (!tm) return null;
+    hour = parseInt(tm[1]); min = parseInt(tm[2]);
+    var ampm = (tm[3] || '').toLowerCase();
+    if (ampm === 'pm' && hour !== 12) hour += 12;
+    if (ampm === 'am' && hour === 12) hour = 0;
+    var wallAsUtc = Date.UTC(year, month, day, hour, min, 0);
+    if (_ecTimezone === 'est') return wallAsUtc + 5 * 3600000;
+    if (_ecTimezone === 'utc') return wallAsUtc;
+    // 'local' — CSV times are in the display timezone
+    var dateStr2 = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    var timeStr2 = String(hour).padStart(2, '0') + ':' + String(min).padStart(2, '0');
+    return parseInTimezone(dateStr2, timeStr2, getDisplayTimezone());
+  } catch(_) { return null; }
+}
 
 // Single unified function: tries the server proxy first, then falls back to manual CSV upload.
 // B64: removed the hidden-iframe "download started" fallback — it doesn't work in modern browsers
@@ -5715,22 +5689,66 @@ function parseEconomicCSV(csv) {
   // the first event's date field has \uFEFF prefix and date matching fails.
   if (csv.charCodeAt(0) === 0xFEFF) csv = csv.slice(1);
   const lines = csv.trim().split('\n');
-  return lines.slice(1).map(function(line) {
+
+  // v5.0: Auto-detect column order from the header row.
+  // Different CSV sources have columns in different orders — this parser reads
+  // the header and maps columns by name, so it works with any format.
+  function parseLine(line) {
     var vals = [];
     var cur = '', inQ = false;
-    for(var i=0; i<line.length; i++) {
+    for (var i = 0; i < line.length; i++) {
       var ch = line[i];
-      if(ch === '"') { inQ = !inQ; continue; }
-      if(ch === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
       cur += ch;
     }
     vals.push(cur);
+    return vals.map(function(v) { return v.trim(); });
+  }
+
+  var header = parseLine(lines[0]).map(function(h) { return h.toLowerCase().trim(); });
+  function findCol(names) {
+    for (var i = 0; i < names.length; i++) {
+      var idx = header.indexOf(names[i]);
+      if (idx >= 0) return idx;
+    }
+    return -1;
+  }
+  var colMap = {
+    date:    findCol(['date', 'event date', 'day', 'datetime']),
+    time:    findCol(['time', 'event time', 'hour', 'datetime']),
+    title:   findCol(['title', 'event', 'event name', 'name', 'description']),
+    country: findCol(['country', 'currency', 'ccy', 'cur']),
+    impact:  findCol(['impact', 'importance', 'priority', 'volatility']),
+    forecast:findCol(['forecast', 'fore', 'est']),
+    previous:findCol(['previous', 'prev', 'last', 'actual'])
+  };
+
+  return lines.slice(1).map(function(line) {
+    var vals = parseLine(line);
+    function get(key) {
+      var idx = colMap[key];
+      return (idx >= 0 && vals[idx]) ? vals[idx] : '';
+    }
+    // If date column includes time (e.g., "2025-07-12 22:30:00"), split it.
+    // Also handle when date and time map to the same 'datetime' column.
+    var dateVal = get('date');
+    var timeVal = get('time');
+    if (dateVal && (colMap.date === colMap.time || !timeVal) && /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(dateVal)) {
+      var parts = dateVal.split(/\s+/);
+      dateVal = parts[0];
+      timeVal = parts[1];
+    }
     return {
-      date: (vals[0]||'').trim(), time: (vals[1]||'').trim(), title: (vals[2]||'').trim(),
-      country: (vals[3]||'').trim(), impact: (vals[4]||'').toLowerCase().trim(),
-      forecast: (vals[5]||'').trim(), previous: (vals[6]||'').trim()
+      date: dateVal,
+      time: timeVal,
+      title: get('title'),
+      country: get('country'),
+      impact: get('impact').toLowerCase(),
+      forecast: get('forecast'),
+      previous: get('previous')
     };
-  }).filter(function(e) { return e.title; });
+  }).filter(function(e) { return e.title || e.date; });
 }
 
 function setEcFilter(f) {
@@ -5739,45 +5757,70 @@ function setEcFilter(f) {
   renderEconomicCalendar();
 }
 
-let _ecTimezone = getSetting('ec_timezone', 'est') || 'est';
+let _ecTimezone = getSetting('ec_timezone', 'utc') || 'utc';
 function changeEcTimezone(tz) { _ecTimezone = tz; saveSetting('ec_timezone', tz); renderEconomicCalendar(); }
 function convertEcTime(dateStr, timeStr, tz) {
   if(!dateStr) return { date: dateStr, time: timeStr };
   if(!timeStr || timeStr === 'All Day') return { date: dateStr, time: timeStr };
-  // Forex Factory CSV times are in US Eastern Time (EST=UTC-5 / EDT=UTC-4)
-  // We parse them as if they were UTC, then adjust by the EST offset (5h)
-  // to get a "real" UTC timestamp, then convert to the target timezone.
+  // v5.0: The `tz` parameter is the SOURCE timezone of the CSV data.
+  //   'est' → CSV times are in US Eastern (EST=UTC-5 / EDT=UTC-4)
+  //   'utc' → CSV times are in UTC
+  //   'local' → CSV times are in the user's display timezone
+  // The function converts from the source TZ to the DISPLAY timezone for output.
   try {
-    var parts = dateStr.match(/(\w+)\s+(\d+)/);
-    if(!parts) return { date: dateStr, time: timeStr };
-    var monthMap = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'May':4,'Jun':5,'Jul':6,'Aug':7,'Sep':8,'Oct':9,'Nov':10,'Dec':11};
-    var month = monthMap[parts[1]]; if(month === undefined) return { date: dateStr, time: timeStr };
-    var day = parseInt(parts[2]);
-    var timeParts = timeStr.split(':'); var hour = parseInt(timeParts[0])||0; var min = parseInt(timeParts[1])||0;
-    // Convert 12-hour format (am/pm) to 24-hour
-    var lowerTime = timeStr.toLowerCase();
-    if(lowerTime.indexOf('pm') > -1 && hour !== 12) hour += 12;
-    if(lowerTime.indexOf('am') > -1 && hour === 12) hour = 0;
-    var year = new Date().getFullYear();
-    // Create a date in UTC representing the EST time (EST = UTC-5, so add 5h to get UTC)
-    var utcMs = Date.UTC(year, month, day, hour, min, 0) + 5 * 3600000;
-    var date = new Date(utcMs);
-    var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var dispDate, dispTime;
-    if(tz === 'est') {
-      // EST: subtract 5h from UTC
-      var est = new Date(utcMs - 5 * 3600000);
-      dispDate = monthNames[est.getUTCMonth()] + ' ' + est.getUTCDate();
-      dispTime = String(est.getUTCHours()).padStart(2,'0') + ':' + String(est.getUTCMinutes()).padStart(2,'0');
-    } else if(tz === 'utc') {
-      dispDate = monthNames[date.getUTCMonth()] + ' ' + date.getUTCDate();
-      dispTime = String(date.getUTCHours()).padStart(2,'0') + ':' + String(date.getUTCMinutes()).padStart(2,'0');
+    // Parse the date — supports "Jul 12", "07-12-2026", "2026-07-12"
+    var month = -1, day = -1, year = new Date().getFullYear();
+    var monthMap = {'jan':0,'feb':1,'mar':2,'apr':3,'may':4,'jun':5,'jul':6,'aug':7,'sep':8,'oct':9,'nov':10,'dec':11};
+    var m1 = dateStr.match(/([A-Za-z]{3})\s+(\d+)/);
+    if (m1) {
+      month = monthMap[m1[1].toLowerCase()]; day = parseInt(m1[2]);
     } else {
-      // local: use the browser's local time
-      dispDate = monthNames[date.getMonth()] + ' ' + date.getDate();
-      dispTime = String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0');
+      var m2 = dateStr.match(/(\d{1,4})[-/](\d{1,2})[-/](\d{1,4})/);
+      if (m2) {
+        var a = parseInt(m2[1]), b = parseInt(m2[2]), c = parseInt(m2[3]);
+        if (a > 31) { year = a; month = b - 1; day = c; } // YYYY-MM-DD
+        else { month = a - 1; day = b; if (c > 31) year = c; } // MM-DD-YYYY or MM-DD-YY
+      }
     }
-    return { date: dispDate, time: dispTime };
+    if (month < 0 || day < 1) return { date: dateStr, time: timeStr };
+
+    // Parse the time — supports "10:30pm", "22:30", "10:30 PM"
+    var hour = 0, min = 0;
+    var tm = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+    if (!tm) return { date: dateStr, time: timeStr };
+    hour = parseInt(tm[1]); min = parseInt(tm[2]);
+    var ampm = (tm[3] || '').toLowerCase();
+    if (ampm === 'pm' && hour !== 12) hour += 12;
+    if (ampm === 'am' && hour === 12) hour = 0;
+
+    // Build the UTC timestamp representing the wall-clock time in the SOURCE timezone
+    // Step 1: pretend the wall-clock time IS UTC to get a baseline
+    var wallAsUtc = Date.UTC(year, month, day, hour, min, 0);
+    // Step 2: adjust based on source timezone to get the TRUE UTC timestamp
+    var trueUtc;
+    if (tz === 'est') {
+      // EST = UTC-5, so true UTC = wall-clock + 5h
+      // (ignoring EDT/EST DST distinction for simplicity — FF CSV uses EST year-round)
+      trueUtc = wallAsUtc + 5 * 3600000;
+    } else if (tz === 'utc') {
+      // Already UTC — no adjustment
+      trueUtc = wallAsUtc;
+    } else {
+      // 'local' — CSV times are in the display timezone, so use parseInTimezone
+      var dtx = getDisplayTimezone();
+      var dateStr2 = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+      var timeStr2 = String(hour).padStart(2, '0') + ':' + String(min).padStart(2, '0');
+      trueUtc = parseInTimezone(dateStr2, timeStr2, dtx);
+    }
+
+    // Step 3: convert trueUtc to the DISPLAY timezone for output
+    var dispTz = getDisplayTimezone();
+    var parts = getPartsInTimezone(trueUtc, dispTz);
+    var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return {
+      date: monthNames[parts.month - 1] + ' ' + parts.day,
+      time: String(parts.hour).padStart(2, '0') + ':' + String(parts.minute).padStart(2, '0')
+    };
   } catch(e) { return { date: dateStr, time: timeStr }; }
 }
 function renderEconomicCalendar() {
@@ -5786,10 +5829,17 @@ function renderEconomicCalendar() {
   var search = ($('ecSearch') ? $('ecSearch').value : '').toLowerCase();
   var items = _ecData;
   if(_ecFilter !== 'all') items = items.filter(function(e) { return e.impact === _ecFilter; });
+  // v5.0: apply currency filter
+  items = items.filter(function(e) { return ecCurrencyMatches(e.country); });
   if(search) items = items.filter(function(e) { return e.title.toLowerCase().includes(search) || e.country.toLowerCase().includes(search); });
   var tzBar = $('ecTzBar'); if(tzBar) tzBar.style.display = 'flex';
-  var tzLabel = $('ecTzLabel'); if(tzLabel) { var tzOffset = -new Date().getTimezoneOffset()/60; var tzOffsetStr = (tzOffset>=0?'+':'') + tzOffset; var tzNames = {est:'EST (UTC-5)', local:'Local (UTC'+tzOffsetStr+')', utc:'UTC'}; tzLabel.textContent = 'Times shown in: ' + (tzNames[_ecTimezone]||'EST'); }
+  // v5.0: show currency filter bar + countdown bar
+  var ccyBar = $('ecCurrencyBar'); if(ccyBar) ccyBar.style.display = 'flex';
+  updateEcCurrencyChips();
+  var tzLabel = $('ecTzLabel'); if(tzLabel) { var dispTzName = (function(){ try { return new Intl.DateTimeFormat('en-US',{timeZone:getDisplayTimezone(),timeZoneName:'short'}).formatToParts(new Date()).filter(function(p){return p.type==='timeZoneName';})[0].value; } catch(_) { return getDisplayTimezone(); } })(); var tzNames = {est:'Source: EST → Display: '+dispTzName, utc:'Source: UTC → Display: '+dispTzName, local:'Source & Display: '+dispTzName}; tzLabel.textContent = 'Times shown in: ' + (tzNames[_ecTimezone]||tzNames.utc); }
   var tzSelect = $('ecTzSelect'); if(tzSelect) tzSelect.value = _ecTimezone;
+  // v5.0: trigger countdown update
+  if (typeof updateEcCountdown === 'function') updateEcCountdown();
   if(items.length === 0) { c.innerHTML = '<div class="ec-loading">No events match.</div>'; return; }
 
   // Group by date
@@ -5860,7 +5910,6 @@ function calcRisk() {
   const balance = num($('rc_balance').value);
   const riskPct = num($('rc_risk_pct').value);
   const r = $('rcResult');
-  // Auto-fetch FX rates if user typed a non-USD-quote pair and we have no rate
   if (sym && typeof ensureFxRates === 'function') {
     const q = getQuoteCurrency(sym);
     if (q !== 'USD' && q !== getAccountCurrency()) {
@@ -5877,17 +5926,11 @@ function calcRisk() {
   const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
   let positionSize, sizeUnit, riskPerLot;
   if(instType === 'crypto') {
-    // Crypto: position_size_usd = risk_usd / (sl_distance_percent / 100)
     const slPct = slDist / entry * 100;
     positionSize = slPct > 0 ? riskUsd / (slPct/100) : 0;
     sizeUnit = 'USDT';
     riskPerLot = slDist;
   } else {
-    // B-FX-RC: use the corrected calculateRisk() which properly converts
-    // quote-currency risk → account currency. This fixes JPY pairs (was using
-    // the pair's own price as USD/JPY) AND fixes USD/CAD, USD/CHF (were not
-    // converting at all).
-    // Risk per 1 lot, in account currency:
     riskPerLot = calculateRisk(sym, dir, entry, sl, 1);
     positionSize = riskPerLot > 0 ? riskUsd / riskPerLot : 0;
     sizeUnit = 'Lots';
@@ -5906,13 +5949,11 @@ function calcRisk() {
       '<div class="rc-result-row"><span class="rc-result-lbl">Net Risk (with fees)</span><span class="rc-result-val neg">'+acctSym+netRisk.toFixed(2)+'</span></div>';
   }
   if(tp) {
-    // B-FX-RC: TP P&L also uses the corrected calculatePnl() (handles all quote currencies)
     var tpPnl = Math.abs(calculatePnl(sym, dir, entry, tp, positionSize));
     var netPnl = tpPnl - fees;
     feeHtml += '<div class="rc-result-row"><span class="rc-result-lbl">Gross P&L at TP</span><span class="rc-result-val pos">'+acctSym+tpPnl.toFixed(2)+'</span></div>'+
       '<div class="rc-result-row"><span class="rc-result-lbl">Net P&L (after fees)</span><span class="rc-result-val pos">'+acctSym+netPnl.toFixed(2)+'</span></div>';
   }
-  // Conversion breakdown for non-USD-quote pairs (so user sees what rate was used)
   var convHtml = '';
   if (instType !== 'crypto') {
     var quote = getQuoteCurrency(sym);
@@ -5980,68 +6021,6 @@ function calcCryptoRisk() {
   }
   if(!risk && !posSize) html += '<div class="rc-result-row"><span class="rc-result-lbl">Enter risk amount or position size</span></div>';
   r.innerHTML = html;
-}
-
-// ============ PIP VALUE CALCULATOR ============
-// Shows 1-pip value per lot for every pair composed of these 7 currencies.
-// Pip value = pip_size × contract_size × lots (in quote currency),
-//             then converted to account currency via FX rates.
-const PIP_VALUE_CURRENCIES = ['USD', 'JPY', 'EUR', 'GBP', 'AUD', 'NZD', 'CHF', 'CAD'];
-
-function buildAllForexPairs() {
-  const pairs = [];
-  for (const base of PIP_VALUE_CURRENCIES) {
-    for (const quote of PIP_VALUE_CURRENCIES) {
-      if (base === quote) continue;
-      pairs.push(base + '/' + quote);
-    }
-  }
-  return pairs;
-}
-
-function renderPipValueTable() {
-  const container = $('pipValueTable');
-  if (!container) return;
-  const lots = Math.max(0.01, num($('pvc_lots') ? $('pvc_lots').value : 1));
-  const acct = getAccountCurrency();
-  const acctSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[acct] || acct+' ';
-  const cs = 100000; // 1 lot = 100,000 units for forex
-  const status = $('pvcStatus');
-  const hasRates = _fxRates && Object.keys(_fxRates).length > 0;
-  if (status) {
-    if (!hasRates) status.textContent = '⚠ No FX rates — open Settings → FX Rates to fetch';
-    else if (_fxFetchedAt) status.textContent = 'Rates from ' + new Date(_fxFetchedAt).toLocaleTimeString();
-    else status.textContent = '';
-  }
-
-  const pairs = buildAllForexPairs();
-  const cells = pairs.map(pair => {
-    const [base, quote] = pair.split('/');
-    const pipSize = quote === 'JPY' ? 0.01 : 0.0001;
-    // Pip value in quote currency = pipSize × cs × lots
-    const pipValueInQuote = pipSize * cs * lots;
-    // Convert to account currency
-    let pipValueInAcct, conversionNote;
-    if (quote === acct) {
-      pipValueInAcct = pipValueInQuote;
-      conversionNote = '';
-    } else {
-      pipValueInAcct = convertToAccountCurrency(pipValueInQuote, quote);
-      const w = fxConversionWarning();
-      conversionNote = w ? ' ⚠' : '';
-    }
-    const isApprox = !hasRates && quote !== acct && quote !== 'USD';
-    const valStr = isApprox ? '—' : acctSym + pipValueInAcct.toFixed(2);
-    const quoteSym = {USD:'$',JPY:'¥',EUR:'€',GBP:'£',CAD:'C$',CHF:'CHF',AUD:'A$',NZD:'NZ$'}[quote] || quote+' ';
-    const cls = pipValueInAcct >= 0 ? 'pos' : 'neg';
-    const title = '1 pip = ' + pipSize + ' ' + quote + '\nPer lot: ' + quoteSym + pipValueInQuote.toFixed(2) + ' ' + quote + (quote !== acct && !isApprox ? '\nConverted to ' + acct : '');
-    return '<div style="display:flex;flex-direction:column;padding:7px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);" title="'+escapeAttr(title)+'">' +
-      '<span style="font-size:11px;color:var(--text-2);font-family:var(--mono);font-weight:600;">'+pair+'</span>' +
-      '<span style="font-size:13px;font-family:var(--mono);color:var(--text);'+(isApprox?'opacity:.4;':'')+'">'+valStr+conversionNote+'</span>' +
-      '<span style="font-size:9px;color:var(--text-3);">'+quoteSym+pipValueInQuote.toFixed(2)+' '+quote+'/pip</span>' +
-    '</div>';
-  });
-  container.innerHTML = cells.join('');
 }
 
 // ============ PARTIAL PROFIT TRACKER ============
@@ -6332,24 +6311,25 @@ function pfViewTrades(id) {
     monthlyPnl[key].trades++; monthlyPnl[key].pnl += p; if (p > 0) monthlyPnl[key].wins++;
   });
 
-  // === Weekday P&L breakdown ===
+  // === Weekday P&L breakdown === (v5.0: uses display timezone)
   var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var _tz = getDisplayTimezone();
   var weekdayPnl = Array(7).fill(0).map(function() { return { trades: 0, pnl: 0, wins: 0 }; });
   trades.forEach(function(t) {
-    var d = new Date(t.timestamp || 0);
-    if (isNaN(d.getTime())) return;
-    var dow = d.getDay();
+    var ts = t.timestamp || 0;
+    if (!Number.isFinite(ts)) return;
+    var dow = getDayInTimezone(ts, _tz);
     var dir = autoDetectDirection(t.entry, t.exit, t.sl, t.tp) || t.direction || 'long';
     var p = t.pnl || calculatePnl(t.symbol, dir, t.entry, t.exit, t.size);
     weekdayPnl[dow].trades++; weekdayPnl[dow].pnl += p; if (p > 0) weekdayPnl[dow].wins++;
   });
 
-  // === Hourly P&L breakdown ===
+  // === Hourly P&L breakdown === (v5.0: uses display timezone)
   var hourlyPnl = Array(24).fill(0).map(function() { return { trades: 0, pnl: 0 }; });
   trades.forEach(function(t) {
-    var d = new Date(t.timestamp || 0);
-    if (isNaN(d.getTime())) return;
-    var h = d.getHours();
+    var ts = t.timestamp || 0;
+    if (!Number.isFinite(ts)) return;
+    var h = getHourInTimezone(ts, _tz);
     var dir = autoDetectDirection(t.entry, t.exit, t.sl, t.tp) || t.direction || 'long';
     var p = t.pnl || calculatePnl(t.symbol, dir, t.entry, t.exit, t.size);
     hourlyPnl[h].trades++; hourlyPnl[h].pnl += p;
@@ -7245,7 +7225,7 @@ function renderMultiChart() {
     var d = document.createElement('div'); d.className = 'tradingview-widget-container__widget'; d.style.height = d.style.width = '100%';
     var s = document.createElement('script'); s.type = 'text/javascript'; s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js?v=' + Date.now(); s.async = true;
     var safeSym = String(sym).replace(/[^A-Za-z0-9.:/_-]/g, '').slice(0, 50) || defaultSymbol;
-    s.text = JSON.stringify({ allow_symbol_change:false, interval:'15', locale:'en', style:'1', symbol:safeSym, theme:currentTheme, timezone:'Asia/Tehran', backgroundColor: currentTheme==='dark'?'#0A0A0B':'#FFFFFF', autosize:true, studies:['STD;RSI'] });
+    s.text = JSON.stringify({ allow_symbol_change:false, interval:'15', locale:'en', style:'1', symbol:safeSym, theme:currentTheme, timezone:(typeof getDisplayTimezone==='function'?getDisplayTimezone():'Asia/Tehran'), backgroundColor: currentTheme==='dark'?'#0A0A0B':'#FFFFFF', autosize:true, studies:['STD;RSI'] });
     w.appendChild(d); w.appendChild(s); cell.appendChild(w); grid.appendChild(cell);
   });
   c.appendChild(grid);
