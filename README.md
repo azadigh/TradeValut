@@ -17,7 +17,7 @@
 
 Available in two editions:
 - **Cloud** (`worker.js`) — Cloudflare Worker + D1 + KV, multi-device sync
-- **Local** (`local.html`) — standalone HTML, browser localStorage, zero setup
+- **Local** (`index.html`) — standalone HTML, browser localStorage, zero setup
 
 ---
 
