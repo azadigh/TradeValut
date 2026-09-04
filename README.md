@@ -134,12 +134,12 @@ No backend, no signup, no network required. Data stays in your browser.
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages
 2. Create a new Worker
 3. Paste the contents of `worjer.js`
-4. Add environment variables (see [Deploy Guide](DEPLOY_GUIDE.md))
+4. Add environment variables (see [Deploy Guide](DEPLOY-GUIDE.md))
 5. Create D1 database and KV namespace
 6. Save and Deploy
 7. Open your Worker URL, enter your password
 
-See [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) for detailed instructions.
+See [DEPLOY_GUIDE.md](DEPLOY-GUIDE.md) for detailed instructions.
 
 ---
 
