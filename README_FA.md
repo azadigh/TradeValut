@@ -120,7 +120,7 @@
 ۱. به [داشبورد Cloudflare](https://dash.cloudflare.com) بروید → Workers & Pages
 ۲. یک Worker جدید بسازید
 ۳. محتوای `worjer.js` را در آن قرار دهید
-۴. متغیرهای محیطی را اضافه کنید (راهنمای کامل در [DEPLOY_GUIDE](DEPLOY_GUIDE.md))
+۴. متغیرهای محیطی را اضافه کنید (راهنمای کامل در [DEPLOY-GUIDE](DEPLOY-GUIDE.md))
 ۵. پایگاه داده D1 و فضای KV بسازید
 ۶. ذخیره و Deploy کنید
 ۷. آدرس Worker خود را باز کنید، رمز عبور را وارد کنید
