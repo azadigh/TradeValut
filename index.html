@@ -4295,6 +4295,7 @@ async function hideLoginScreen() {
       var parsedId = parseInt(accountParam, 10);
       if (parsedId > 0) {
         API.accountId = parsedId;
+        currentAccountId = parsedId;
         localStorage.setItem('current_account_id', String(parsedId));
       }
     } else if (!API.accountId) {
@@ -4311,12 +4312,23 @@ async function hideLoginScreen() {
     if (typeof ensureFxRates === 'function') ensureFxRates();
     initAccounts();
     const accounts = getAccounts() || [];
+    if (accountParam) {
+      if (accounts.length > 0) {
+        currentAccountId = parseInt(accountParam, 10);
+        API.setAccountId(parseInt(currentAccountId, 10) || 0);
+        localStorage.setItem('current_account_id', String(currentAccountId));
+      }
+      proceedAfterAccountLoad();
+      return;
+    }
     if (accounts.length > 1) {
       const savedId = localStorage.getItem('current_account_id');
       const savedValid = savedId && accounts.find(a => String(a.id) === String(savedId));
       if (savedValid) {
         currentAccountId = parseInt(savedId, 10);
         API.setAccountId(parseInt(currentAccountId, 10) || 0);
+        proceedAfterAccountLoad();
+        return;
       }
       showAccountPicker(accounts);
       return;
